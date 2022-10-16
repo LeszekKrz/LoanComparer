@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32922.545
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoanComparer.Api", "LoanComparer.Api\LoanComparer.Api.csproj", "{56CDF78E-864F-4490-BF75-49912737927A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{00DB61B0-540B-4CC3-8E6C-1A0880AA927C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{38FE65E6-D23A-4292-BCC9-CFB8EA809D41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoanComparer.Application", "LoanComparer.Application\LoanComparer.Application.csproj", "{33135B03-BFE7-4665-9450-9CF1D4C466A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoanComparer.Api.Tests", "LoanComparer.Api.Tests\LoanComparer.Api.Tests.csproj", "{441A6B46-BA3A-4213-A662-2EBC4DEBE15C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoanComparer.Application.Tests", "LoanComparer.Application.Tests\LoanComparer.Application.Tests.csproj", "{A4C8FA1A-1695-4A61-B38C-71C77CB010CD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{56CDF78E-864F-4490-BF75-49912737927A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56CDF78E-864F-4490-BF75-49912737927A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56CDF78E-864F-4490-BF75-49912737927A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56CDF78E-864F-4490-BF75-49912737927A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33135B03-BFE7-4665-9450-9CF1D4C466A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33135B03-BFE7-4665-9450-9CF1D4C466A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33135B03-BFE7-4665-9450-9CF1D4C466A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33135B03-BFE7-4665-9450-9CF1D4C466A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{441A6B46-BA3A-4213-A662-2EBC4DEBE15C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{441A6B46-BA3A-4213-A662-2EBC4DEBE15C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{441A6B46-BA3A-4213-A662-2EBC4DEBE15C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{441A6B46-BA3A-4213-A662-2EBC4DEBE15C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4C8FA1A-1695-4A61-B38C-71C77CB010CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4C8FA1A-1695-4A61-B38C-71C77CB010CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4C8FA1A-1695-4A61-B38C-71C77CB010CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4C8FA1A-1695-4A61-B38C-71C77CB010CD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{33135B03-BFE7-4665-9450-9CF1D4C466A0} = {00DB61B0-540B-4CC3-8E6C-1A0880AA927C}
+		{441A6B46-BA3A-4213-A662-2EBC4DEBE15C} = {38FE65E6-D23A-4292-BCC9-CFB8EA809D41}
+		{A4C8FA1A-1695-4A61-B38C-71C77CB010CD} = {38FE65E6-D23A-4292-BCC9-CFB8EA809D41}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {430F0EA3-3724-4EAC-8A25-A52598D66A97}
+	EndGlobalSection
+EndGlobal
