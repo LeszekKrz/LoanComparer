@@ -1,3 +1,9 @@
+using LoanComparer.Api.Middleware;
+using LoanComparer.Application;
+using LoanComparer.Application.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,21 +11,48 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => options.SwaggerDoc("v1", new OpenApiInfo { Title = "LoanComparer.Api", Version = "v1" }));
+
+builder.Services.AddMvc();
+// builder.Services.AddValidatorsFromAssemblyContaining<>();
+
+builder.Services.AddDbContext<LoanComparerContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
+
+builder.Services.AddTransient<JobTypeService>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy( // TODO
+        "Allow ALL",
+        builder => builder
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowAnyOrigin());
+});
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    app.UseHsts();
+}
+
+app.UseCors("Allow ALL");
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
 app.Run();
