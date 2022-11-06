@@ -1,6 +1,10 @@
+using FluentValidation;
 using LoanComparer.Api.Middleware;
 using LoanComparer.Application;
+using LoanComparer.Application.Model;
 using LoanComparer.Application.Services;
+using LoanComparer.Application.Validators;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -14,11 +18,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => options.SwaggerDoc("v1", new OpenApiInfo { Title = "LoanComparer.Api", Version = "v1" }));
 
 builder.Services.AddMvc();
-// builder.Services.AddValidatorsFromAssemblyContaining<>();
+builder.Services.AddValidatorsFromAssemblyContaining<UserForRegistrationDTOValidator>();
 
 builder.Services.AddDbContext<LoanComparerContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
 
+builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<LoanComparerContext>();
+
 builder.Services.AddTransient<JobTypeService>();
+builder.Services.AddTransient<UserService>();
 
 builder.Services.AddCors(options =>
 {

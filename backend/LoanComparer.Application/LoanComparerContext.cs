@@ -1,10 +1,11 @@
 ﻿using LoanComparer.Application.Model;
 using LoanComparer.Application.ModelEntityTypeConfiguration;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace LoanComparer.Application
 {
-    public class LoanComparerContext : DbContext
+    public class LoanComparerContext : IdentityDbContext<User>
     {
         public DbSet<JobType> JobTypes { get; private set; }
 
@@ -12,6 +13,7 @@ namespace LoanComparer.Application
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(JobTypeEntityConfiguration).Assembly);
 
             modelBuilder.Entity<JobType>().HasData( // TODO

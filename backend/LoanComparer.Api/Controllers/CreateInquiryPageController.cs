@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace LoanComparer.Api.Controllers
 {
     [ApiController]
-    [Route("create-inquiry-page")]
+    [Route("api/create-inquiry-page")]
     public class CreateInquiryPageController : ControllerBase
     {
         private readonly JobTypeService _jobTypeService;

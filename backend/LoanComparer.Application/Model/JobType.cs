@@ -2,7 +2,8 @@
 {
     public class JobType
     {
-        public string Name { get;private set; }
+        public string Name { get; private set; }
+        public virtual IReadOnlyCollection<User> Users { get; private set; }
 
         public JobType(string name)
         {
