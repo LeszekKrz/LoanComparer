@@ -1,8 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { MessageService } from 'primeng/api';
 import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
-import { JobTypeDTO } from 'src/app/global/models/job-type-dto';
-import { JobTypesHttpService } from 'src/app/global/services/job.type.http.service';
+import { JobTypeDTO } from 'src/app/core/models/job-type-dto';
+import { JobTypesHttpService } from 'src/app/core/services/job.type.http.service';
+import { GovernmentIdDTO } from './models/government-id-dto';
+import { UserForRegistrationDTO } from './models/user-for-registration-dto';
+import { RegistrationHttpService } from './services/registration.http.service';
 
 @Component({
   selector: 'app-registration',
@@ -27,7 +31,10 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   confirmPasswordInputType = "password";
   confirmPasswordEyeIcon = "pi-eye";
 
-  constructor(private formBuilder: FormBuilder, private jobTypesHttpService: JobTypesHttpService) { }
+  constructor(private formBuilder: FormBuilder,
+    private jobTypesHttpService: JobTypesHttpService,
+    private registrationHttpService: RegistrationHttpService,
+    private messageService: MessageService) { }
 
   ngOnInit(): void {
     this.registerForm = this.formBuilder.group({
@@ -102,7 +109,42 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
+      return;
+    }
 
+    const jobType: JobTypeDTO = {
+      name: this.registerForm.get('jobType')!.value['name']
+    };
+
+    const governmentId: GovernmentIdDTO = {
+      type: this.registerForm.get('governmentIdType')!.value,
+      value: this.registerForm.get('governmentIdValue')!.value
+    };
+
+    const userForRegistration: UserForRegistrationDTO = {
+      firstName: this.registerForm.get('firstName')!.value,
+      lastName: this.registerForm.get('lastName')!.value,
+      email: this.registerForm.get('email')!.value,
+      jobType: jobType,
+      incomeLevel: this.registerForm.get('incomeLevel')!.value,
+      governmentId: governmentId,
+      password: this.registerForm.get('password')!.value,
+      confirmPassword: this.registerForm.get('confirmPassword')!.value
+    };
+    console.log(userForRegistration);
+    const register$ = this.registrationHttpService.registerUser(userForRegistration).pipe(
+      tap(() => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Registration successful'
+        })
+        // here route to login page
+      })
+    );
+    this.subscriptions.push(this.doWithLoading(register$).subscribe());
   }
 
   hideShowPassword(): void {

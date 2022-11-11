@@ -15,6 +15,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         switch(errorResponse.status) {
           case 400:
             const error: ErrorResponse[] = errorResponse.error;
+            console.log(error);
             error.forEach((e: ErrorResponse) => {
               this.messageService.add({severity: 'error', summary: 'Error', detail: e.errorMessage});
             });

@@ -14,6 +14,10 @@ namespace LoanComparer.Application.Services
         }
 
         public async Task<IReadOnlyCollection<JobTypeDTO>> GetAllJobTypes(CancellationToken cancellationToken)
-            => await _context.JobTypes.Select(x => new JobTypeDTO(x.Name)).ToArrayAsync(cancellationToken);
+        {
+            Thread.Sleep(10000);
+            return await _context.JobTypes.Select(x => new JobTypeDTO(x.Name)).ToArrayAsync(cancellationToken);
+
+        }
     }
 }

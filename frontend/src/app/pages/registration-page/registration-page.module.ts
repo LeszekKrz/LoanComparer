@@ -8,7 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown'
 import { HttpClientModule } from '@angular/common/http';
 import {InputNumberModule} from 'primeng/inputnumber';
-import {PasswordModule} from 'primeng/password';
+import {ProgressSpinnerModule} from 'primeng/progressspinner';
 
 
 @NgModule({
@@ -28,7 +28,7 @@ import {PasswordModule} from 'primeng/password';
     DropdownModule,
     HttpClientModule,
     InputNumberModule,
-    PasswordModule
+    ProgressSpinnerModule
   ]
 })
 export class RegistrationPageModule { }
