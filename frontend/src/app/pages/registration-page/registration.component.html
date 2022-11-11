@@ -73,7 +73,7 @@
         [showClear]="true"
         [ngClass]="{
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('jobType')
-        }"> <!--validation doesnt display correctly-->
+        }">
       </p-dropdown>
       <small class="p-error" *ngIf="isInputInvalidAndTouchedOrDirty('jobType')">
         This field is required
@@ -115,7 +115,7 @@
         [showClear]="true"
         [ngClass]="{
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('governmentIdType')
-        }"> <!--validation doesnt display correctly-->
+        }">
       </p-dropdown>
       <small class="p-error" *ngIf="isInputInvalidAndTouchedOrDirty('governmentIdType')">
         This field is required
@@ -131,15 +131,15 @@
         formControlName="governmentIdValue"
         pInputText
         [ngClass]="{
-          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('governmentIdValue')
+          'ng-invalid ng-dirty': isGovernmentIdValueInvalidAndTouchedOrDirty()
         }"
-        placeholder="{{ this.getSelectedGovernmentIdType() }}" />
+        placeholder="{{ this.getSelectedGovernmentIdType() }}" /> <!--ngClass same as confirm password issue-->
         <small class="p-error" *ngIf="isInputTouchedOrDirtyAndEmpty('governmentIdValue'); else invalidEmailFormatMessage">
           This field is required
         </small>
         <ng-template #invalidEmailFormatMessage>
-          <small class="p-error" *ngIf="isEmailInputTouchedOrDirtyAndNotValidEmail()">
-            Please enter valid government id value
+          <small class="p-error" *ngIf="isGovernmentIdValueInvalidButNotEmptyAndTouchedOrDirty()">
+            Please enter valid {{ this.getSelectedGovernmentIdType() }}
           </small>
         </ng-template>
     </div>
@@ -150,14 +150,14 @@
       <span class="p-input-icon-right">
         <i class="pi {{ this.passwordEyeIcon }}" (click)="hideShowPassword()"></i>
         <input
-        pInputText
-        [type]="passwordInputType"
-        id="password-input"
-        formControlName="password"
-        [ngClass]="{
-          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('password')
-        }"
-        placeholder="Password"/>
+          pInputText
+          [type]="passwordInputType"
+          id="password-input"
+          formControlName="password"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('password')
+          }"
+          placeholder="Password"/>
       </span>
       <small class="p-error" *ngIf="isInputTouchedOrDirtyAndEmpty('password'); else passwordToShortMessage">
         This field is required
@@ -188,6 +188,31 @@
       <ng-template #passwordDoesntContainASpecialCharacterMessage>
         <small class="p-error" *ngIf="isPasswordInputTouchedOrDirtyAndDoesntContainSpecialCharacter()">
           Password should have at least 1 special character
+        </small>
+      </ng-template>
+    </div>
+    <div class="p-field">
+      <label for="confirmPassword-input" class="field-label">
+        <p class="required">Confirm Password</p>
+      </label>
+      <span class="p-input-icon-right">
+        <i class="pi {{ this.confirmPasswordEyeIcon }}" (click)="hideShowConfirmPassword()"></i>
+        <input
+          pInputText
+          [type]="confirmPasswordInputType"
+          id="confirmPassword-input"
+          formControlName="confirmPassword"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isConfirmPasswordInputInvalidAndTouchedOrDirty()
+          }"
+          placeholder="Password"/> <!--ngClass only works once passwords were the same-->
+      </span>
+      <small class="p-error" *ngIf="isInputTouchedOrDirtyAndEmpty('confirmPassword'); else passwordsNotMatchingMessage">
+        This field is required
+      </small>
+      <ng-template #passwordsNotMatchingMessage>
+        <small class="p-error" *ngIf="arePasswordAndConfirmPasswordTouchedOrDirtyAndNotMatching()">
+          Password and confirm password fields are not matching
         </small>
       </ng-template>
     </div>

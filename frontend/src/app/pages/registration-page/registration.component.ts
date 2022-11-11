@@ -24,29 +24,31 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   passwordMinLength = 6;
   passwordInputType = "password";
   passwordEyeIcon = "pi-eye";
+  confirmPasswordInputType = "password";
+  confirmPasswordEyeIcon = "pi-eye";
 
   constructor(private formBuilder: FormBuilder, private jobTypesHttpService: JobTypesHttpService) { }
 
   ngOnInit(): void {
-    this.registerForm = this.formBuilder.group({ // depricated change it
+    this.registerForm = this.formBuilder.group({
       firstName: new FormControl('', Validators.required),
       lastName: new FormControl('', Validators.required),
       email: new FormControl('', [Validators.required, Validators.email]),
       jobType: new FormControl('', Validators.required),
       incomeLevel: new FormControl(null, [Validators.required, Validators.min(1)]),
       governmentIdType: new FormControl(null, Validators.required),
-      governmentIdValue: new FormControl('', Validators.required), // check if valid, the eye in password doesnt display correctly
-      password: new FormControl('', Validators.compose([
+      governmentIdValue: new FormControl('', Validators.required), // check if valid
+      password: new FormControl('', [
         Validators.required,
         Validators.minLength(this.passwordMinLength),
         Validators.pattern(this.containsLowerCaseLetterRegex),
         Validators.pattern(this.constainsUpperCaseLetterRegex),
         Validators.pattern(this.containsNumberRegex),
         Validators.pattern(this.constainsSpecialCharacterRegex)
-      ])),
+      ]),
       confirmPassword: new FormControl('', [Validators.required])
     }, {
-      Validators: [
+      validators: [
         this.passwordsNotMatching,
         this.governmentIdValueIsValid
       ]
@@ -63,7 +65,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   private passwordsNotMatching: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
     return group.get('password')!.value === group.get('confirmPassword')!.value
       ? null
-      : {passwordAreNotTheSame: true};
+      : {passwordsNotMatching: true};
   }
 
   private governmentIdValueIsValid: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
@@ -114,6 +116,17 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     }
   }
 
+  hideShowConfirmPassword(): void {
+    if (this.confirmPasswordInputType == "password") {
+      this.confirmPasswordInputType = "text";
+      this.confirmPasswordEyeIcon = "pi-eye-slash";
+    }
+    else {
+      this.confirmPasswordInputType = "password";
+      this.confirmPasswordEyeIcon = "pi-eye";
+    }
+  }
+
   isInputInvalidAndTouchedOrDirty(inputName: string): boolean {
     const control = this.registerForm.get(inputName)!;
     return this.isInputTouchedOrDirty(control) && control.invalid;
@@ -132,6 +145,16 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   isIncomeLevelInputTouchedOrDirtyAndNotValidValue(): boolean {
     const control = this.registerForm.get('incomeLevel')!;
     return this.isInputTouchedOrDirty(control) && control.hasError('min');
+  }
+
+  isGovernmentIdValueInvalidAndTouchedOrDirty(): boolean {
+    const control = this.registerForm.get('governmentIdValue')!;
+    return this.isInputTouchedOrDirty(control) && (control.invalid || this.registerForm.hasError('invalidGovernmentIdValue'));
+  }
+
+  isGovernmentIdValueInvalidButNotEmptyAndTouchedOrDirty(): boolean {
+    const control = this.registerForm.get('governmentIdValue')!;
+    return this.isInputTouchedOrDirty(control) && this.registerForm.hasError('invalidGovernmentIdValue');
   }
 
   isPasswordInputTouchedOrDirtyAndTooShort(): boolean {
@@ -165,6 +188,20 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     return this.isInputTouchedOrDirty(control)
       && control.hasError('pattern')
       && control.errors!['pattern'].requiredPattern === this.constainsSpecialCharacterRegex.toString();
+  }
+
+  isConfirmPasswordInputInvalidAndTouchedOrDirty(): boolean {
+    const control = this.registerForm.get('confirmPassword')!;
+    return this.isInputTouchedOrDirty(control) && (control.invalid || this.registerForm.hasError('passwordsNotMatching'));
+  }
+
+  arePasswordAndConfirmPasswordTouchedOrDirtyAndNotMatching(): boolean {
+    const passwordControl = this.registerForm.get('password')!;
+    const confirmPasswordControl = this.registerForm.get('confirmPassword')!;
+
+    return this.isInputTouchedOrDirty(passwordControl)
+      && this.isInputTouchedOrDirty(confirmPasswordControl)
+      && this.registerForm.hasError('passwordsNotMatching');
   }
 
   private isInputTouchedOrDirty(control: AbstractControl): boolean {
