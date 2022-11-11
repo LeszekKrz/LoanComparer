@@ -22,6 +22,8 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   containsNumberRegex: RegExp = /\d/;
   constainsSpecialCharacterRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
   passwordMinLength = 6;
+  passwordInputType = "password";
+  passwordEyeIcon = "pi-eye";
 
   constructor(private formBuilder: FormBuilder, private jobTypesHttpService: JobTypesHttpService) { }
 
@@ -101,6 +103,17 @@ export class RegistrationComponent implements OnInit, OnDestroy {
 
   }
 
+  hideShowPassword(): void {
+    if (this.passwordInputType == "password") {
+      this.passwordInputType = "text";
+      this.passwordEyeIcon = "pi-eye-slash";
+    }
+    else {
+      this.passwordInputType = "password";
+      this.passwordEyeIcon = "pi-eye";
+    }
+  }
+
   isInputInvalidAndTouchedOrDirty(inputName: string): boolean {
     const control = this.registerForm.get(inputName)!;
     return this.isInputTouchedOrDirty(control) && control.invalid;
@@ -123,16 +136,11 @@ export class RegistrationComponent implements OnInit, OnDestroy {
 
   isPasswordInputTouchedOrDirtyAndTooShort(): boolean {
     const control = this.registerForm.get('password')!;
-    console.log('Control dirty or touched: ', this.isInputTouchedOrDirty(control));
-    console.log('Password too short: ', control.hasError('minLength'));
-    return this.isInputTouchedOrDirty(control) && control.hasError('minLength');
+    return this.isInputTouchedOrDirty(control) && control.hasError('minlength');
   }
 
   isPasswordInputTouchedOrDirtyAndDoesntContainLowerCaseLetter(): boolean {
     const control = this.registerForm.get('password')!;
-    // console.log('No lower case letter: ', this.isInputTouchedOrDirty(control)
-    // && control.hasError('pattern')
-    // && control.errors!['pattern'].requiredPattern === this.containsLowerCaseLetterRegex.toString());
     return this.isInputTouchedOrDirty(control)
       && control.hasError('pattern')
       && control.errors!['pattern'].requiredPattern === this.containsLowerCaseLetterRegex.toString();
@@ -140,9 +148,6 @@ export class RegistrationComponent implements OnInit, OnDestroy {
 
   isPasswordInputTouchedOrDirtyAndDoesntContainUpperCaseLetter(): boolean {
     const control = this.registerForm.get('password')!;
-    // console.log('No upper case letter: ', this.isInputTouchedOrDirty(control)
-    // && control.hasError('pattern')
-    // && control.errors!['pattern'].requiredPattern === this.constainsUpperCaseLetterRegex.toString());
     return this.isInputTouchedOrDirty(control)
       && control.hasError('pattern')
       && control.errors!['pattern'].requiredPattern === this.constainsUpperCaseLetterRegex.toString();
@@ -150,9 +155,6 @@ export class RegistrationComponent implements OnInit, OnDestroy {
 
   isPasswordInputTouchedOrDirtyAndDoesntContainNumber(): boolean {
     const control = this.registerForm.get('password')!;
-    // console.log('No number: ', this.isInputTouchedOrDirty(control)
-    // && control.hasError('pattern')
-    // && control.errors!['pattern'].requiredPattern === this.containsNumberRegex.toString());
     return this.isInputTouchedOrDirty(control)
       && control.hasError('pattern')
       && control.errors!['pattern'].requiredPattern === this.containsNumberRegex.toString();
@@ -160,9 +162,6 @@ export class RegistrationComponent implements OnInit, OnDestroy {
 
   isPasswordInputTouchedOrDirtyAndDoesntContainSpecialCharacter(): boolean {
     const control = this.registerForm.get('password')!;
-    // console.log('No special character: ', this.isInputTouchedOrDirty(control)
-    // && control.hasError('pattern')
-    // && control.errors!['pattern'].requiredPattern === this.constainsSpecialCharacterRegex.toString());
     return this.isInputTouchedOrDirty(control)
       && control.hasError('pattern')
       && control.errors!['pattern'].requiredPattern === this.constainsSpecialCharacterRegex.toString();
