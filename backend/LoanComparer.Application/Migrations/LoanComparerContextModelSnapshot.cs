@@ -22,6 +22,28 @@ namespace LoanComparer.Application.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("LoanComparer.Application.Model.GovernmentId", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)")
+                        .HasColumnName("GovernmentIdType");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)")
+                        .HasColumnName("GovernmentIdValue");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
             modelBuilder.Entity("LoanComparer.Application.Model.Inquiry", b =>
                 {
                     b.Property<int>("Id")
@@ -116,14 +138,6 @@ namespace LoanComparer.Application.Migrations
                     b.Property<string>("FirstName")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("GovernmentIdType")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<string>("GovernmentIdValue")
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
 
                     b.Property<int?>("IncomeLevel")
                         .HasColumnType("int");
@@ -316,6 +330,17 @@ namespace LoanComparer.Application.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("LoanComparer.Application.Model.GovernmentId", b =>
+                {
+                    b.HasOne("LoanComparer.Application.Model.User", "User")
+                        .WithOne("GovernmentId")
+                        .HasForeignKey("LoanComparer.Application.Model.GovernmentId", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LoanComparer.Application.Model.Inquiry", b =>
                 {
                     b.HasOne("LoanComparer.Application.Model.JobType", "JobType")
@@ -390,6 +415,12 @@ namespace LoanComparer.Application.Migrations
             modelBuilder.Entity("LoanComparer.Application.Model.JobType", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("LoanComparer.Application.Model.User", b =>
+                {
+                    b.Navigation("GovernmentId")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

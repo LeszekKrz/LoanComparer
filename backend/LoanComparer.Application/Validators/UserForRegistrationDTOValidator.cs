@@ -13,7 +13,12 @@ namespace LoanComparer.Application.Validators
 
             RuleFor(x => x.LastName).NotNull().Length(1, LoanComparerConstants.MaxLastNameLength);
 
-            RuleFor(x => x.Email).NotNull().Length(1, LoanComparerConstants.MaxEmailLength).EmailAddress();
+            RuleFor(x => x.Email)
+                .NotNull()
+                .Length(1, LoanComparerConstants.MaxEmailLength)
+                .EmailAddress()
+                .MustAsync(async (email, cancellationToken) => !await context.Users.AnyAsync(user => user.Email == email))
+                .WithMessage(x => $"User with email {x.Email} already exists");
 
             RuleFor(x => x.JobType)
                 .MustAsync(async (jobType, cancellationToken) => await context.JobTypes.AnyAsync(jt => jt.Name == jobType.Name, cancellationToken))
@@ -21,25 +26,30 @@ namespace LoanComparer.Application.Validators
 
             RuleFor(x => x.IncomeLevel).NotNull().GreaterThan(0);
 
-            RuleFor(x => x.GovernmentIdType).NotNull().NotEmpty()
+            RuleFor(x => x.GovernmentId.Type).NotNull().NotEmpty()
                 .Must(governmentIdType => LoanComparerConstants.GovernmentIdTypes.Contains(governmentIdType))
                 .WithMessage("Invalid government id type");
 
-            RuleFor(x => x.GovernmentIdValue).NotNull().NotEmpty();
+            RuleFor(x => x.GovernmentId.Value)
+                .NotNull()
+                .NotEmpty()
+                .MustAsync(async (governmentIdValue, cancellationToken) 
+                    => !await context.Users.AnyAsync(user => user.GovernmentId.Value == governmentIdValue))
+                .WithMessage(x => $"User with specified government id already exists");
 
-            When(x => x.GovernmentIdType == "PESEL", () =>
+            When(x => x.GovernmentId.Type == "PESEL", () =>
             {
-                RuleFor(x => x.GovernmentIdValue).Length(LoanComparerConstants.PeselLength).Matches(@"^\d{11}$"); // 11 jako argument jak?
+                RuleFor(x => x.GovernmentId.Value).Length(LoanComparerConstants.PeselLength).Matches(@"^\d{11}$"); // 11 jako argument jak?
             }); // jest jeszcze bardziej skomplikowana logika na pesel jakies tam dodawanie tych liczb ale to moze sie pozniej doda
 
-            When(x => x.GovernmentIdType == "ID Number", () =>
+            When(x => x.GovernmentId.Type == "ID Number", () =>
             {
-                RuleFor(x => x.GovernmentIdValue).Length(LoanComparerConstants.IDNumberLength).Matches(@"^[a-zA-Z]{3}\d{6}$");
+                RuleFor(x => x.GovernmentId.Value).Length(LoanComparerConstants.IDNumberLength).Matches(@"^[a-zA-Z]{3}\d{6}$");
             }); // tez tu jest jakas zwalona logika
 
-            When(x => x.GovernmentIdType == "Passport Number", () =>
+            When(x => x.GovernmentId.Type == "Passport Number", () =>
             {
-                RuleFor(x => x.GovernmentIdValue).Length(LoanComparerConstants.PassportNumberLength).Matches(@"^[a-zA-Z]{2}\d{7}$");
+                RuleFor(x => x.GovernmentId.Value).Length(LoanComparerConstants.PassportNumberLength).Matches(@"^[a-zA-Z]{2}\d{7}$");
             }); // a tu to nawet nie wiem bo nie ma za duzo o tym
 
             RuleFor(x => x.Password).Equal(x => x.ConfirmPassword);

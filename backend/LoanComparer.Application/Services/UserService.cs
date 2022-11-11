@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using LoanComparer.Application.DTO;
 using LoanComparer.Application.DTO.UserDTO;
 using LoanComparer.Application.Model;
 using Microsoft.AspNetCore.Identity;
@@ -27,7 +28,7 @@ namespace LoanComparer.Application.Services
         }
 
         [HttpPost("registatrion")]
-        public async Task<RegistrationResponseDTO> RegisterUser(UserForRegistrationDTO userForRegistration, CancellationToken cancellationToken)
+        public async Task<IEnumerable<ErrorResponseDTO>?> RegisterUser(UserForRegistrationDTO userForRegistration, CancellationToken cancellationToken)
         {
             await _userForRegistrationValidator.ValidateAndThrowAsync(userForRegistration, cancellationToken);
 
@@ -37,17 +38,11 @@ namespace LoanComparer.Application.Services
                 userForRegistration.Email,
                 await _context.JobTypes.SingleAsync(jobType => jobType.Name == userForRegistration.JobType.Name, cancellationToken),
                 userForRegistration.IncomeLevel,
-                userForRegistration.GovernmentIdType,
-                userForRegistration.GovernmentIdValue);
+                new GovernmentId(userForRegistration.GovernmentId));
 
             IdentityResult result = await _userManager.CreateAsync(newUser, userForRegistration.Password);
 
-            IEnumerable<string>? errors = null;
-
-            if (!result.Succeeded)
-                errors = result.Errors.Select(e => e.Description);
-
-            return new RegistrationResponseDTO(errors);
+            return result.Succeeded ? null : result.Errors.Select(e => new ErrorResponseDTO(e.Description));
         }
     }
 }

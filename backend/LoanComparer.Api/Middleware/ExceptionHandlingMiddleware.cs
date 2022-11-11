@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using LoanComparer.Application.DTO;
 
 namespace LoanComparer.Api.Middleware
 {
@@ -32,7 +33,7 @@ namespace LoanComparer.Api.Middleware
         private async Task HandleValidationExceptionAsync(HttpContext httpContext, ValidationException validationException)
         {
             httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-            var mappedErrors = validationException.Errors.Select(error => new ValidationErrorResponse(error.PropertyName, error.ErrorCode, error.ErrorMessage));
+            var mappedErrors = validationException.Errors.Select(error => new ErrorResponseDTO(error.ErrorMessage));
             await httpContext.Response.WriteAsJsonAsync(mappedErrors);
             return;
         }

@@ -5,6 +5,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { ToastModule } from 'primeng/toast'
 import { AppComponent } from './app.component';
 import { CreateInquiryPageModule } from './pages/create-inquiry-page/create-inquiry-page.module';
+import { CoreModule } from './core/core.module';
+import { RegistrationPageModule } from './pages/registration-page/registration-page.module';
+import { MessageService } from 'primeng/api';
 
 @NgModule({
   declarations: [
@@ -16,8 +19,10 @@ import { CreateInquiryPageModule } from './pages/create-inquiry-page/create-inqu
     ToastModule,
     CreateInquiryPageModule,
     BrowserAnimationsModule,
+    CoreModule,
+    RegistrationPageModule
   ],
-  providers: [],
+  providers: [MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
