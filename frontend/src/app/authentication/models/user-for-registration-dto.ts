@@ -1,4 +1,4 @@
-import { JobTypeDTO } from '../../../core/models/job-type-dto';
+import { JobTypeDTO } from '../../core/models/job-type-dto';
 import { GovernmentIdDTO } from './government-id-dto';
 
 export interface UserForRegistrationDTO {

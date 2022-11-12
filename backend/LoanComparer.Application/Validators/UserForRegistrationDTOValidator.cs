@@ -1,13 +1,15 @@
 ﻿using FluentValidation;
 using LoanComparer.Application.Constants;
 using LoanComparer.Application.DTO.UserDTO;
+using LoanComparer.Application.Model;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace LoanComparer.Application.Validators
 {
     public class UserForRegistrationDTOValidator : AbstractValidator<UserForRegistrationDTO>
     {
-        public UserForRegistrationDTOValidator(LoanComparerContext context)
+        public UserForRegistrationDTOValidator(LoanComparerContext context, UserManager<User> userManager)
         {
             RuleFor(x => x.FirstName).NotNull().Length(1, LoanComparerConstants.MaxFirstNameLength);
 
@@ -17,7 +19,7 @@ namespace LoanComparer.Application.Validators
                 .NotNull()
                 .Length(1, LoanComparerConstants.MaxEmailLength)
                 .EmailAddress()
-                .MustAsync(async (email, cancellationToken) => !await context.Users.AnyAsync(user => user.Email == email))
+                .MustAsync(async (email, cancellationToken) => await userManager.FindByEmailAsync(email) == null)
                 .WithMessage(x => $"User with email {x.Email} already exists");
 
             RuleFor(x => x.JobType)

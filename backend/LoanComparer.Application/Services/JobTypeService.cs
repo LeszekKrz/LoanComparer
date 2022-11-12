@@ -1,6 +1,5 @@
 ﻿using LoanComparer.Application.DTO;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Immutable;
 
 namespace LoanComparer.Application.Services
 {

@@ -1,12 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { JobTypeDTO } from 'src/app/core/models/job-type-dto';
 import { JobTypesHttpService } from 'src/app/core/services/job.type.http.service';
-import { GovernmentIdDTO } from './models/government-id-dto';
-import { UserForRegistrationDTO } from './models/user-for-registration-dto';
-import { RegistrationHttpService } from './services/registration.http.service';
+import { GovernmentIdDTO } from '../../authentication/models/government-id-dto';
+import { UserForRegistrationDTO } from '../../authentication/models/user-for-registration-dto';
+import { AuthenticationHttpService } from 'src/app/authentication/services/authentication.http.service';
 
 @Component({
   selector: 'app-registration',
@@ -25,7 +26,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   constainsUpperCaseLetterRegex = /[A-Z]/;
   containsNumberRegex: RegExp = /\d/;
   constainsSpecialCharacterRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
-  passwordMinLength = 6;
+  passwordMinLength = 8;
   passwordInputType = "password";
   passwordEyeIcon = "pi-eye";
   confirmPasswordInputType = "password";
@@ -33,8 +34,9 @@ export class RegistrationComponent implements OnInit, OnDestroy {
 
   constructor(private formBuilder: FormBuilder,
     private jobTypesHttpService: JobTypesHttpService,
-    private registrationHttpService: RegistrationHttpService,
-    private messageService: MessageService) { }
+    private authenticationHttpService: AuthenticationHttpService,
+    private messageService: MessageService,
+    private router: Router) { }
 
   ngOnInit(): void {
     this.registerForm = this.formBuilder.group({
@@ -44,7 +46,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
       jobType: new FormControl('', Validators.required),
       incomeLevel: new FormControl(null, [Validators.required, Validators.min(1)]),
       governmentIdType: new FormControl(null, Validators.required),
-      governmentIdValue: new FormControl('', Validators.required), // check if valid
+      governmentIdValue: new FormControl('', Validators.required),
       password: new FormControl('', [
         Validators.required,
         Validators.minLength(this.passwordMinLength),
@@ -133,18 +135,21 @@ export class RegistrationComponent implements OnInit, OnDestroy {
       password: this.registerForm.get('password')!.value,
       confirmPassword: this.registerForm.get('confirmPassword')!.value
     };
-    console.log(userForRegistration);
-    const register$ = this.registrationHttpService.registerUser(userForRegistration).pipe(
+
+    const register$ = this.authenticationHttpService.registerUser(userForRegistration).pipe(
       tap(() => {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
           detail: 'Registration successful'
         })
-        // here route to login page
       })
     );
-    this.subscriptions.push(this.doWithLoading(register$).subscribe());
+    this.subscriptions.push(this.doWithLoading(register$).subscribe({
+      complete: () => {
+        this.router.navigate(["login"]);
+      }
+    }));
   }
 
   hideShowPassword(): void {

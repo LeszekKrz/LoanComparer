@@ -1,34 +1,29 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RegistrationComponent } from './registration.component';
+import { LoginComponent } from './login.component';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
-import { DropdownModule } from 'primeng/dropdown'
 import { HttpClientModule } from '@angular/common/http';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ButtonModule } from 'primeng/button';
+
 
 
 @NgModule({
   declarations: [
-    RegistrationComponent
+    LoginComponent
   ],
-  exports: [
-    RegistrationComponent
-  ],
+  exports: [LoginComponent],
   imports: [
     CommonModule,
+    ProgressSpinnerModule,
     CardModule,
-    ButtonModule,
     FormsModule,
     ReactiveFormsModule,
     InputTextModule,
-    DropdownModule,
     HttpClientModule,
-    InputNumberModule,
-    ProgressSpinnerModule
+    ButtonModule
   ]
 })
-export class RegistrationPageModule { }
+export class LoginPageModule { }
