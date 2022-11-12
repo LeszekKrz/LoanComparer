@@ -1,1 +1,39 @@
-<p>menu works!</p>
+<p-menubar>
+  <div class="flex justify-content-start">
+    <div class="flex align-content-center">
+      <img alt="brand logo"
+        height="40"
+        src="https://wompampsupport.azureedge.net/fetchimage?siteId=7575&v=2&jpgQuality=100&width=700&url=https%3A%2F%2Fi.kym-cdn.com%2Fphotos%2Fimages%2Fnewsfeed%2F002%2F297%2F368%2F17f.jpg"
+        class="flex align-content-center"
+        (click)="BrandLogoOnClick()"/>
+    </div>
+    <div *ngIf="!this.isUserAuthenticated; else userNotAuthenticated">
+      <button
+        pButton
+        pRipple
+        type="login"
+        label="Login"
+        class="p-button-secondary p-button-text"
+        (click)="loginButtonOnClick()">
+      </button>
+      <button
+        pButton
+        pRipple
+        type="register"
+        label="Register"
+        class="p-button-secondary p-button-text"
+        (click)="registerButtonOnClick()">
+      </button>
+    </div>
+    <ng-template #userNotAuthenticated>
+      <button
+        pButton
+        pRipple
+        type="logout"
+        label="Logout"
+        class="p-button-secondary p-button-text"
+        (click)="logoutButtonOnClick()">
+      </button>
+    </ng-template>
+  </div>
+</p-menubar>

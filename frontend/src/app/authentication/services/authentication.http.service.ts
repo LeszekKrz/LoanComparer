@@ -11,7 +11,7 @@ import { UserForRegistrationDTO } from "../models/user-for-registration-dto";
 })
 export class AuthenticationHttpService {
   private authenticationStateChangeSubject = new Subject<boolean>();
-  private authenticationStateChanged = this.authenticationStateChangeSubject.asObservable();
+  public authenticationStateChanged = this.authenticationStateChangeSubject.asObservable();
   private readonly registrationPageUrl: string = `${environment.webApiUrl}/registration-page`;
   private readonly loginPageUrl: string = `${environment.webApiUrl}/login-page`;
 
@@ -29,4 +29,8 @@ export class AuthenticationHttpService {
     return this.httpClient.post<AuthenticationResponseDTO>(`${this.loginPageUrl}/login`, userForAuthentication);
   }
 
+  logout() {
+    localStorage.removeItem('token');
+    this.sendAuthenticationStateChangedNotification(false);
+  }
 }
