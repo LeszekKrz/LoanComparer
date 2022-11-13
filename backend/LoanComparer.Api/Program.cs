@@ -1,6 +1,7 @@
 using FluentValidation;
 using LoanComparer.Api.Middleware;
 using LoanComparer.Application;
+using LoanComparer.Application.Configuration;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services;
 using LoanComparer.Application.Services.JwtFeatures;
@@ -10,6 +11,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SendGrid.Extensions.DependencyInjection;
+using System.Diagnostics;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,7 +34,11 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequiredLength = 8;
     // options.Stores.ProtectPersonalData = true; maybe thats a good idea check it later
     options.User.RequireUniqueEmail = true;
-}).AddEntityFrameworkStores<LoanComparerContext>();
+}).AddEntityFrameworkStores<LoanComparerContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+    options.TokenLifespan = TimeSpan.FromHours(2));
 
 var jwtSettings = builder.Configuration.GetSection("JWTSettings");
 builder.Services.AddAuthentication(options =>
@@ -57,6 +64,7 @@ builder.Services.AddScoped<JwtHandler>();
 
 builder.Services.AddTransient<JobTypeService>();
 builder.Services.AddTransient<UserService>();
+builder.Services.AddTransient<EmailService>();
 
 builder.Services.AddCors(options =>
 {
@@ -67,6 +75,12 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowAnyOrigin());
 });
+
+Debug.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAA" + Environment.GetEnvironmentVariable("SENDGRID_API_KEY"));
+builder.Services.AddOptions<FromEmailConfiguration>()
+    .Bind(builder.Configuration.GetSection("FromEmail"))
+    .ValidateDataAnnotations();
+builder.Services.AddSendGrid(options => options.ApiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY"));
 
 var app = builder.Build();
 

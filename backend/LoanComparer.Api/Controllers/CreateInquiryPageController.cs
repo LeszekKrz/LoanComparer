@@ -16,7 +16,7 @@ namespace LoanComparer.Api.Controllers
         }
 
         [HttpGet("job-types")]
-        public async Task<IReadOnlyCollection<JobTypeDTO>> GetAllJobTypes(CancellationToken cancellationToken)
-            => await _jobTypeService.GetAllJobTypes(cancellationToken);
+        public async Task<IReadOnlyCollection<JobTypeDTO>> GetAllJobTypesAsync(CancellationToken cancellationToken)
+            => await _jobTypeService.GetAllJobTypesAsync(cancellationToken); // TODO:
     }
 }

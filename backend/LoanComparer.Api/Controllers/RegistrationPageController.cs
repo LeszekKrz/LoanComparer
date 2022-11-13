@@ -19,9 +19,9 @@ namespace LoanComparer.Api.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDTO userForRegistration, CancellationToken cancellationToken)
+        public async Task<IActionResult> RegisterUserAsync([FromBody] UserForRegistrationDTO userForRegistration, CancellationToken cancellationToken)
         {
-            IEnumerable<ErrorResponseDTO>? registrationResponse = await _userService.RegisterUser(userForRegistration, cancellationToken);
+            IEnumerable<ErrorResponseDTO>? registrationResponse = await _userService.RegisterUserAsync(userForRegistration, cancellationToken);
 
             return registrationResponse == null
                 ? StatusCode((int)HttpStatusCode.Created)

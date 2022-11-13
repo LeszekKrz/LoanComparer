@@ -4,13 +4,13 @@ using LoanComparer.Application.DTO.UserDTO;
 
 namespace LoanComparer.Application.Validators
 {
-    public class UserForAuthenticationDTOValidator : AbstractValidator<UserForAuthenticationDTO>
+    public class ForgotPasswordDTOValidator : AbstractValidator<ForgotPasswordDTO>
     {
-        public UserForAuthenticationDTOValidator()
+        public ForgotPasswordDTOValidator()
         {
             RuleFor(x => x.Email).NotNull().Length(1, LoanComparerConstants.MaxEmailLength);
 
-            RuleFor(x => x.Password).NotNull().NotEmpty();
+            RuleFor(x => x.ClientURI).NotNull().NotEmpty();
         }
     }
 }

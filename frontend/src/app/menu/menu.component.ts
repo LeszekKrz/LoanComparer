@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MenuItem } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { AuthenticationService } from '../authentication/services/authentication.service';
 
