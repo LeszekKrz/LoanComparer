@@ -7,6 +7,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { HttpClientModule } from '@angular/common/http';
 import { ButtonModule } from 'primeng/button';
+import { RouterModule } from '@angular/router';
 
 
 
@@ -23,7 +24,8 @@ import { ButtonModule } from 'primeng/button';
     ReactiveFormsModule,
     InputTextModule,
     HttpClientModule,
-    ButtonModule
+    ButtonModule,
+    RouterModule
   ]
 })
 export class LoginPageModule { }

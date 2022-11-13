@@ -2,45 +2,26 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { Subscription } from 'rxjs';
-import { AuthenticationHttpService } from '../authentication/services/authentication.http.service';
+import { AuthenticationService } from '../authentication/services/authentication.service';
 
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.scss']
 })
-export class MenuComponent implements OnInit, OnDestroy {
+export class MenuComponent implements OnDestroy {
   isUserAuthenticated!: boolean;
   subscriptions: Subscription[] = [];
 
-  loginItem: MenuItem = {
-    label: 'Login',
-    routerLink: ['login'],
-    visible: !this.isUserAuthenticated
-  };
-
-  registerItem: MenuItem = {
-    label: 'Register',
-    routerLink: ['register'],
-    visible: !this.isUserAuthenticated
-  };
-
-  logoutItem: MenuItem = {
-    label: 'Logout',
-    command: () => console.log('logout'),
-    visible: this.isUserAuthenticated
-  }
-
-  menuItems: MenuItem[] = [
-    this.loginItem,
-    this.registerItem,
-    this.logoutItem
-  ]
-
-  constructor(private router: Router, private authenticationHttpService: AuthenticationHttpService) { }
+  constructor(private router: Router, private authenticationHttpService: AuthenticationService) {
+    this.subscriptions.push(
+      this.authenticationHttpService.authenticationStateChanged.subscribe(isAuthenticated => {
+        this.isUserAuthenticated = isAuthenticated;
+    }));
+   }
 
   BrandLogoOnClick(): void {
-    console.log('route to home page'); // route to home page
+    this.router.navigate(['home']);
   }
 
   loginButtonOnClick(): void {
@@ -53,13 +34,6 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   logoutButtonOnClick(): void {
     this.authenticationHttpService.logout();
-  }
-
-  ngOnInit(): void {
-    this.subscriptions.push(
-      this.authenticationHttpService.authenticationStateChanged.subscribe(isAuthenticated => {
-        this.isUserAuthenticated = isAuthenticated;
-    }));
   }
 
   ngOnDestroy(): void {

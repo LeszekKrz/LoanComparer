@@ -1,10 +1,9 @@
-<p-menubar>
-  <div class="flex justify-content-start">
+<p-card styleClass="p-card-style shadow-7">
+  <div class="flex justify-content-between flex-wrap">
     <div class="flex align-content-center">
       <img alt="brand logo"
-        height="40"
+        height="45"
         src="https://wompampsupport.azureedge.net/fetchimage?siteId=7575&v=2&jpgQuality=100&width=700&url=https%3A%2F%2Fi.kym-cdn.com%2Fphotos%2Fimages%2Fnewsfeed%2F002%2F297%2F368%2F17f.jpg"
-        class="flex align-content-center"
         (click)="BrandLogoOnClick()"/>
     </div>
     <div *ngIf="!this.isUserAuthenticated; else userNotAuthenticated">
@@ -36,4 +35,4 @@
       </button>
     </ng-template>
   </div>
-</p-menubar>
+</p-card>

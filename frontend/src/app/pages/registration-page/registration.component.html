@@ -4,7 +4,7 @@
 
 <p-card
   header="Register"
-  styleClass="pCardStyle shadow-2">
+  styleClass="p-card-style shadow-7">
   <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
     <div class="p-field">
       <label for="firstName-input" class="field-label">
@@ -15,6 +15,7 @@
         type="text"
         formControlName="firstName"
         pInputText
+        class="input-field"
         [ngClass]="{
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('firstName')
         }"
@@ -32,6 +33,7 @@
         type="text"
         formControlName="lastName"
         pInputText
+        class="input-field"
         [ngClass]="{
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('lastName')
         }"
@@ -49,6 +51,7 @@
         type="text"
         formControlName="email"
         pInputText
+        class="input-field"
         [ngClass]="{
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('email')
         }"
@@ -66,6 +69,7 @@
       <label for="jobType-dropdown" class="field-label">
         <p class="required">Job Type</p>
       </label>
+      <div class="width: 100%">
       <p-dropdown
         id="jobType-dropdown"
         formControlName="jobType"
@@ -75,10 +79,12 @@
         [filter]="true"
         filterBy="name"
         [showClear]="true"
+        styleClass="p-dropdown-style"
         [ngClass]="{
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('jobType')
         }">
       </p-dropdown>
+      </div>
       <small class="p-error" *ngIf="isInputInvalidAndTouchedOrDirty('jobType')">
         This field is required
       </small>
@@ -92,6 +98,7 @@
         type="number"
         formControlName="incomeLevel"
         [min]="1"
+        styleClass="p-inputNumber-style"
         [ngClass]="{
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('incomeLevel')
         }"
@@ -117,6 +124,7 @@
         [options]="governmentIdTypes"
         placeholder="Select government id you want to provide"
         [showClear]="true"
+        styleClass="p-dropdown-style"
         [ngClass]="{
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('governmentIdType')
         }">
@@ -134,6 +142,7 @@
         type="text"
         formControlName="governmentIdValue"
         pInputText
+        class="input-field"
         [ngClass]="{
           'ng-invalid ng-dirty': isGovernmentIdValueInvalidAndTouchedOrDirty()
         }"
@@ -158,6 +167,7 @@
           [type]="passwordInputType"
           id="password-input"
           formControlName="password"
+          class="input-field"
           [ngClass]="{
             'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('password')
           }"
@@ -206,6 +216,7 @@
           [type]="confirmPasswordInputType"
           id="confirmPassword-input"
           formControlName="confirmPassword"
+          class="input-field"
           [ngClass]="{
             'ng-invalid ng-dirty': isConfirmPasswordInputInvalidAndTouchedOrDirty()
           }"
@@ -220,6 +231,6 @@
         </small>
       </ng-template>
     </div>
-    <p-button type="submit" class="flex justify-content-end" label="Register" icon="pi pi-check"></p-button>
+    <p-button pRipple type="submit" styleClass="p-button-style" label="Register"></p-button>
   </form>
 </p-card>

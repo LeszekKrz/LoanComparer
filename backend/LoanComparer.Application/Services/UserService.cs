@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using LoanComparer.Application.Constants;
 using LoanComparer.Application.DTO;
 using LoanComparer.Application.DTO.UserDTO;
 using LoanComparer.Application.Model;
@@ -49,7 +50,13 @@ namespace LoanComparer.Application.Services
 
             IdentityResult result = await _userManager.CreateAsync(newUser, userForRegistration.Password);
 
-            return result.Succeeded ? null : result.Errors.Select(e => new ErrorResponseDTO(e.Description));
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(newUser, LoanComparerConstants.ClientRoleName);
+                return null;
+            }
+
+            return result.Errors.Select(e => new ErrorResponseDTO(e.Description));
         }
 
         public async Task<AuthenticationResponseDTO> LoginUser(UserForAuthenticationDTO userForAuthentication)
@@ -62,7 +69,7 @@ namespace LoanComparer.Application.Services
                 return new AuthenticationResponseDTO("Provided password is invalid", null);
 
             SigningCredentials signingCredentials = _jwtHandler.GetSigningCredentials();
-            ICollection<Claim> claims = _jwtHandler.GetClaims(user);
+            ICollection<Claim> claims = await _jwtHandler.GetClaimsAsync(user);
             JwtSecurityToken jwtSecurityToken = _jwtHandler.GenerateJwtSecurityToken(signingCredentials, claims);
             string token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             return new AuthenticationResponseDTO(null, token);

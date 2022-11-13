@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using LoanComparer.Application.Model;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -9,13 +11,13 @@ namespace LoanComparer.Application.Services.JwtFeatures
 {
     public class JwtHandler
     {
-        private readonly IConfiguration _configuration;
         private readonly IConfigurationSection _jwtSettings;
+        private readonly UserManager<User> _userManager;
 
-        public JwtHandler(IConfiguration configuration)
+        public JwtHandler(IConfiguration configuration, UserManager<User> userManager)
         {
-            _configuration = configuration;
             _jwtSettings = configuration.GetSection("JwtSettings");
+            _userManager = userManager;
         }
 
         public SigningCredentials GetSigningCredentials()
@@ -25,12 +27,18 @@ namespace LoanComparer.Application.Services.JwtFeatures
             return new SigningCredentials(symetricSecurityKey, SecurityAlgorithms.HmacSha256);
         }
 
-        public ICollection<Claim> GetClaims(IdentityUser identityUser)
+        public async Task<ICollection<Claim>> GetClaimsAsync(User user)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, identityUser.Email)
+                new Claim(ClaimTypes.Name, user.Email)
             };
+
+            IList<string> roles = await _userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
             return claims;
         }
 
@@ -40,7 +48,7 @@ namespace LoanComparer.Application.Services.JwtFeatures
                 issuer: _jwtSettings["validIssuer"],
                 audience: _jwtSettings["validAudience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtSettings["expiresInMinutes"])),
+                expires: DateTime.Now.AddDays(Convert.ToDouble(_jwtSettings["expiresInDays"])),
                 signingCredentials: signingCredentials);
         }
     }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoanComparer.Application.Migrations
 {
     [DbContext(typeof(LoanComparerContext))]
-    [Migration("20221109202350_InitialMigration")]
+    [Migration("20221112200520_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,12 +32,14 @@ namespace LoanComparer.Application.Migrations
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("nvarchar(15)")
+                        .HasColumnName("GovernmentIdType");
 
                     b.Property<string>("Value")
                         .IsRequired()
                         .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
+                        .HasColumnType("nvarchar(11)")
+                        .HasColumnName("GovernmentIdValue");
 
                     b.HasKey("Id");
 
@@ -222,6 +224,22 @@ namespace LoanComparer.Application.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "34b4cca3-c1fb-471a-b5e2-409a260af857",
+                            ConcurrencyStamp = "3b328283-b0e8-40ac-98b3-907904b94462",
+                            Name = "Client",
+                            NormalizedName = "CLIENT"
+                        },
+                        new
+                        {
+                            Id = "92e26d8e-c883-4237-96a5-13f6960154d2",
+                            ConcurrencyStamp = "a04f2602-0c48-4470-9998-a557b320ad5c",
+                            Name = "BankEmployee",
+                            NormalizedName = "BANKEMPLOYEE"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

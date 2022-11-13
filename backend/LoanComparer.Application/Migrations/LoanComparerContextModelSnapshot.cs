@@ -222,6 +222,22 @@ namespace LoanComparer.Application.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "34b4cca3-c1fb-471a-b5e2-409a260af857",
+                            ConcurrencyStamp = "3b328283-b0e8-40ac-98b3-907904b94462",
+                            Name = "Client",
+                            NormalizedName = "CLIENT"
+                        },
+                        new
+                        {
+                            Id = "92e26d8e-c883-4237-96a5-13f6960154d2",
+                            ConcurrencyStamp = "a04f2602-0c48-4470-9998-a557b320ad5c",
+                            Name = "BankEmployee",
+                            NormalizedName = "BANKEMPLOYEE"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

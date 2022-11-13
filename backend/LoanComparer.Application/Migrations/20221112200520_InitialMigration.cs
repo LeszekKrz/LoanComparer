@@ -64,8 +64,8 @@ namespace LoanComparer.Application.Migrations
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     JobTypeName = table.Column<string>(type: "nvarchar(50)", nullable: true),
                     IncomeLevel = table.Column<int>(type: "int", nullable: true),
-                    Type = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
+                    GovernmentIdType = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
+                    GovernmentIdValue = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -204,19 +204,23 @@ namespace LoanComparer.Application.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "JobTypes",
-                column: "Name",
-                value: "JobType1");
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "34b4cca3-c1fb-471a-b5e2-409a260af857", "3b328283-b0e8-40ac-98b3-907904b94462", "Client", "CLIENT" },
+                    { "92e26d8e-c883-4237-96a5-13f6960154d2", "a04f2602-0c48-4470-9998-a557b320ad5c", "BankEmployee", "BANKEMPLOYEE" }
+                });
 
             migrationBuilder.InsertData(
                 table: "JobTypes",
                 column: "Name",
-                value: "JobType2");
-
-            migrationBuilder.InsertData(
-                table: "JobTypes",
-                column: "Name",
-                value: "Other");
+                values: new object[]
+                {
+                    "JobType1",
+                    "JobType2",
+                    "Other"
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

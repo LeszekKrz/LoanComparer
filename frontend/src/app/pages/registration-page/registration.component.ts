@@ -7,7 +7,7 @@ import { JobTypeDTO } from 'src/app/core/models/job-type-dto';
 import { JobTypesHttpService } from 'src/app/core/services/job.type.http.service';
 import { GovernmentIdDTO } from '../../authentication/models/government-id-dto';
 import { UserForRegistrationDTO } from '../../authentication/models/user-for-registration-dto';
-import { AuthenticationHttpService } from 'src/app/authentication/services/authentication.http.service';
+import { AuthenticationService } from 'src/app/authentication/services/authentication.service';
 
 @Component({
   selector: 'app-registration',
@@ -34,7 +34,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
 
   constructor(private formBuilder: FormBuilder,
     private jobTypesHttpService: JobTypesHttpService,
-    private authenticationHttpService: AuthenticationHttpService,
+    private authenticationService: AuthenticationService,
     private messageService: MessageService,
     private router: Router) { }
 
@@ -136,7 +136,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
       confirmPassword: this.registerForm.get('confirmPassword')!.value
     };
 
-    const register$ = this.authenticationHttpService.registerUser(userForRegistration).pipe(
+    const register$ = this.authenticationService.registerUser(userForRegistration).pipe(
       tap(() => {
         this.messageService.add({
           severity: 'success',

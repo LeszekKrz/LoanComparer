@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { AuthenticationResponseDTO } from '../../authentication/models/authentication-response-dto';
 import { UserForAuthenticationDTO } from '../../authentication/models/user-for-authentication-dto';
-import { AuthenticationHttpService } from 'src/app/authentication/services/authentication.http.service';
+import { AuthenticationService } from 'src/app/authentication/services/authentication.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -21,7 +22,7 @@ export class LoginComponent {
   passwordInputType = "password";
   passwordEyeIcon = "pi-eye";
 
-  constructor(private authenticationHttpService: AuthenticationHttpService, private messageService: MessageService) { }
+  constructor(private authenticationService: AuthenticationService, private messageService: MessageService, private router: Router) { }
 
   onSubmit(): void {
     if (this.loginForm.invalid) {
@@ -34,7 +35,7 @@ export class LoginComponent {
       password: this.loginForm.get('password')!.value
     };
 
-    const login$ = this.authenticationHttpService.loginUser(userForAuthentication).pipe(
+    const login$ = this.authenticationService.loginUser(userForAuthentication).pipe(
       tap(() => {
         this.messageService.add({
           severity: 'success',
@@ -48,8 +49,8 @@ export class LoginComponent {
         localStorage.setItem("token", authenticationResponse.token!);
       },
       complete: () => {
-        this.authenticationHttpService.sendAuthenticationStateChangedNotification(true);
-        // here route to home page
+        this.authenticationService.sendAuthenticationStateChangedNotification(true);
+        this.router.navigate(["home"]);
       }
     }));
   }

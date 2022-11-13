@@ -4,7 +4,7 @@
 
 <p-card
   header="Login"
-  styleClass="pCardStyle shadow-2">
+  styleClass="p-card-style shadow-7">
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <div class="p-field">
       <label for="email-input" class="field-label">
@@ -17,6 +17,7 @@
           type="text"
           formControlName="email"
           pInputText
+          class="input-field"
           [ngClass]="{
             'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('email')
           }"
@@ -43,6 +44,7 @@
           [type]="passwordInputType"
           id="password-input"
           formControlName="password"
+          class="input-field"
           [ngClass]="{
             'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('password')
           }"
@@ -52,6 +54,18 @@
         This field is required
       </small>
     </div>
-    <p-button type="submit" class="flex justify-content-end" label="Login" icon="pi pi-check"></p-button>
+    <p-button pRipple type="submit" styleClass="p-button-style" label="Login"></p-button>
   </form>
+  <div class="flex justify-content-center">
+    Don't have an account?&nbsp;<a class="router-link" routerLink="/register">Sign Up</a>
+  </div>
+  <div class="flex justify-content-center forget-password">
+    <a class="router-link" routerLink="/home">Forgot password?</a> <!--add action here-->
+  </div>
+  <div class="horizontal-line">
+    <span>or connect with</span>
+  </div>
+  <div class="flex justify-content-center icon">
+    <img height="35" src="https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-suite-everything-you-need-know-about-google-newest-0.png" />
+  </div> <!--make it clickable-->
 </p-card>

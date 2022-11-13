@@ -14,5 +14,7 @@ namespace LoanComparer.Application.Constants
         internal const int PeselLength = 11;
         internal const int IDNumberLength = 9;
         internal const int PassportNumberLength = 9;
+        internal const string ClientRoleName = "Client";
+        internal const string BankEmployeeRoleName = "BankEmployee";
     }
 }

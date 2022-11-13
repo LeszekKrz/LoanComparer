@@ -10,6 +10,13 @@ import { RegistrationPageModule } from './pages/registration-page/registration-p
 import { MessageService } from 'primeng/api';
 import { LoginPageModule } from './pages/login-page/login-page.module';
 import { MenuModule } from './menu/menu.module';
+import { JwtModule } from '@auth0/angular-jwt';
+import { AdminPanelPageModule } from './pages/admin-panel-page/admin-panel-page.module';
+import { HomePageModule } from './pages/home-page/home-page.module';
+
+export function tokenGetter(): string | null {
+  return localStorage.getItem('token');
+}
 
 @NgModule({
   declarations: [
@@ -24,7 +31,16 @@ import { MenuModule } from './menu/menu.module';
     CoreModule,
     RegistrationPageModule,
     LoginPageModule,
-    MenuModule
+    MenuModule,
+    AdminPanelPageModule,
+    HomePageModule,
+    JwtModule.forRoot({
+      config: {
+        tokenGetter: tokenGetter,
+        allowedDomains: ['localhost:7282'],
+        disallowedRoutes: []
+      }
+    })
   ],
   providers: [MessageService],
   bootstrap: [AppComponent]

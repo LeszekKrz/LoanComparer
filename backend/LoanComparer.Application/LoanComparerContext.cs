@@ -15,11 +15,6 @@ namespace LoanComparer.Application
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(JobTypeEntityConfiguration).Assembly);
-
-            modelBuilder.Entity<JobType>().HasData( // TODO
-                new JobType("JobType1"),
-                new JobType("JobType2"),
-                new JobType("Other"));
         }
     }
 }

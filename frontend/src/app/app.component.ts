@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PrimeNGConfig } from 'primeng/api';
+import { AuthenticationService } from './authentication/services/authentication.service';
 
 @Component({
   selector: 'app-root',
@@ -9,9 +10,13 @@ import { PrimeNGConfig } from 'primeng/api';
 export class AppComponent implements OnInit {
   title = 'loan-comparer';
 
-  constructor(private primengConfig: PrimeNGConfig) {}
+  constructor(private primengConfig: PrimeNGConfig, private authenticationService: AuthenticationService) { }
 
   ngOnInit(): void {
     this.primengConfig.ripple = true;
+    console.log('User auth: ', this.authenticationService.isUserAuthenticated());
+    if (this.authenticationService.isUserAuthenticated()) {
+      this.authenticationService.sendAuthenticationStateChangedNotification(true);
+    }
   }
 }
