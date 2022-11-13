@@ -45,8 +45,11 @@ export class LoginComponent {
       })
     );
     this.subscriptions.push(this.doWithLoading(login$).subscribe({
-      next: (authenticationResponse: AuthenticationResponseDTO) => {
-        localStorage.setItem("token", authenticationResponse.token!);
+      // next: (authenticationResponse: AuthenticationResponseDTO) => {
+      //   localStorage.setItem("token", authenticationResponse.token!);
+      // },
+      next: (xd: Number) => {
+
       },
       complete: () => {
         this.authenticationService.sendAuthenticationStateChangedNotification(true);

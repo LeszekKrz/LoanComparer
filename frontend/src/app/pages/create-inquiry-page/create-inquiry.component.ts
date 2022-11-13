@@ -30,14 +30,11 @@ export class CreateInquiryComponent implements OnInit {
 
   isEmailInputTouchedOrDirtyAndEmpty(): boolean {
     const control = this.createInquiryForm.get('email')!;
-    console.log("email empty")
-    console.log(this.isInputTouchedOrDirty(control) && control.hasError('required'));
     return this.isInputTouchedOrDirty(control) && control.hasError('required');
   }
 
   isEmailInputTouchedOrDirtyAndNotValidEmail(): boolean {
     const control = this.createInquiryForm.get('email')!;
-    console.log("Email valid? " + this.isInputTouchedOrDirty(control) && control.hasError('email'));
     return this.isInputTouchedOrDirty(control) && control.hasError('email');
   }
 

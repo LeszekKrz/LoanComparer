@@ -54,7 +54,12 @@ namespace LoanComparer.Application.Validators
                 RuleFor(x => x.GovernmentId.Value).Length(LoanComparerConstants.PassportNumberLength).Matches(@"^[a-zA-Z]{2}\d{7}$");
             }); // a tu to nawet nie wiem bo nie ma za duzo o tym
 
-            RuleFor(x => x.Password).Equal(x => x.ConfirmPassword);
+            RuleFor(x => x.Password).NotNull().NotEmpty();
+            RuleFor(x => x.ConfirmPassword).NotNull().NotEmpty();
+
+            RuleFor(x => x.Password)
+                .Equal(x => x.ConfirmPassword)
+                .WithMessage("Password and Confirm Password are not the same");
         }
     }
 }

@@ -2,8 +2,10 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { Observable, Subject } from "rxjs";
+import { ErrorResponseDTO } from "src/app/core/models/error-response-dto";
 import { environment } from "src/environments/environment";
 import { AuthenticationResponseDTO } from "../models/authentication-response-dto";
+import { ForgotPasswordDTO } from "../models/forgot-password-dto";
 import { UserForAuthenticationDTO } from "../models/user-for-authentication-dto";
 import { UserForRegistrationDTO } from "../models/user-for-registration-dto";
 
@@ -16,8 +18,9 @@ export class AuthenticationService {
   private readonly bankEmployeeRoleName = 'BankEmployee';
   private readonly roleUrl = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
 
-  private readonly registrationPageUrl: string = `${environment.webApiUrl}/registration-page`;
-  private readonly loginPageUrl: string = `${environment.webApiUrl}/login-page`;
+  private readonly registrationPageWebAPIUrl: string = `${environment.webApiUrl}/registration-page`;
+  private readonly loginPageWebAPIUrl: string = `${environment.webApiUrl}/login-page`;
+  private readonly forgotPasswordPageWebAPIUrl: string = `${environment.webApiUrl}/forgot-password-page`;
 
   sendAuthenticationStateChangedNotification = (isAuthenticated: boolean): void => {
     this.authenticationStateChangeSubject.next(isAuthenticated);
@@ -25,12 +28,12 @@ export class AuthenticationService {
 
   constructor(private httpClient: HttpClient, private jwtHelperService: JwtHelperService) {}
 
-  registerUser(userForRegistration: UserForRegistrationDTO): Observable<void> {
-    return this.httpClient.post<void>(`${this.registrationPageUrl}/register`, userForRegistration);
+  registerUser(userForRegistration: UserForRegistrationDTO): Observable<ErrorResponseDTO[]> {
+    return this.httpClient.post<ErrorResponseDTO[]>(`${this.registrationPageWebAPIUrl}/register`, userForRegistration);
   }
 
   loginUser(userForAuthentication: UserForAuthenticationDTO): Observable<AuthenticationResponseDTO> {
-    return this.httpClient.post<AuthenticationResponseDTO>(`${this.loginPageUrl}/login`, userForAuthentication);
+    return this.httpClient.post<AuthenticationResponseDTO>(`${this.loginPageWebAPIUrl}/login`, userForAuthentication);
   }
 
   logout(): void {
@@ -54,5 +57,9 @@ export class AuthenticationService {
       return role === this.bankEmployeeRoleName;
     }
     return role.find(role => role === this.bankEmployeeRoleName) !== undefined;
+  }
+
+  forgotPassword(forgotPassword: ForgotPasswordDTO): Observable<ErrorResponseDTO[]> {
+    return this.httpClient.post<ErrorResponseDTO[]>(`${this.forgotPasswordPageWebAPIUrl}/forgot-password`, forgotPassword);
   }
 }

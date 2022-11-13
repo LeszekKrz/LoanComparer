@@ -14,7 +14,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.primengConfig.ripple = true;
-    console.log('User auth: ', this.authenticationService.isUserAuthenticated());
     if (this.authenticationService.isUserAuthenticated()) {
       this.authenticationService.sendAuthenticationStateChangedNotification(true);
     }

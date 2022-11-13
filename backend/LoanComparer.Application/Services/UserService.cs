@@ -19,18 +19,21 @@ namespace LoanComparer.Application.Services
         private readonly IValidator<UserForRegistrationDTO> _userForRegistrationValidator;
         private readonly IValidator<UserForAuthenticationDTO> _userForAuthenticationValidator;
         private readonly IValidator<ForgotPasswordDTO> _forgotPasswordValidator;
+        private readonly IValidator<ResetPasswordDTO> _resetPasswordValidator;
         private readonly LoanComparerContext _context;
         private readonly JwtHandler _jwtHandler;
         private readonly EmailService _emailService;
 
         public UserService(UserManager<User> userManager, IValidator<UserForRegistrationDTO> userForRegistrationValidator,
             IValidator<UserForAuthenticationDTO> userForAuthenticationValidator, IValidator<ForgotPasswordDTO> forgotPasswordValidator,
-            LoanComparerContext context, JwtHandler jwtHandler, EmailService emailService)
+            IValidator<ResetPasswordDTO> resetPasswordValidator, LoanComparerContext context, JwtHandler jwtHandler,
+            EmailService emailService)
         {
             _userManager = userManager;
             _userForRegistrationValidator = userForRegistrationValidator;
             _userForAuthenticationValidator = userForAuthenticationValidator;
             _forgotPasswordValidator = forgotPasswordValidator;
+            _resetPasswordValidator = resetPasswordValidator;
             _context = context;
             _jwtHandler = jwtHandler;
             _emailService = emailService;
@@ -98,6 +101,21 @@ namespace LoanComparer.Application.Services
             await _emailService.SendEmailAsync(email, cancellationToken);
 
             return null;
+        }
+
+        public async Task<IEnumerable<ErrorResponseDTO>?> ResetPasswordAsync(ResetPasswordDTO resetPassword, CancellationToken cancellationToken)
+        {
+            await _resetPasswordValidator.ValidateAndThrowAsync(resetPassword, cancellationToken);
+
+            User user = await _userManager.FindByEmailAsync(resetPassword.Email);
+            if (user == null)
+                return new ErrorResponseDTO[1] { new ErrorResponseDTO("There is no registered user with email provided") };
+
+            IdentityResult resetPasswordResult = await _userManager.ResetPasswordAsync(user, resetPassword.Token, resetPassword.Password);
+
+            return resetPasswordResult.Succeeded 
+                ? null
+                : resetPasswordResult.Errors.Select(error => new ErrorResponseDTO(error.Description));
         }
     }
 }

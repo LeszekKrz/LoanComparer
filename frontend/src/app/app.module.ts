@@ -13,6 +13,7 @@ import { MenuModule } from './menu/menu.module';
 import { JwtModule } from '@auth0/angular-jwt';
 import { AdminPanelPageModule } from './pages/admin-panel-page/admin-panel-page.module';
 import { HomePageModule } from './pages/home-page/home-page.module';
+import { ForgotPasswordPageModule } from './pages/forgot-password-page/forgot-password-page.module';
 
 export function tokenGetter(): string | null {
   return localStorage.getItem('token');
@@ -34,6 +35,7 @@ export function tokenGetter(): string | null {
     MenuModule,
     AdminPanelPageModule,
     HomePageModule,
+    ForgotPasswordPageModule,
     JwtModule.forRoot({
       config: {
         tokenGetter: tokenGetter,

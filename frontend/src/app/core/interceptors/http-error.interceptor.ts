@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { catchError, Observable } from 'rxjs';
-import { ErrorResponse } from '../models/error-response';
+import { ErrorResponseDTO } from '../models/error-response-dto';
 import { insuficcientAccessMessage, internalServerErrorMessage } from '../messages';
 import { AuthenticationResponseDTO } from 'src/app/authentication/models/authentication-response-dto';
 
@@ -15,8 +15,8 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       catchError((errorResponse: HttpErrorResponse) => {
         switch(errorResponse.status) {
           case 400:
-            const error: ErrorResponse[] = errorResponse.error;
-            error.forEach((e: ErrorResponse) => {
+            const error: ErrorResponseDTO[] = errorResponse.error;
+            error.forEach((e: ErrorResponseDTO) => {
               this.messageService.add({severity: 'error', summary: 'Error', detail: e.errorMessage});
             });
             break;

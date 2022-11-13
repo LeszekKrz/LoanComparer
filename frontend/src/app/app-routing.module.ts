@@ -3,6 +3,7 @@ import { Routes, RouterModule } from "@angular/router";
 import { BankEmployeeGuard } from "./authentication/guards/bank.employee.guard";
 import { AdminPanelComponent } from "./pages/admin-panel-page/admin-panel.component";
 import { CreateInquiryComponent } from "./pages/create-inquiry-page/create-inquiry.component";
+import { ForgotPasswordComponent } from "./pages/forgot-password-page/forgot-password.component";
 import { HomeComponent } from "./pages/home-page/home.component";
 import { LoginComponent } from "./pages/login-page/login.component";
 import { RegistrationComponent } from "./pages/registration-page/registration.component";
@@ -14,6 +15,7 @@ const routes: Routes = [
   {path: 'register', component: RegistrationComponent},
   {path: 'login', component: LoginComponent},
   {path: 'admin-panel', component: AdminPanelComponent, canActivate: [BankEmployeeGuard]},
+  {path: 'forgot-password', component: ForgotPasswordComponent},
   {path: '**', component: HomeComponent}
 ];
 

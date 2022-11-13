@@ -10,7 +10,11 @@ namespace LoanComparer.Application.Validators
         {
             RuleFor(x => x.Email).NotNull().Length(1, LoanComparerConstants.MaxEmailLength);
 
-            RuleFor(x => x.ClientURI).NotNull().NotEmpty();
+            RuleFor(x => x.ClientURI)
+                .NotNull()
+                .NotEmpty()
+                .Must(clientUri => Uri.TryCreate(clientUri, UriKind.Absolute, out _))
+                .WithMessage("Internal Server error. Provided uri is invalid");
         }
     }
 }

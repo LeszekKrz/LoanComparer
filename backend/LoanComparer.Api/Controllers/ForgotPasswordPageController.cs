@@ -22,7 +22,7 @@ namespace LoanComparer.Api.Controllers
             ErrorResponseDTO? errorResponse = await _userService.ForgotPasswordAsync(forgotPassword, cancellationToken);
             return errorResponse == null
                 ? Ok()
-                : BadRequest(errorResponse);
+                : BadRequest(new ErrorResponseDTO[1] { errorResponse });
         }
     }
 }
