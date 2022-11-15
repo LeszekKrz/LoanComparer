@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -11,7 +11,7 @@ import { AuthenticationService } from 'src/app/authentication/services/authentic
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.scss']
 })
-export class ResetPasswordComponent implements OnInit {
+export class ResetPasswordComponent implements OnInit, OnDestroy {
   isProgressSpinnerVisible = false;
   resetPasswordForm!: FormGroup;
   containsLowerCaseLetterRegex = /[a-z]/;
@@ -48,8 +48,14 @@ export class ResetPasswordComponent implements OnInit {
     })
   }
 
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(subscription => {
+      subscription.unsubscribe();
+    });
+  }
+
   private passwordsNotMatching: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
-    return group.get('password')!.value === group.get('confirmPassword')!.value
+    return group.get('newPassword')!.value === group.get('confirmPassword')!.value
       ? null
       : {passwordsNotMatching: true};
   }

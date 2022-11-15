@@ -18,12 +18,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   ],
   imports: [
     CommonModule,
-    CardModule,
     ProgressSpinnerModule,
     ButtonModule,
     InputTextModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CardModule
   ]
 })
 export class ResetPasswordPageModule { }

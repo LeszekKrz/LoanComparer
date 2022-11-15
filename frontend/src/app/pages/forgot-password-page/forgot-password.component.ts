@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss']
 })
-export class ForgotPasswordComponent implements OnInit {
+export class ForgotPasswordComponent implements OnDestroy {
   email: FormControl = new FormControl('', [Validators.required, Validators.email]);
   subscriptions: Subscription[] = [];
   isProgressSpinnerVisible = false;
@@ -20,8 +20,10 @@ export class ForgotPasswordComponent implements OnInit {
 
   constructor(private authenticationService: AuthenticationService, private messageService: MessageService, private router: Router) { }
 
-  ngOnInit(): void {
-
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(subscription => {
+      subscription.unsubscribe();
+    });
   }
 
   onSubmit(): void {
