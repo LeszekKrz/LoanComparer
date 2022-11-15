@@ -6,7 +6,7 @@
   header="Register"
   styleClass="p-card-style shadow-7">
   <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-    <div class="p-field">
+    <div class="p-fluid">
       <label for="firstName-input" class="field-label">
         <p class="required">First Name</p>
       </label>
@@ -15,7 +15,6 @@
         type="text"
         formControlName="firstName"
         pInputText
-        class="input-field"
         [ngClass]="{
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('firstName')
         }"
@@ -24,7 +23,7 @@
         This field is required
       </small>
     </div>
-    <div class="p-field">
+    <div class="p-fluid">
       <label for="lastName-input" class="field-label">
         <p class="required">Last Name</p>
       </label>
@@ -33,7 +32,6 @@
         type="text"
         formControlName="lastName"
         pInputText
-        class="input-field"
         [ngClass]="{
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('lastName')
         }"
@@ -42,7 +40,7 @@
         This field is required
       </small>
     </div>
-    <div class="p-field">
+    <div class="p-fluid">
       <label for="email-input" class="field-label">
         <p class="required">Email</p>
       </label>
@@ -51,7 +49,6 @@
         type="text"
         formControlName="email"
         pInputText
-        class="input-field"
         [ngClass]="{
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('email')
         }"
@@ -65,7 +62,7 @@
           </small>
         </ng-template>
     </div>
-    <div class="p-field">
+    <div class="p-fluid">
       <label for="jobType-dropdown" class="field-label">
         <p class="required">Job Type</p>
       </label>
@@ -79,7 +76,6 @@
         [filter]="true"
         filterBy="name"
         [showClear]="true"
-        styleClass="p-dropdown-style"
         [ngClass]="{
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('jobType')
         }">
@@ -89,7 +85,7 @@
         This field is required
       </small>
     </div>
-    <div class="p-field">
+    <div class="p-fluid">
       <label for="incomeLevel-input" class="field-label">
         <p class="required">Income Level</p>
       </label>
@@ -114,7 +110,7 @@
         </small>
       </ng-template>
     </div>
-    <div class="p-field">
+    <div class="p-fluid">
       <label for="governmentId-dropdown" class="field-label">
         <p class="required">Government Id Type</p>
       </label>
@@ -124,7 +120,6 @@
         [options]="governmentIdTypes"
         placeholder="Select government id you want to provide"
         [showClear]="true"
-        styleClass="p-dropdown-style"
         [ngClass]="{
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('governmentIdType')
         }">
@@ -133,7 +128,7 @@
         This field is required
       </small>
     </div>
-    <div class="p-field" *ngIf="isGovernmentIdTypeSelected()">
+    <div class="p-fluid" *ngIf="isGovernmentIdTypeSelected()">
       <label for="governmentIdValue-input" class="field-label">
         <p class="required">{{ this.getSelectedGovernmentIdType() }}</p>
       </label>
@@ -142,7 +137,6 @@
         type="text"
         formControlName="governmentIdValue"
         pInputText
-        class="input-field"
         [ngClass]="{
           'ng-invalid ng-dirty': isGovernmentIdValueInvalidAndTouchedOrDirty()
         }"
@@ -156,7 +150,7 @@
           </small>
         </ng-template>
     </div>
-    <div class="p-field">
+    <div class="p-fluid">
       <label for="password-input" class="field-label">
         <p class="required">Password</p>
       </label>
@@ -167,7 +161,6 @@
           [type]="passwordInputType"
           id="password-input"
           formControlName="password"
-          class="input-field"
           [ngClass]="{
             'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('password')
           }"
@@ -205,7 +198,7 @@
         </small>
       </ng-template>
     </div>
-    <div class="p-field">
+    <div class="p-fluid">
       <label for="confirmPassword-input" class="field-label">
         <p class="required">Confirm Password</p>
       </label>
@@ -216,7 +209,6 @@
           [type]="confirmPasswordInputType"
           id="confirmPassword-input"
           formControlName="confirmPassword"
-          class="input-field"
           [ngClass]="{
             'ng-invalid ng-dirty': isConfirmPasswordInputInvalidAndTouchedOrDirty()
           }"

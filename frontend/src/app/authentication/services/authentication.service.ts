@@ -6,6 +6,7 @@ import { ErrorResponseDTO } from "src/app/core/models/error-response-dto";
 import { environment } from "src/environments/environment";
 import { AuthenticationResponseDTO } from "../models/authentication-response-dto";
 import { ForgotPasswordDTO } from "../models/forgot-password-dto";
+import { ResetPasswordDTO } from "../models/reset-password-dto";
 import { UserForAuthenticationDTO } from "../models/user-for-authentication-dto";
 import { UserForRegistrationDTO } from "../models/user-for-registration-dto";
 
@@ -21,6 +22,7 @@ export class AuthenticationService {
   private readonly registrationPageWebAPIUrl: string = `${environment.webApiUrl}/registration-page`;
   private readonly loginPageWebAPIUrl: string = `${environment.webApiUrl}/login-page`;
   private readonly forgotPasswordPageWebAPIUrl: string = `${environment.webApiUrl}/forgot-password-page`;
+  private readonly resetPasswordPageWebAPIUrl: string = `${environment.webApiUrl}/reset-password-page`;
 
   sendAuthenticationStateChangedNotification = (isAuthenticated: boolean): void => {
     this.authenticationStateChangeSubject.next(isAuthenticated);
@@ -61,5 +63,9 @@ export class AuthenticationService {
 
   forgotPassword(forgotPassword: ForgotPasswordDTO): Observable<ErrorResponseDTO[]> {
     return this.httpClient.post<ErrorResponseDTO[]>(`${this.forgotPasswordPageWebAPIUrl}/forgot-password`, forgotPassword);
+  }
+
+  resetPassword(resetPassword: ResetPasswordDTO): Observable<ErrorResponseDTO[]> {
+    return this.httpClient.post<ErrorResponseDTO[]>(`${this.resetPasswordPageWebAPIUrl}/reset-password`, resetPassword);
   }
 }

@@ -6,7 +6,7 @@
   header="Login"
   styleClass="p-card-style shadow-7">
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <div class="p-field">
+    <div class="p-fluid">
       <label for="email-input" class="field-label">
         <p class="required">Email</p>
       </label>
@@ -17,7 +17,6 @@
           type="text"
           formControlName="email"
           pInputText
-          class="input-field"
           [ngClass]="{
             'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('email')
           }"
@@ -32,7 +31,7 @@
         </small>
       </ng-template>
     </div>
-    <div class="p-field">
+    <div class="p-fluid">
       <label for="password-input" class="field-label">
         <p class="required">Password</p>
       </label>
@@ -44,7 +43,6 @@
           [type]="passwordInputType"
           id="password-input"
           formControlName="password"
-          class="input-field"
           [ngClass]="{
             'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('password')
           }"

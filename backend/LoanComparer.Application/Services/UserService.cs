@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Web;
 
 namespace LoanComparer.Application.Services
 {
@@ -89,8 +91,14 @@ namespace LoanComparer.Application.Services
                 return new ErrorResponseDTO("There is no registered user with email provided");
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            
-            var callback = QueryHelpers.AddQueryString(forgotPassword.ClientURI, token, forgotPassword.Email);
+
+            var queryParameters = new Dictionary<string, string?>()
+            {
+                { "token", HttpUtility.UrlEncode(token) },
+                { "email", forgotPassword.Email }
+            };
+
+            var callback = QueryHelpers.AddQueryString(forgotPassword.ClientURI, queryParameters);
 
             var email = new Email(
                 new string[] { user.Email },
@@ -110,8 +118,8 @@ namespace LoanComparer.Application.Services
             User user = await _userManager.FindByEmailAsync(resetPassword.Email);
             if (user == null)
                 return new ErrorResponseDTO[1] { new ErrorResponseDTO("There is no registered user with email provided") };
-
-            IdentityResult resetPasswordResult = await _userManager.ResetPasswordAsync(user, resetPassword.Token, resetPassword.Password);
+            
+            IdentityResult resetPasswordResult = await _userManager.ResetPasswordAsync(user, HttpUtility.UrlDecode(resetPassword.Token), resetPassword.Password);
 
             return resetPasswordResult.Succeeded 
                 ? null

@@ -76,7 +76,6 @@ builder.Services.AddCors(options =>
             .AllowAnyOrigin());
 });
 
-Debug.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAA" + Environment.GetEnvironmentVariable("SENDGRID_API_KEY"));
 builder.Services.AddOptions<FromEmailConfiguration>()
     .Bind(builder.Configuration.GetSection("FromEmail"))
     .ValidateDataAnnotations();

@@ -7,6 +7,7 @@ import { ForgotPasswordComponent } from "./pages/forgot-password-page/forgot-pas
 import { HomeComponent } from "./pages/home-page/home.component";
 import { LoginComponent } from "./pages/login-page/login.component";
 import { RegistrationComponent } from "./pages/registration-page/registration.component";
+import { ResetPasswordComponent } from "./pages/reset-password-page/reset-password.component";
 
 
 const routes: Routes = [
@@ -16,6 +17,7 @@ const routes: Routes = [
   {path: 'login', component: LoginComponent},
   {path: 'admin-panel', component: AdminPanelComponent, canActivate: [BankEmployeeGuard]},
   {path: 'forgot-password', component: ForgotPasswordComponent},
+  {path: 'reset-password', component: ResetPasswordComponent},
   {path: '**', component: HomeComponent}
 ];
 
