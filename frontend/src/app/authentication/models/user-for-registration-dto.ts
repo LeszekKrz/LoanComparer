@@ -10,4 +10,5 @@ export interface UserForRegistrationDTO {
   governmentId: GovernmentIdDTO;
   password: string;
   confirmPassword: string;
+  clientURI: string;
 }

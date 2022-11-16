@@ -8,6 +8,7 @@ import { JobTypesHttpService } from 'src/app/core/services/job.type.http.service
 import { GovernmentIdDTO } from '../../authentication/models/government-id-dto';
 import { UserForRegistrationDTO } from '../../authentication/models/user-for-registration-dto';
 import { AuthenticationService } from 'src/app/authentication/services/authentication.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-registration',
@@ -31,6 +32,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   passwordEyeIcon = "pi-eye";
   confirmPasswordInputType = "password";
   confirmPasswordEyeIcon = "pi-eye";
+  clientURI = environment.webUrl + '/confirm-email';
 
   constructor(private formBuilder: FormBuilder,
     private jobTypesHttpService: JobTypesHttpService,
@@ -133,7 +135,8 @@ export class RegistrationComponent implements OnInit, OnDestroy {
       incomeLevel: this.registerForm.get('incomeLevel')!.value,
       governmentId: governmentId,
       password: this.registerForm.get('password')!.value,
-      confirmPassword: this.registerForm.get('confirmPassword')!.value
+      confirmPassword: this.registerForm.get('confirmPassword')!.value,
+      clientURI: this.clientURI
     };
 
     const register$ = this.authenticationService.registerUser(userForRegistration).pipe(
@@ -141,36 +144,36 @@ export class RegistrationComponent implements OnInit, OnDestroy {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Registration successful'
+          detail: 'Registration successful. Email confirmation has been sent'
         })
       })
     );
     this.subscriptions.push(this.doWithLoading(register$).subscribe({
       complete: () => {
-        this.router.navigate(["login"]);
+        this.router.navigate(['login']);
       }
     }));
   }
 
   hideShowPassword(): void {
-    if (this.passwordInputType == "password") {
-      this.passwordInputType = "text";
-      this.passwordEyeIcon = "pi-eye-slash";
+    if (this.passwordInputType == 'password') {
+      this.passwordInputType = 'text';
+      this.passwordEyeIcon = 'pi-eye-slash';
     }
     else {
-      this.passwordInputType = "password";
-      this.passwordEyeIcon = "pi-eye";
+      this.passwordInputType = 'password';
+      this.passwordEyeIcon = 'pi-eye';
     }
   }
 
   hideShowConfirmPassword(): void {
-    if (this.confirmPasswordInputType == "password") {
-      this.confirmPasswordInputType = "text";
-      this.confirmPasswordEyeIcon = "pi-eye-slash";
+    if (this.confirmPasswordInputType == 'password') {
+      this.confirmPasswordInputType = 'text';
+      this.confirmPasswordEyeIcon = 'pi-eye-slash';
     }
     else {
-      this.confirmPasswordInputType = "password";
-      this.confirmPasswordEyeIcon = "pi-eye";
+      this.confirmPasswordInputType = 'password';
+      this.confirmPasswordEyeIcon = 'pi-eye';
     }
   }
 

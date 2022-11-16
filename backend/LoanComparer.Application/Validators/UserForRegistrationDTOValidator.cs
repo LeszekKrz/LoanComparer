@@ -60,6 +60,12 @@ namespace LoanComparer.Application.Validators
             RuleFor(x => x.Password)
                 .Equal(x => x.ConfirmPassword)
                 .WithMessage("Password and Confirm Password are not the same");
+
+            RuleFor(x => x.ClientURI)
+                .NotNull()
+                .NotEmpty()
+                .Must(clientUri => Uri.TryCreate(clientUri, UriKind.Absolute, out _))
+                .WithMessage("Internal Server error. Provided uri is invalid");
         }
     }
 }

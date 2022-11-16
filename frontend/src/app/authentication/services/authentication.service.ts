@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { Observable, Subject } from "rxjs";
@@ -23,6 +23,7 @@ export class AuthenticationService {
   private readonly loginPageWebAPIUrl: string = `${environment.webApiUrl}/login-page`;
   private readonly forgotPasswordPageWebAPIUrl: string = `${environment.webApiUrl}/forgot-password-page`;
   private readonly resetPasswordPageWebAPIUrl: string = `${environment.webApiUrl}/reset-password-page`;
+  private readonly confirmEmailPageWebAPIUrl: string = `${environment.webApiUrl}/confirm-email-page`;
 
   sendAuthenticationStateChangedNotification = (isAuthenticated: boolean): void => {
     this.authenticationStateChangeSubject.next(isAuthenticated);
@@ -67,5 +68,18 @@ export class AuthenticationService {
 
   resetPassword(resetPassword: ResetPasswordDTO): Observable<ErrorResponseDTO[]> {
     return this.httpClient.post<ErrorResponseDTO[]>(`${this.resetPasswordPageWebAPIUrl}/reset-password`, resetPassword);
+  }
+
+  confirmEmail(token: string, email: string): Observable<ErrorResponseDTO[]> {
+    // let httpParams = new HttpParams();
+    // httpParams = httpParams.append('token', token);
+    // httpParams = httpParams.append('email', email);
+
+    const httpParams = {
+      'token': token,
+      'email': email
+    }
+
+    return this.httpClient.get<ErrorResponseDTO[]>(`${this.confirmEmailPageWebAPIUrl}/confirm-email`, {params: httpParams});
   }
 }

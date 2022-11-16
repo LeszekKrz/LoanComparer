@@ -16,7 +16,7 @@ export class ForgotPasswordComponent implements OnDestroy {
   email: FormControl = new FormControl('', [Validators.required, Validators.email]);
   subscriptions: Subscription[] = [];
   isProgressSpinnerVisible = false;
-  clientURI: string = environment.webUrl + '/reset-password';
+  clientURI = environment.webUrl + '/reset-password';
 
   constructor(private authenticationService: AuthenticationService, private messageService: MessageService, private router: Router) { }
 

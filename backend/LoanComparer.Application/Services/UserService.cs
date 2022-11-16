@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Web;
@@ -55,13 +54,30 @@ namespace LoanComparer.Application.Services
 
             IdentityResult result = await _userManager.CreateAsync(newUser, userForRegistration.Password);
 
-            if (result.Succeeded)
-            {
-                await _userManager.AddToRoleAsync(newUser, LoanComparerConstants.ClientRoleName);
-                return null;
-            }
+            if (!result.Succeeded)
+                return result.Errors.Select(e => new ErrorResponseDTO(e.Description));
 
-            return result.Errors.Select(e => new ErrorResponseDTO(e.Description));
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
+
+            var queryParameters = new Dictionary<string, string?>()
+            {
+                { "token", HttpUtility.UrlEncode(token) },
+                { "email", newUser.Email }
+            };
+
+            var callback = QueryHelpers.AddQueryString(userForRegistration.ClientURI, queryParameters);
+
+            var email = new Email(
+                new string[] { newUser.Email },
+                LoanComparerConstants.PasswordResetEmailSubject,
+                string.Empty,
+                string.Format(LoanComparerConstants.EmailConfirmHtmlContent, newUser.FirstName, callback));
+
+            await _emailService.SendEmailAsync(email, cancellationToken);
+
+            await _userManager.AddToRoleAsync(newUser, LoanComparerConstants.ClientRoleName);
+
+            return null;
         }
 
         public async Task<AuthenticationResponseDTO> LoginUserAsync(UserForAuthenticationDTO userForAuthentication, CancellationToken cancellationToken)
@@ -71,6 +87,9 @@ namespace LoanComparer.Application.Services
             User user = await _userManager.FindByEmailAsync(userForAuthentication.Email);
             if (user == null)
                 return new AuthenticationResponseDTO("There is no registered user with email provided", null);
+
+            if (!await _userManager.IsEmailConfirmedAsync(user))
+                return new AuthenticationResponseDTO("Email is not confirmed", null); // maybe send email to confirm here
 
             if (!await _userManager.CheckPasswordAsync(user, userForAuthentication.Password))
                 return new AuthenticationResponseDTO("Provided password is invalid", null);
@@ -124,6 +143,19 @@ namespace LoanComparer.Application.Services
             return resetPasswordResult.Succeeded 
                 ? null
                 : resetPasswordResult.Errors.Select(error => new ErrorResponseDTO(error.Description));
+        }
+
+        public async Task<IEnumerable<ErrorResponseDTO>?> ConfirmEmailAsync(string email, string token)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return new ErrorResponseDTO[1] { new ErrorResponseDTO("There is not registered user with email provided") };
+
+            var confirmEmailResult = await _userManager.ConfirmEmailAsync(user, HttpUtility.UrlDecode(token));
+
+            return confirmEmailResult.Succeeded
+                ? null
+                : confirmEmailResult.Errors.Select(error => new ErrorResponseDTO(error.Description));
         }
     }
 }
