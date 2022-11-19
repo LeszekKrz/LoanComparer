@@ -14,6 +14,13 @@ namespace LoanComparer.Application.Model
             Type = governmentIdDTO.Type;
             Value = governmentIdDTO.Value;
         }
+
+        public GovernmentId(string type, string value)
+        {
+            Type = type;
+            Value = value;
+        }
+
         private GovernmentId() { }
     }
 }

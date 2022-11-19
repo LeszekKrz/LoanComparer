@@ -19,9 +19,7 @@ namespace LoanComparer.Api.Controllers
         public async Task<IActionResult> LoginUserAsync([FromBody] UserForAuthenticationDTO userForAuthentication, CancellationToken cancellationToken)
         {
             AuthenticationResponseDTO authenticationResponse = await _userService.LoginUserAsync(userForAuthentication, cancellationToken);
-            return authenticationResponse.Token == null
-                ? Unauthorized(authenticationResponse)
-                : Ok(authenticationResponse);
+            return Ok(authenticationResponse);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using LoanComparer.Application.DTO;
-using LoanComparer.Application.DTO.UserDTO;
+﻿using LoanComparer.Application.DTO.UserDTO;
 using LoanComparer.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,10 +18,8 @@ namespace LoanComparer.Api.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPasswordAsync([FromBody] ForgotPasswordDTO forgotPassword, CancellationToken cancellationToken)
         {
-            ErrorResponseDTO? errorResponse = await _userService.ForgotPasswordAsync(forgotPassword, cancellationToken);
-            return errorResponse == null
-                ? Ok()
-                : BadRequest(new ErrorResponseDTO[1] { errorResponse });
+            await _userService.ForgotPasswordAsync(forgotPassword, cancellationToken);
+            return Ok();
         }
     }
 }

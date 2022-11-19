@@ -1,11 +1,20 @@
 ﻿using LoanComparer.Application.Model;
 using LoanComparer.Application.ModelEntityTypeConfiguration;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace LoanComparer.Application
 {
-    public class LoanComparerContext : IdentityDbContext<User>
+    public class LoanComparerContext : IdentityDbContext<
+        User,
+        Role,
+        string,
+        IdentityUserClaim<string>,
+        UserRole,
+        IdentityUserLogin<string>,
+        IdentityRoleClaim<string>,
+        IdentityUserToken<string>>
     {
         public DbSet<JobType> JobTypes { get; private set; }
 

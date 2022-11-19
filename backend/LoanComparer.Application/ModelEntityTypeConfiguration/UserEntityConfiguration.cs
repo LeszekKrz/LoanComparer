@@ -21,6 +21,11 @@ namespace LoanComparer.Application.ModelEntityTypeConfiguration
                 .WithOne(x => x.User)
                 .HasForeignKey<GovernmentId>(x => x.Id);
 
+            builder.HasMany(x => x.UserRoles)
+                .WithOne(x => x.User)
+                .HasForeignKey(userRole => userRole.UserId)
+                .IsRequired();
+
             builder.Property(x => x.FirstName).HasMaxLength(LoanComparerConstants.MaxFirstNameLength);
             builder.Property(x => x.LastName).HasMaxLength(LoanComparerConstants.MaxLastNameLength);
         }

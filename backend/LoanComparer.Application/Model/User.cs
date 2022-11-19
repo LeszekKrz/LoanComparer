@@ -10,6 +10,7 @@ namespace LoanComparer.Application.Model
         public JobType? JobType { get; private set; }
         public int? IncomeLevel { get; private set; }
         public GovernmentId GovernmentId { get; private set; }
+        public virtual ICollection<UserRole> UserRoles { get; private set; }
 
         public User(string firstName, string lastName, string email, JobType jobType, int incomeLevel, GovernmentId governmentId)
         {

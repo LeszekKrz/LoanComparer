@@ -8,11 +8,11 @@ using LoanComparer.Application.Services.JwtFeatures;
 using LoanComparer.Application.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SendGrid.Extensions.DependencyInjection;
-using System.Diagnostics;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,12 +29,23 @@ builder.Services.AddValidatorsFromAssemblyContaining<UserForRegistrationDTOValid
 
 builder.Services.AddDbContext<LoanComparerContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
 
-builder.Services.AddIdentity<User, IdentityRole>(options =>
+builder.Services.AddIdentity<User, Role>(options =>
 {
     options.Password.RequiredLength = 8;
     // options.Stores.ProtectPersonalData = true; maybe thats a good idea check it later
     options.User.RequireUniqueEmail = true;
-}).AddEntityFrameworkStores<LoanComparerContext>()
+}).AddUserStore<
+    UserStore<
+        User,
+        Role,
+        LoanComparerContext,
+        string,
+        IdentityUserClaim<string>,
+        UserRole,
+        IdentityUserLogin<string>,
+        IdentityUserToken<string>,
+        IdentityRoleClaim<string>>>()
+    .AddRoleStore<RoleStore<Role, LoanComparerContext, string, UserRole, IdentityRoleClaim<string>>>()
     .AddDefaultTokenProviders();
 
 builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
@@ -64,7 +75,7 @@ builder.Services.AddScoped<JwtHandler>();
 
 builder.Services.AddTransient<JobTypeService>();
 builder.Services.AddTransient<UserService>();
-builder.Services.AddTransient<EmailService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddCors(options =>
 {

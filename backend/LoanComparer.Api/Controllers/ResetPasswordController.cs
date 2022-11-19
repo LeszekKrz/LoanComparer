@@ -1,5 +1,4 @@
-﻿using LoanComparer.Application.DTO;
-using LoanComparer.Application.DTO.UserDTO;
+﻿using LoanComparer.Application.DTO.UserDTO;
 using LoanComparer.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,10 +18,8 @@ namespace LoanComparer.Api.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO resetPassword, CancellationToken cancellationToken)
         {
-            IEnumerable<ErrorResponseDTO>? resetPasswordResponse = await _userService.ResetPasswordAsync(resetPassword, cancellationToken);
-            return resetPasswordResponse == null
-                ? Ok()
-                : BadRequest(resetPasswordResponse);
+            await _userService.ResetPasswordAsync(resetPassword, cancellationToken);
+            return Ok();
         }
     }
 }

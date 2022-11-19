@@ -2,11 +2,13 @@
 using LoanComparer.Application.Constants;
 using LoanComparer.Application.DTO;
 using LoanComparer.Application.DTO.UserDTO;
+using LoanComparer.Application.Exceptions;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.JwtFeatures;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -17,32 +19,24 @@ namespace LoanComparer.Application.Services
     public class UserService
     {
         private readonly UserManager<User> _userManager;
-        private readonly IValidator<UserForRegistrationDTO> _userForRegistrationValidator;
-        private readonly IValidator<UserForAuthenticationDTO> _userForAuthenticationValidator;
-        private readonly IValidator<ForgotPasswordDTO> _forgotPasswordValidator;
-        private readonly IValidator<ResetPasswordDTO> _resetPasswordValidator;
+        private readonly IServiceProvider _serviceProvider;
         private readonly LoanComparerContext _context;
         private readonly JwtHandler _jwtHandler;
-        private readonly EmailService _emailService;
+        private readonly IEmailService _emailService;
 
-        public UserService(UserManager<User> userManager, IValidator<UserForRegistrationDTO> userForRegistrationValidator,
-            IValidator<UserForAuthenticationDTO> userForAuthenticationValidator, IValidator<ForgotPasswordDTO> forgotPasswordValidator,
-            IValidator<ResetPasswordDTO> resetPasswordValidator, LoanComparerContext context, JwtHandler jwtHandler,
-            EmailService emailService)
+        public UserService(UserManager<User> userManager, IServiceProvider serviceProvider, LoanComparerContext context, JwtHandler jwtHandler,
+            IEmailService emailService)
         {
             _userManager = userManager;
-            _userForRegistrationValidator = userForRegistrationValidator;
-            _userForAuthenticationValidator = userForAuthenticationValidator;
-            _forgotPasswordValidator = forgotPasswordValidator;
-            _resetPasswordValidator = resetPasswordValidator;
+            _serviceProvider = serviceProvider;
             _context = context;
             _jwtHandler = jwtHandler;
             _emailService = emailService;
         }
 
-        public async Task<IEnumerable<ErrorResponseDTO>?> RegisterUserAsync(UserForRegistrationDTO userForRegistration, CancellationToken cancellationToken)
+        public async Task RegisterUserAsync(UserForRegistrationDTO userForRegistration, CancellationToken cancellationToken)
         {
-            await _userForRegistrationValidator.ValidateAndThrowAsync(userForRegistration, cancellationToken);
+            await _serviceProvider.GetService<IValidator<UserForRegistrationDTO>>().ValidateAndThrowAsync(userForRegistration, cancellationToken);
 
             var newUser = new User(
                 userForRegistration.FirstName,
@@ -55,7 +49,7 @@ namespace LoanComparer.Application.Services
             IdentityResult result = await _userManager.CreateAsync(newUser, userForRegistration.Password);
 
             if (!result.Succeeded)
-                return result.Errors.Select(e => new ErrorResponseDTO(e.Description));
+                throw new BadRequestException(result.Errors.Select(error => new ErrorResponseDTO(error.Description)));
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
 
@@ -69,45 +63,39 @@ namespace LoanComparer.Application.Services
 
             var email = new Email(
                 new string[] { newUser.Email },
-                LoanComparerConstants.PasswordResetEmailSubject,
+                LoanComparerConstants.EmailConfirmEmailSubject,
                 string.Empty,
                 string.Format(LoanComparerConstants.EmailConfirmHtmlContent, newUser.FirstName, callback));
 
             await _emailService.SendEmailAsync(email, cancellationToken);
 
             await _userManager.AddToRoleAsync(newUser, LoanComparerConstants.ClientRoleName);
-
-            return null;
         }
 
         public async Task<AuthenticationResponseDTO> LoginUserAsync(UserForAuthenticationDTO userForAuthentication, CancellationToken cancellationToken)
         {
-            await _userForAuthenticationValidator.ValidateAndThrowAsync(userForAuthentication, cancellationToken);
+            await _serviceProvider.GetService<IValidator<UserForAuthenticationDTO>>().ValidateAndThrowAsync(userForAuthentication, cancellationToken);
 
-            User user = await _userManager.FindByEmailAsync(userForAuthentication.Email);
-            if (user == null)
-                return new AuthenticationResponseDTO("There is no registered user with email provided", null);
+            User user = await GetUserByEmailAsync(userForAuthentication.Email);
 
             if (!await _userManager.IsEmailConfirmedAsync(user))
-                return new AuthenticationResponseDTO("Email is not confirmed", null); // maybe send email to confirm here
+                throw new BadRequestException(new ErrorResponseDTO[1] { new ErrorResponseDTO("Email is not confirmed") }); // maybe send email to confirm here
 
             if (!await _userManager.CheckPasswordAsync(user, userForAuthentication.Password))
-                return new AuthenticationResponseDTO("Provided password is invalid", null);
+                throw new BadRequestException(new ErrorResponseDTO[1] { new ErrorResponseDTO("Provided password is invalid") });
 
             SigningCredentials signingCredentials = _jwtHandler.GetSigningCredentials();
             ICollection<Claim> claims = await _jwtHandler.GetClaimsAsync(user);
             JwtSecurityToken jwtSecurityToken = _jwtHandler.GenerateJwtSecurityToken(signingCredentials, claims);
             string token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-            return new AuthenticationResponseDTO(null, token);
+            return new AuthenticationResponseDTO(token);
         }
 
-        public async Task<ErrorResponseDTO?> ForgotPasswordAsync(ForgotPasswordDTO forgotPassword, CancellationToken cancellationToken)
+        public async Task ForgotPasswordAsync(ForgotPasswordDTO forgotPassword, CancellationToken cancellationToken)
         {
-            await _forgotPasswordValidator.ValidateAndThrowAsync(forgotPassword, cancellationToken);
+            await _serviceProvider.GetService<IValidator<ForgotPasswordDTO>>().ValidateAndThrowAsync(forgotPassword, cancellationToken);
 
-            User user = await _userManager.FindByEmailAsync(forgotPassword.Email);
-            if (user == null)
-                return new ErrorResponseDTO("There is no registered user with email provided");
+            User user = await GetUserByEmailAsync(forgotPassword.Email);
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
@@ -126,36 +114,36 @@ namespace LoanComparer.Application.Services
                 string.Format(LoanComparerConstants.PasswordResetHtmlContent, user.FirstName, callback));
 
             await _emailService.SendEmailAsync(email, cancellationToken);
-
-            return null;
         }
 
-        public async Task<IEnumerable<ErrorResponseDTO>?> ResetPasswordAsync(ResetPasswordDTO resetPassword, CancellationToken cancellationToken)
+        public async Task ResetPasswordAsync(ResetPasswordDTO resetPassword, CancellationToken cancellationToken)
         {
-            await _resetPasswordValidator.ValidateAndThrowAsync(resetPassword, cancellationToken);
+            await _serviceProvider.GetService<IValidator<ResetPasswordDTO>>().ValidateAndThrowAsync(resetPassword, cancellationToken);
 
-            User user = await _userManager.FindByEmailAsync(resetPassword.Email);
-            if (user == null)
-                return new ErrorResponseDTO[1] { new ErrorResponseDTO("There is no registered user with email provided") };
+            User user = await GetUserByEmailAsync(resetPassword.Email);
             
             IdentityResult resetPasswordResult = await _userManager.ResetPasswordAsync(user, HttpUtility.UrlDecode(resetPassword.Token), resetPassword.Password);
 
-            return resetPasswordResult.Succeeded 
-                ? null
-                : resetPasswordResult.Errors.Select(error => new ErrorResponseDTO(error.Description));
+            if (!resetPasswordResult.Succeeded)
+                throw new BadRequestException(resetPasswordResult.Errors.Select(error => new ErrorResponseDTO(error.Description)));
         }
 
-        public async Task<IEnumerable<ErrorResponseDTO>?> ConfirmEmailAsync(string email, string token)
+        public async Task ConfirmEmailAsync(string email, string token)
         {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-                return new ErrorResponseDTO[1] { new ErrorResponseDTO("There is not registered user with email provided") };
+            var user = await GetUserByEmailAsync(email);
 
             var confirmEmailResult = await _userManager.ConfirmEmailAsync(user, HttpUtility.UrlDecode(token));
 
-            return confirmEmailResult.Succeeded
-                ? null
-                : confirmEmailResult.Errors.Select(error => new ErrorResponseDTO(error.Description));
+            if (!confirmEmailResult.Succeeded)
+                throw new BadRequestException(confirmEmailResult.Errors.Select(error => new ErrorResponseDTO(error.Description)));
+        }
+
+        private async Task<User> GetUserByEmailAsync(string email)
+        {
+            User user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                throw new BadRequestException(new ErrorResponseDTO[1] { new ErrorResponseDTO("There is no registered user with email provided") });
+            return user;
         }
     }
 }

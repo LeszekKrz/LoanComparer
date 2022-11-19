@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using LoanComparer.Application.DTO;
+using LoanComparer.Application.Exceptions;
 
 namespace LoanComparer.Api.Middleware
 {
@@ -24,6 +25,10 @@ namespace LoanComparer.Api.Middleware
             {
                 await HandleValidationExceptionAsync(httpContext, validationException);
             }
+            catch (BadRequestException badRequestException)
+            {
+                await HandleBadRequestException(httpContext, badRequestException);
+            }
             catch (Exception)
             {
                 HandleExceptionAsync(httpContext);
@@ -35,7 +40,13 @@ namespace LoanComparer.Api.Middleware
             httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             var mappedErrors = validationException.Errors.Select(error => new ErrorResponseDTO(error.ErrorMessage));
             await httpContext.Response.WriteAsJsonAsync(mappedErrors);
-            return;
+        }
+
+        private async Task HandleBadRequestException(HttpContext httpContext, BadRequestException badRequestException)
+        {
+            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            var mappedErrors = badRequestException.Errors;
+            await httpContext.Response.WriteAsJsonAsync(mappedErrors);
         }
 
         private void HandleExceptionAsync(HttpContext httpContext) // logger is it okay?

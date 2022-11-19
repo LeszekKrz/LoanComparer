@@ -1,5 +1,4 @@
-﻿using LoanComparer.Application.DTO;
-using LoanComparer.Application.DTO.UserDTO;
+﻿using LoanComparer.Application.DTO.UserDTO;
 using LoanComparer.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -21,11 +20,9 @@ namespace LoanComparer.Api.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUserAsync([FromBody] UserForRegistrationDTO userForRegistration, CancellationToken cancellationToken)
         {
-            IEnumerable<ErrorResponseDTO>? registrationResponse = await _userService.RegisterUserAsync(userForRegistration, cancellationToken);
+            await _userService.RegisterUserAsync(userForRegistration, cancellationToken);
 
-            return registrationResponse == null
-                ? StatusCode((int)HttpStatusCode.Created)
-                : BadRequest(registrationResponse);
+            return StatusCode((int)HttpStatusCode.Created);
         }
     }
 }

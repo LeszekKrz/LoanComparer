@@ -3,11 +3,12 @@ using LoanComparer.Application.Model;
 using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using System.Diagnostics;
 using System.Security.Cryptography.Xml;
 
 namespace LoanComparer.Application.Services
 {
-    public class EmailService
+    public class EmailService : IEmailService
     {
         private readonly EmailAddress _fromEmailAddress;
         private readonly ISendGridClient _sendGridClient;
