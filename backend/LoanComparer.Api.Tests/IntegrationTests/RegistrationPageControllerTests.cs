@@ -27,17 +27,15 @@ namespace LoanComparer.Api.Tests.IntegrationTests
         private string _connection;
         private Respawner _respawner;
         private Mock<IEmailService> _emailServiceMock = new Mock<IEmailService>();
-        private Mock<UserManager<User>> _userManagerMock = new Mock<UserManager<User>>();
 
         [TestInitialize]
         public async Task Initialize()
         {
-            _webApplicationFactory = IntegrationTestSetup.GetWebApplicationFactory();
+            _emailServiceMock.Setup(x => x.SendEmailAsync(It.IsAny<Email>(), It.IsAny<CancellationToken>())).Verifiable();
+            _webApplicationFactory = IntegrationTestSetup.GetWebApplicationFactory(_emailServiceMock.Object);
             var config = _webApplicationFactory.Services.GetService<IConfiguration>();
             _connection = config.GetConnectionString("Database");
             _respawner = await IntegrationTestSetup.CreateRespawnerAsync(_connection);
-            _emailServiceMock.Setup(x => x.SendEmailAsync(It.IsAny<Email>(), It.IsAny<CancellationToken>())).Verifiable();
-            _userManagerMock.Setup(x => x.GenerateEmailConfirmationTokenAsync(It.IsAny<User>())).ReturnsAsync("token").Verifiable();
         }
 
         [TestMethod]
@@ -103,7 +101,6 @@ namespace LoanComparer.Api.Tests.IntegrationTests
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
 
-            _userManagerMock.Verify(userManager => userManager.GenerateEmailConfirmationTokenAsync(It.IsAny<User>()), Times.Once);
             _emailServiceMock.Verify(emailService => emailService.SendEmailAsync(It.IsAny<Email>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 

@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using LoanComparer.Application.DTO.UserDTO;
 using LoanComparer.Application.Model;
 using LoanComparer.Application;
 using Microsoft.AspNetCore.Identity;
@@ -7,20 +6,17 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
 using Respawn;
 using System.Net;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Web;
-using LoanComparer.Application.Constants;
 
 namespace LoanComparer.Api.Tests.IntegrationTests
 {
     [TestClass]
     [TestCategory(TestCategories.SQL)]
-    public class EmailConfirmationPageTests
+    public class EmailConfirmationPageControllerTests
     {
         private WebApplicationFactory<Program> _webApplicationFactory;
         private string _connection;

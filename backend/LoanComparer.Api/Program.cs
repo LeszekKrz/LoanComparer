@@ -32,7 +32,6 @@ builder.Services.AddDbContext<LoanComparerContext>(options => options.UseSqlServ
 builder.Services.AddIdentity<User, Role>(options =>
 {
     options.Password.RequiredLength = 8;
-    // options.Stores.ProtectPersonalData = true; maybe thats a good idea check it later
     options.User.RequireUniqueEmail = true;
 }).AddUserStore<
     UserStore<

@@ -1,15 +1,17 @@
 ﻿using FluentAssertions;
 using LoanComparer.Application.DTO.UserDTO;
 using LoanComparer.Application.Model;
+using LoanComparer.Application.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Newtonsoft.Json;
 using Respawn;
 using System.Net;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using LoanComparer.Application;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,23 +19,25 @@ namespace LoanComparer.Api.Tests.IntegrationTests
 {
     [TestClass]
     [TestCategory(TestCategories.SQL)]
-    public class LoginPageControllerTests
+    public class ForgotPasswordPageControllerTests
     {
         private WebApplicationFactory<Program> _webApplicationFactory;
         private string _connection;
         private Respawner _respawner;
+        private Mock<IEmailService> _emailServiceMock = new Mock<IEmailService>();
 
         [TestInitialize]
         public async Task Initialize()
         {
-            _webApplicationFactory = IntegrationTestSetup.GetWebApplicationFactory();
+            _emailServiceMock.Setup(x => x.SendEmailAsync(It.IsAny<Email>(), It.IsAny<CancellationToken>())).Verifiable();
+            _webApplicationFactory = IntegrationTestSetup.GetWebApplicationFactory(_emailServiceMock.Object);
             var config = _webApplicationFactory.Services.GetService<IConfiguration>();
             _connection = config.GetConnectionString("Database");
             _respawner = await IntegrationTestSetup.CreateRespawnerAsync(_connection);
         }
 
         [TestMethod]
-        public async Task LoginUser_ShouldReturnOk()
+        public async Task ForgotPassword_ShouldSendEmailAndOk()
         {
             // ARRANGE
 
@@ -41,9 +45,7 @@ namespace LoanComparer.Api.Tests.IntegrationTests
 
             await _respawner.ResetAsync(_connection);
 
-            string jobTypeName = "Other";
-            string userPassword = "Password123!";
-            string userEmail = "loan.comparer@gmail.com";
+            var forgotPasswordDTO = new ForgotPasswordDTO("loan.comparer@gmail.com", "https://testURI");
 
             await _webApplicationFactory.DoWithinScope<LoanComparerContext, UserManager<User>>(
                 async (context, userManager) =>
@@ -51,29 +53,26 @@ namespace LoanComparer.Api.Tests.IntegrationTests
                     var user = new User(
                         "testFirstName",
                         "testLastName",
-                        userEmail,
-                        await context.JobTypes.SingleAsync(jobType => jobType.Name == jobTypeName),
+                        forgotPasswordDTO.Email,
+                        await context.JobTypes.SingleAsync(jobType => jobType.Name == "Other"),
                         1,
                         new GovernmentId(
                             "PESEL",
                             "05240816772"));
-                    await userManager.CreateAsync(user, userPassword);
-                    User userFromDb = await userManager.FindByEmailAsync(user.Email);
-                    string token = await userManager.GenerateEmailConfirmationTokenAsync(userFromDb);
-                    await userManager.ConfirmEmailAsync(userFromDb, token);
+                    await userManager.CreateAsync(user, "Password123!");
                 });
 
-            var userForAuthenticationDTO = new UserForAuthenticationDTO(userEmail, userPassword);
-
-            var stringContent = new StringContent(JsonConvert.SerializeObject(userForAuthenticationDTO), Encoding.UTF8, "application/json");
+            var stringContent = new StringContent(JsonConvert.SerializeObject(forgotPasswordDTO), Encoding.UTF8, "application/json");
 
             // ACT
 
-            HttpResponseMessage response = await httpClient.PostAsync("api/login-page/login", stringContent);
+            HttpResponseMessage response = await httpClient.PostAsync("api/forgot-password-page/forgot-password", stringContent);
 
             // ASSERT
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            _emailServiceMock.Verify(emailService => emailService.SendEmailAsync(It.IsAny<Email>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }
