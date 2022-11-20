@@ -5,7 +5,7 @@ import { MessageService } from 'primeng/api';
 import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { JobTypeDTO } from 'src/app/core/models/job-type-dto';
 import { JobTypesHttpService } from 'src/app/core/services/job.type.http.service';
-import { GovernmentIdDTO } from '../../authentication/models/government-id-dto';
+import { GovernmentIdDTO } from '../../core/models/government-id-dto';
 import { UserForRegistrationDTO } from '../../authentication/models/user-for-registration-dto';
 import { AuthenticationService } from 'src/app/authentication/services/authentication.service';
 import { environment } from 'src/environments/environment';

@@ -71,10 +71,6 @@ export class AuthenticationService {
   }
 
   confirmEmail(token: string, email: string): Observable<ErrorResponseDTO[]> {
-    // let httpParams = new HttpParams();
-    // httpParams = httpParams.append('token', token);
-    // httpParams = httpParams.append('email', email);
-
     const httpParams = {
       'token': token,
       'email': email

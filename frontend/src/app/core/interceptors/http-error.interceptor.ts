@@ -20,10 +20,6 @@ export class HttpErrorInterceptor implements HttpInterceptor {
               this.messageService.add({severity: 'error', summary: 'Error', detail: e.errorMessage});
             });
             break;
-          case 401:
-            const authenticationResponse: AuthenticationResponseDTO = errorResponse.error;
-            this.messageService.add({severity: 'error', summary: 'Error', detail: authenticationResponse.errorResponse!});
-            break;
           case 403:
             this.messageService.add({severity: 'error', summary: 'Error', detail: insuficcientAccessMessage})
             break;

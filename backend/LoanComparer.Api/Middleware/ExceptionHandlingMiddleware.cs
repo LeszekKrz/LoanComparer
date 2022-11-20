@@ -29,9 +29,9 @@ namespace LoanComparer.Api.Middleware
             {
                 await HandleBadRequestException(httpContext, badRequestException);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                HandleExceptionAsync(httpContext);
+                HandleExceptionAsync(httpContext, exception);
             }
         }
 
@@ -49,7 +49,7 @@ namespace LoanComparer.Api.Middleware
             await httpContext.Response.WriteAsJsonAsync(mappedErrors);
         }
 
-        private void HandleExceptionAsync(HttpContext httpContext) // logger is it okay?
+        private void HandleExceptionAsync(HttpContext httpContext, Exception exception)
         {
             httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
             _logger.LogInformation(
@@ -57,6 +57,9 @@ namespace LoanComparer.Api.Middleware
                 httpContext.Request.Method,
                 httpContext.Request.Path.Value,
                 httpContext.Response.StatusCode);
+            _logger.LogInformation("Exception message: " + exception.Message);
+            _logger.LogInformation("Exception source: " + exception.Source);
+            _logger.LogInformation("Exception stack trace: " + exception.StackTrace);
         }
     }
 }

@@ -52,7 +52,7 @@ export class LoginComponent implements OnDestroy {
     );
     this.subscriptions.push(this.doWithLoading(login$).subscribe({
       next: (authenticationResponse: AuthenticationResponseDTO) => {
-        localStorage.setItem('token', authenticationResponse.token!);
+        localStorage.setItem('token', authenticationResponse.token);
       },
       complete: () => {
         this.authenticationService.sendAuthenticationStateChangedNotification(true);
