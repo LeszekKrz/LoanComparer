@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -11,19 +10,18 @@ namespace LoanComparer.Application.Services.JwtFeatures
 {
     public class JwtHandler
     {
-        private readonly IConfigurationSection _jwtSettings;
+        private readonly JwtSettings _jwtSettings;
         private readonly UserManager<User> _userManager;
 
-        public JwtHandler(IConfiguration configuration, UserManager<User> userManager)
+        public JwtHandler(JwtSettings jwtSettings, UserManager<User> userManager)
         {
-            _jwtSettings = configuration.GetSection("JwtSettings");
+            _jwtSettings = jwtSettings;
             _userManager = userManager;
         }
 
         public SigningCredentials GetSigningCredentials()
         {
-            byte[] securityKey = Encoding.UTF8.GetBytes(_jwtSettings["securityKey"]);
-            var symetricSecurityKey = new SymmetricSecurityKey(securityKey);
+            var symetricSecurityKey = new SymmetricSecurityKey(_jwtSettings.SecurityKey);
             return new SigningCredentials(symetricSecurityKey, SecurityAlgorithms.HmacSha256);
         }
 
@@ -45,10 +43,10 @@ namespace LoanComparer.Application.Services.JwtFeatures
         public JwtSecurityToken GenerateJwtSecurityToken(SigningCredentials signingCredentials, ICollection<Claim> claims)
         {
             return new JwtSecurityToken(
-                issuer: _jwtSettings["validIssuer"],
-                audience: _jwtSettings["validAudience"],
+                issuer: _jwtSettings.ValidIssuer,
+                audience: _jwtSettings.ValidAudience,
                 claims: claims,
-                expires: DateTime.Now.AddDays(Convert.ToDouble(_jwtSettings["expiresInDays"])),
+                expires: DateTime.Now.AddDays(_jwtSettings.ExpiresInDays),
                 signingCredentials: signingCredentials);
         }
     }

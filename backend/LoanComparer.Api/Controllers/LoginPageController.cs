@@ -16,7 +16,7 @@ namespace LoanComparer.Api.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> LoginUserAsync([FromBody] UserForAuthenticationDTO userForAuthentication, CancellationToken cancellationToken)
+        public async Task<ActionResult<AuthenticationResponseDTO>> LoginUserAsync([FromBody] UserForAuthenticationDTO userForAuthentication, CancellationToken cancellationToken)
         {
             AuthenticationResponseDTO authenticationResponse = await _userService.LoginUserAsync(userForAuthentication, cancellationToken);
             return Ok(authenticationResponse);

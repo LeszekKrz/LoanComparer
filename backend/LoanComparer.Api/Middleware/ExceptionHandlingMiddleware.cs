@@ -8,11 +8,13 @@ namespace LoanComparer.Api.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger, IWebHostEnvironment webHostEnvironment)
         {
             _next = next;
             _logger = logger;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public async Task InvokeAsync(HttpContext httpContext)
@@ -31,7 +33,7 @@ namespace LoanComparer.Api.Middleware
             }
             catch (Exception exception)
             {
-                HandleExceptionAsync(httpContext, exception);
+                HandleException(httpContext, exception);
             }
         }
 
@@ -49,17 +51,20 @@ namespace LoanComparer.Api.Middleware
             await httpContext.Response.WriteAsJsonAsync(mappedErrors);
         }
 
-        private void HandleExceptionAsync(HttpContext httpContext, Exception exception)
+        private void HandleException(HttpContext httpContext, Exception exception)
         {
             httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            _logger.LogInformation(
+            if (!_webHostEnvironment.IsProduction())
+            {
+                _logger.LogInformation(
                 "Request {method} {url} => {statusCode}",
                 httpContext.Request.Method,
                 httpContext.Request.Path.Value,
                 httpContext.Response.StatusCode);
-            _logger.LogInformation("Exception message: " + exception.Message);
-            _logger.LogInformation("Exception source: " + exception.Source);
-            _logger.LogInformation("Exception stack trace: " + exception.StackTrace);
+                _logger.LogInformation("Exception message: " + exception.Message);
+                _logger.LogInformation("Exception source: " + exception.Source);
+                _logger.LogInformation("Exception stack trace: " + exception.StackTrace);
+            }
         }
     }
 }
