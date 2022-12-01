@@ -208,8 +208,8 @@ namespace LoanComparer.Application.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "3afda462-74b1-4212-924f-fcd16f0a5b3c", "cf0e4d9f-6ff8-4873-a398-d6fa84fc73ce", "Client", "CLIENT" },
-                    { "c46ffc5a-ed56-463b-8e96-232b86ef61fc", "1c93382e-9e5b-4694-92be-f2091af2b9ba", "BankEmployee", "BANKEMPLOYEE" }
+                    { "0ca57a25-8e00-4401-871e-05c5075f7cde", "6e9c71b1-2fbd-4256-a715-dcb102f2c16c", "Client", "CLIENT" },
+                    { "956524f4-7558-41ad-a2b4-8be36b75b848", "f0882e18-2720-417b-9b9e-cbfedc219181", "BankEmployee", "BANKEMPLOYEE" }
                 });
 
             migrationBuilder.InsertData(

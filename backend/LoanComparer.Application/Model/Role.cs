@@ -6,6 +6,10 @@ namespace LoanComparer.Application.Model
     {
         public virtual ICollection<UserRole> UsersRoles { get; private set; }
 
-        internal Role() { }
+        internal Role(string roleName) : base(roleName)
+        {
+            NormalizedName = roleName.ToUpper();
+        }
+        private Role() { }
     }
 }

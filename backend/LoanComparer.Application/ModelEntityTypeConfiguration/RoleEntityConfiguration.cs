@@ -16,17 +16,8 @@ namespace LoanComparer.Application.ModelEntityTypeConfiguration
                 .IsRequired();
 
             builder.HasData(
-                new Role()
-                { 
-                    Name = LoanComparerConstants.ClientRoleName,
-                    NormalizedName= LoanComparerConstants.ClientRoleName.ToUpper()
-                },
-                new Role()
-                { 
-                    Name = LoanComparerConstants.BankEmployeeRoleName,
-                    NormalizedName= LoanComparerConstants.BankEmployeeRoleName.ToUpper()
-                });
-
+                new Role(LoanComparerConstants.ClientRoleName),
+                new Role(LoanComparerConstants.BankEmployeeRoleName));
         }
     }
 }

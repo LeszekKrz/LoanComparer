@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoanComparer.Application.Migrations
 {
     [DbContext(typeof(LoanComparerContext))]
-    [Migration("20221119133645_InitialMigration")]
+    [Migration("20221201110012_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -147,15 +147,15 @@ namespace LoanComparer.Application.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "3afda462-74b1-4212-924f-fcd16f0a5b3c",
-                            ConcurrencyStamp = "cf0e4d9f-6ff8-4873-a398-d6fa84fc73ce",
+                            Id = "0ca57a25-8e00-4401-871e-05c5075f7cde",
+                            ConcurrencyStamp = "6e9c71b1-2fbd-4256-a715-dcb102f2c16c",
                             Name = "Client",
                             NormalizedName = "CLIENT"
                         },
                         new
                         {
-                            Id = "c46ffc5a-ed56-463b-8e96-232b86ef61fc",
-                            ConcurrencyStamp = "1c93382e-9e5b-4694-92be-f2091af2b9ba",
+                            Id = "956524f4-7558-41ad-a2b4-8be36b75b848",
+                            ConcurrencyStamp = "f0882e18-2720-417b-9b9e-cbfedc219181",
                             Name = "BankEmployee",
                             NormalizedName = "BANKEMPLOYEE"
                         });

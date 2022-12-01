@@ -4,7 +4,7 @@ namespace LoanComparer.Application.Model
 {
     public class GovernmentId
     {
-        public string Id { get; set; }
+        public string Id { get; init; }
         public string Type { get; private set; }
         public string Value { get; private set; }
         public User User { get; private set; }

@@ -78,7 +78,7 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy( // TODO
+    options.AddPolicy(
         "Allow ALL",
         builder => builder
             .AllowAnyMethod()
@@ -96,12 +96,13 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-else
+
+if(app.Environment.IsProduction())
 {
     app.UseHsts();
 }
@@ -115,6 +116,11 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+app.UseEndpoints(endpoints => {
+    if (app.Environment.IsDevelopment())
+        endpoints.MapControllers().AllowAnonymous();
+    else
+        endpoints.MapControllers();
+});
 
 app.Run();

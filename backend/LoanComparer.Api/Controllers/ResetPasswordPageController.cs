@@ -6,11 +6,11 @@ namespace LoanComparer.Api.Controllers
 {
     [ApiController]
     [Route("api/reset-password-page")]
-    public class ResetPasswordController : ControllerBase
+    public class ResetPasswordPageController : ControllerBase
     {
         private readonly UserService _userService;
 
-        public ResetPasswordController(UserService userService)
+        public ResetPasswordPageController(UserService userService)
         {
             _userService = userService;
         }

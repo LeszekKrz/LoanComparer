@@ -2,7 +2,7 @@
 {
     public class Inquiry
     {
-        public int Id { get; set; }
+        public int Id { get; init; }
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
         public string GovernmentIdType { get; private set; }
