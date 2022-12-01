@@ -1,0 +1,228 @@
+<div class="progress-spinner" *ngIf="isProgressSpinnerVisible">
+  <p-progressSpinner></p-progressSpinner>
+</div>
+
+<p-card
+  header="Register"
+  styleClass="p-card-style shadow-7">
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <div class="p-fluid">
+      <label for="firstName-input" class="field-label">
+        <p class="required">First Name</p>
+      </label>
+      <input
+        id="firstName-input"
+        type="text"
+        formControlName="firstName"
+        pInputText
+        [ngClass]="{
+          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('firstName')
+        }"
+        placeholder="First name" />
+      <small class="p-error" *ngIf="isInputInvalidAndTouchedOrDirty('firstName')">
+        This field is required
+      </small>
+    </div>
+    <div class="p-fluid">
+      <label for="lastName-input" class="field-label">
+        <p class="required">Last Name</p>
+      </label>
+      <input
+        id="lastName-input"
+        type="text"
+        formControlName="lastName"
+        pInputText
+        [ngClass]="{
+          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('lastName')
+        }"
+        placeholder="Last name" />
+      <small class="p-error" *ngIf="isInputInvalidAndTouchedOrDirty('lastName')">
+        This field is required
+      </small>
+    </div>
+    <div class="p-fluid">
+      <label for="email-input" class="field-label">
+        <p class="required">Email</p>
+      </label>
+      <input
+        id="email-input"
+        type="text"
+        formControlName="email"
+        pInputText
+        [ngClass]="{
+          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('email')
+        }"
+        placeholder="Email" />
+        <small class="p-error" *ngIf="isInputTouchedOrDirtyAndEmpty('email'); else invalidEmailFormatMessage">
+          This field is required
+        </small>
+        <ng-template #invalidEmailFormatMessage>
+          <small class="p-error" *ngIf="isEmailInputTouchedOrDirtyAndNotValidEmail()">
+            Please enter valid email address
+          </small>
+        </ng-template>
+    </div>
+    <div class="p-fluid">
+      <label for="jobType-dropdown" class="field-label">
+        <p class="required">Job Type</p>
+      </label>
+      <div class="width: 100%">
+      <p-dropdown
+        id="jobType-dropdown"
+        formControlName="jobType"
+        [options]="jobTypes"
+        placeholder="Select your job type"
+        optionLabel="name"
+        [filter]="true"
+        filterBy="name"
+        [showClear]="true"
+        [ngClass]="{
+          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('jobType')
+        }">
+      </p-dropdown>
+      </div>
+      <small class="p-error" *ngIf="isInputInvalidAndTouchedOrDirty('jobType')">
+        This field is required
+      </small>
+    </div>
+    <div class="p-fluid">
+      <label for="incomeLevel-input" class="field-label">
+        <p class="required">Income Level</p>
+      </label>
+      <p-inputNumber
+        id="incomeLevel-input"
+        type="number"
+        formControlName="incomeLevel"
+        [min]="1"
+        styleClass="p-inputNumber-style"
+        [ngClass]="{
+          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('incomeLevel')
+        }"
+        placeholder="Income level"
+        suffix=" zł">
+      </p-inputNumber>
+      <small class="p-error" *ngIf="isInputTouchedOrDirtyAndEmpty('incomeLevel'); else invalidIncomeLevelValueMessage">
+        This field is required
+      </small>
+      <ng-template #invalidIncomeLevelValueMessage>
+        <small class="p-error" *ngIf="isIncomeLevelInputTouchedOrDirtyAndNotValidValue()">
+          Please enter a value that is greater than 0
+        </small>
+      </ng-template>
+    </div>
+    <div class="p-fluid">
+      <label for="governmentId-dropdown" class="field-label">
+        <p class="required">Government Id Type</p>
+      </label>
+      <p-dropdown
+        id="governmentId-dropdown"
+        formControlName="governmentIdType"
+        [options]="governmentIdTypes"
+        placeholder="Select government id you want to provide"
+        [showClear]="true"
+        [ngClass]="{
+          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('governmentIdType')
+        }">
+      </p-dropdown>
+      <small class="p-error" *ngIf="isInputInvalidAndTouchedOrDirty('governmentIdType')">
+        This field is required
+      </small>
+    </div>
+    <div class="p-fluid" *ngIf="isGovernmentIdTypeSelected()">
+      <label for="governmentIdValue-input" class="field-label">
+        <p class="required">{{ this.getSelectedGovernmentIdType() }}</p>
+      </label>
+      <input
+        id="governmentIdValue-input"
+        type="text"
+        formControlName="governmentIdValue"
+        pInputText
+        [ngClass]="{
+          'ng-invalid ng-dirty': isGovernmentIdValueInvalidAndTouchedOrDirty()
+        }"
+        placeholder="{{ this.getSelectedGovernmentIdType() }}" /> <!--ngClass same as confirm password issue-->
+        <small class="p-error" *ngIf="isInputTouchedOrDirtyAndEmpty('governmentIdValue'); else invalidEmailFormatMessage">
+          This field is required
+        </small>
+        <ng-template #invalidEmailFormatMessage>
+          <small class="p-error" *ngIf="isGovernmentIdValueInvalidButNotEmptyAndTouchedOrDirty()">
+            Please enter valid {{ this.getSelectedGovernmentIdType() }}
+          </small>
+        </ng-template>
+    </div>
+    <div class="p-fluid">
+      <label for="password-input" class="field-label">
+        <p class="required">Password</p>
+      </label>
+      <span class="p-input-icon-right">
+        <i class="pi {{ this.passwordEyeIcon }}" (click)="hideShowPassword()"></i>
+        <input
+          pInputText
+          [type]="passwordInputType"
+          id="password-input"
+          formControlName="password"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('password')
+          }"
+          placeholder="Password"/>
+      </span>
+      <small class="p-error" *ngIf="isInputTouchedOrDirtyAndEmpty('password'); else passwordToShortMessage">
+        This field is required
+      </small>
+      <ng-template #passwordToShortMessage>
+        <small class="p-error" *ngIf="isPasswordInputTouchedOrDirtyAndTooShort(); else passwordDoesntContainALowerCaseLetterMessage">
+          Password should have at least {{ this.passwordMinLength }} characters
+        </small>
+      </ng-template>
+      <ng-template #passwordDoesntContainALowerCaseLetterMessage>
+        <small class="p-error" *ngIf="isPasswordInputTouchedOrDirtyAndDoesntContainLowerCaseLetter();
+         else passwordDoesntContainAUpperCaseLetterMessage">
+          Password should have at least 1 lower case letter
+        </small>
+      </ng-template>
+      <ng-template #passwordDoesntContainAUpperCaseLetterMessage>
+        <small class="p-error" *ngIf="isPasswordInputTouchedOrDirtyAndDoesntContainUpperCaseLetter();
+         else passwordDoesntContainANumberMessage">
+          Password should have at least 1 upper case letter
+        </small>
+      </ng-template>
+      <ng-template #passwordDoesntContainANumberMessage>
+        <small class="p-error" *ngIf="isPasswordInputTouchedOrDirtyAndDoesntContainNumber();
+         else passwordDoesntContainASpecialCharacterMessage">
+          Password should have at least 1 number
+        </small>
+      </ng-template>
+      <ng-template #passwordDoesntContainASpecialCharacterMessage>
+        <small class="p-error" *ngIf="isPasswordInputTouchedOrDirtyAndDoesntContainSpecialCharacter()">
+          Password should have at least 1 special character
+        </small>
+      </ng-template>
+    </div>
+    <div class="p-fluid">
+      <label for="confirmPassword-input" class="field-label">
+        <p class="required">Confirm Password</p>
+      </label>
+      <span class="p-input-icon-right">
+        <i class="pi {{ this.confirmPasswordEyeIcon }}" (click)="hideShowConfirmPassword()"></i>
+        <input
+          pInputText
+          [type]="confirmPasswordInputType"
+          id="confirmPassword-input"
+          formControlName="confirmPassword"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isConfirmPasswordInputInvalidAndTouchedOrDirty()
+          }"
+          placeholder="Password"/> <!--ngClass only works once passwords were the same-->
+      </span>
+      <small class="p-error" *ngIf="isInputTouchedOrDirtyAndEmpty('confirmPassword'); else passwordsNotMatchingMessage">
+        This field is required
+      </small>
+      <ng-template #passwordsNotMatchingMessage>
+        <small class="p-error" *ngIf="arePasswordAndConfirmPasswordTouchedOrDirtyAndNotMatching()">
+          Password and confirm password fields are not matching
+        </small>
+      </ng-template>
+    </div>
+    <p-button pRipple type="submit" styleClass="p-button-style" label="Register"></p-button>
+  </form>
+</p-card>

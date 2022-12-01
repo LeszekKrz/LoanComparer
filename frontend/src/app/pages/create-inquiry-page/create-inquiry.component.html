@@ -1,0 +1,63 @@
+<p-card
+  header="Create Inquiry"
+  styleClass="pCardStyle shadow-2">
+  <form [formGroup]="createInquiryForm" (ngSubmit)="onSubmit()">
+    <div class="p-field">
+      <label for="firstName-input" class="field-label">
+        <p class="required">First Name</p>
+      </label>
+      <input
+        id="firstName-input"
+        type="text"
+        formControlName="firstName"
+        pInputText
+        [ngClass]="{
+          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('firstName')
+        }"
+        placeholder="First name" />
+      <small class="p-error" *ngIf="isInputInvalidAndTouchedOrDirty('firstName')">
+        This field is required
+      </small>
+    </div>
+    <div class="p-field">
+      <label for="lastName-input" class="field-label">
+        <p class="required">Last Name</p>
+      </label>
+      <input
+        id="lastName-input"
+        type="text"
+        formControlName="lastName"
+        pInputText
+        [ngClass]="{
+          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('lastName')
+        }"
+        placeholder="Last name" />
+      <small class="p-error" *ngIf="isInputInvalidAndTouchedOrDirty('lastName')">
+        This field is required
+      </small>
+    </div>
+    <div class="p-field">
+      <label for="email-input" class="field-label">
+        <p class="required">Email</p>
+      </label>
+      <input
+        id="email-input"
+        type="text"
+        formControlName="email"
+        pInputText
+        [ngClass]="{
+          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('email')
+        }"
+        placeholder="Email" />
+        <small class="p-error" *ngIf="isEmailInputTouchedOrDirtyAndEmpty(); else invalidEmailFormatMessage">
+          This field is required
+        </small>
+        <ng-template #invalidEmailFormatMessage>
+          <small class="p-error" *ngIf="isEmailInputTouchedOrDirtyAndNotValidEmail()">
+            Please enter valid email address
+          </small>
+        </ng-template>
+    </div>
+      <p-button type="submit" class="flex justify-content-end" label="Send Inquiry" icon="pi pi-check"></p-button>
+  </form>
+</p-card>
