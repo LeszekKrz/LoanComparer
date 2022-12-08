@@ -5,6 +5,14 @@
 <p-card
   header="Loan Comparer"
   styleClass="p-card-style shadow-7">
+  <p class="center-text">{{ applicationDescription }}</p>
+  <p class="center-text">Currently we have {{this.registeredUsersCount}} registered users.</p>
+  <p-button
+    pRipple
+    type="createInquiry"
+    styleClass="p-button-style"
+    label="Create New Inquiry"
+    (onClick)="createNewInquiryOnClickHandler()"></p-button>
   <p-table
     #inquiriesTable
     [value]="inquiries"
@@ -18,19 +26,19 @@
     *ngIf="this.isUserAuthenticated">
 
     <ng-template pTemplate="caption">
-      <p class="center-text">Your inquiries</p>
+      <p class="center-text delete-margin">Your inquiries</p>
     </ng-template>
 
     <ng-template pTemplate="header">
       <tr>
         <th>
-          <p class="center-text">Loan Value</p>
+          <p class="center-text delete-margin">Loan Value</p>
         </th>
         <th>
-          <p class="center-text">Inquiry Submition Date</p>
+          <p class="center-text delete-margin">Inquiry Submition Date</p>
         </th>
         <th>
-          <p class="center-text">Status</p>
+          <p class="center-text delete-margin">Status</p>
         </th>
       </tr>
     </ng-template>
@@ -38,13 +46,13 @@
     <ng-template pTemplate="body" let-inquiry>
       <tr>
         <td>
-          <p class="center-text">{{ inquiry.loanValue }}</p>
+          <p class="center-text delete-margin">{{ inquiry.loanValue }}</p>
         </td>
         <td>
-          <p class="center-text">{{ inquiry.dateOfInquirySubmition | date: 'dd.MM.yyyy, HH:mm' }}</p>
+          <p class="center-text delete-margin">{{ inquiry.dateOfInquirySubmition | date: 'dd.MM.yyyy, HH:mm' }}</p>
         </td>
         <td>
-          <p class="center-text"><span [class]="'status-' + inquiry.status.toLowerCase()">{{ inquiry.status }}</span></p>
+          <p class="center-text delete-margin"><span [class]="'status-' + inquiry.status.toLowerCase()">{{ inquiry.status }}</span></p>
         </td>
       </tr>
     </ng-template>

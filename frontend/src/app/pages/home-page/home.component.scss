@@ -2,16 +2,21 @@
   border-radius: 1rem;
   width: 60%;
   margin: 1rem auto;
+
   .p-card-title {
     text-align: center;
     margin: 0 auto;
     font-size: 2.5rem;
   }
+
+  .p-card-content {
+    padding: 0;
+  }
 }
 
 :host ::ng-deep {
   .p-datatable {
-    margin: 30px 15px;
+    margin: 16px 16px 0 16px;
   }
 
   .p-datatable-header {
@@ -30,12 +35,21 @@
   }
 }
 
+:host ::ng-deep .p-button-style.p-button {
+  margin-top: 16px;
+  width: 100%;
+  border-radius: 2em;
+}
+
 .table-empty-message {
   text-align: center;
 }
 
 .center-text {
   text-align: center;
+}
+
+.delete-margin {
   margin: 0;
 }
 

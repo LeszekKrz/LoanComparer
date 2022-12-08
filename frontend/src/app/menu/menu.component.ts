@@ -8,17 +8,20 @@ import { AuthenticationService } from '../authentication/services/authentication
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.scss']
 })
-export class MenuComponent implements OnDestroy {
+export class MenuComponent implements OnInit, OnDestroy {
   isUserAuthenticated!: boolean;
   subscriptions: Subscription[] = [];
 
   constructor(private router: Router, private authenticationHttpService: AuthenticationService) {
     this.isUserAuthenticated = this.authenticationHttpService.isUserAuthenticated();
+  }
+
+  ngOnInit(): void {
     this.subscriptions.push(
       this.authenticationHttpService.authenticationStateChanged.subscribe(isAuthenticated => {
         this.isUserAuthenticated = isAuthenticated;
     }));
-   }
+  }
 
   BrandLogoOnClick(): void {
     this.router.navigate(['home']);
