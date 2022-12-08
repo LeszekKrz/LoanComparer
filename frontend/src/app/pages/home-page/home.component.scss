@@ -1,0 +1,70 @@
+:host ::ng-deep .p-card-style.p-card {
+  border-radius: 1rem;
+  width: 60%;
+  margin: 1rem auto;
+  .p-card-title {
+    text-align: center;
+    margin: 0 auto;
+    font-size: 2.5rem;
+  }
+}
+
+:host ::ng-deep {
+  .p-datatable {
+    margin: 30px 15px;
+  }
+
+  .p-datatable-header {
+    background-color: transparent;
+    border: 0;
+    font-size: 1.65rem;
+    margin: 0;
+  }
+
+  .p-datatable-thead > tr > th {
+    background-color: transparent;
+  }
+
+  .p-datatable-tbody > tr > td {
+    padding: 1rem 1rem;
+  }
+}
+
+.table-empty-message {
+  text-align: center;
+}
+
+.center-text {
+  text-align: center;
+  margin: 0;
+}
+
+.status-submitted {
+  color: #348ce0;
+  background-color: #c7ecfc;
+  padding: 2px 10px;
+}
+
+.status-offerscreated {
+  color: #6c35c4;
+  background-color: #ddc9ff;
+  padding: 2px 10px;
+}
+
+.status-waiting {
+  color: #a06750;
+  background-color: #fbedba;
+  padding: 2px 10px;
+}
+
+.status-accepted {
+  color: #357b3a;
+  background-color: #d5efd6;
+  padding: 2px 10px;
+}
+
+.status-rejected {
+  color: #b94444;
+  background-color: #ffdbdf;
+  padding: 2px 10px;
+}

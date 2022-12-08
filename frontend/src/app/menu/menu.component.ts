@@ -13,6 +13,7 @@ export class MenuComponent implements OnDestroy {
   subscriptions: Subscription[] = [];
 
   constructor(private router: Router, private authenticationHttpService: AuthenticationService) {
+    this.isUserAuthenticated = this.authenticationHttpService.isUserAuthenticated();
     this.subscriptions.push(
       this.authenticationHttpService.authenticationStateChanged.subscribe(isAuthenticated => {
         this.isUserAuthenticated = isAuthenticated;
