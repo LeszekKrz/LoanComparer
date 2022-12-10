@@ -1,8 +1,12 @@
+<div class="progress-spinner" *ngIf="isProgressSpinnerVisible">
+  <p-progressSpinner></p-progressSpinner>
+</div>
+
 <p-card
   header="Create Inquiry"
-  styleClass="pCardStyle shadow-2">
+  styleClass="p-card-style shadow-7">
   <form [formGroup]="createInquiryForm" (ngSubmit)="onSubmit()">
-    <div class="p-field">
+    <div class="p-fluid">
       <label for="firstName-input" class="field-label">
         <p class="required">First Name</p>
       </label>
@@ -19,7 +23,7 @@
         This field is required
       </small>
     </div>
-    <div class="p-field">
+    <div class="p-fluid">
       <label for="lastName-input" class="field-label">
         <p class="required">Last Name</p>
       </label>
@@ -36,7 +40,7 @@
         This field is required
       </small>
     </div>
-    <div class="p-field">
+    <div class="p-fluid">
       <label for="email-input" class="field-label">
         <p class="required">Email</p>
       </label>
@@ -49,7 +53,7 @@
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('email')
         }"
         placeholder="Email" />
-        <small class="p-error" *ngIf="isEmailInputTouchedOrDirtyAndEmpty(); else invalidEmailFormatMessage">
+        <small class="p-error" *ngIf="isInputTouchedOrDirtyAndEmpty('email'); else invalidEmailFormatMessage">
           This field is required
         </small>
         <ng-template #invalidEmailFormatMessage>
@@ -58,6 +62,141 @@
           </small>
         </ng-template>
     </div>
-      <p-button type="submit" class="flex justify-content-end" label="Send Inquiry" icon="pi pi-check"></p-button>
+    <div class="p-fluid">
+      <label for="jobType-dropdown" class="field-label">
+        <p class="required">Job Type</p>
+      </label>
+      <div class="width: 100%">
+        <p-dropdown
+          id="jobType-dropdown"
+          formControlName="jobType"
+          [options]="jobTypes"
+          placeholder="Select your job type"
+          optionLabel="name"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="true"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('jobType')
+          }">
+        </p-dropdown>
+      </div>
+      <small class="p-error" *ngIf="isInputInvalidAndTouchedOrDirty('jobType')">
+        This field is required
+      </small>
+    </div>
+    <div class="p-fluid">
+      <label for="incomeLevel-input" class="field-label">
+        <p class="required">Income Level</p>
+      </label>
+      <p-inputNumber
+        id="incomeLevel-input"
+        type="number"
+        formControlName="incomeLevel"
+        [min]="1"
+        styleClass="p-inputNumber-style"
+        [ngClass]="{
+          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('incomeLevel')
+        }"
+        placeholder="Income level"
+        suffix=" zł">
+      </p-inputNumber>
+      <small class="p-error" *ngIf="isInputTouchedOrDirtyAndEmpty('incomeLevel'); else invalidIncomeLevelValueMessage">
+        This field is required
+      </small>
+      <ng-template #invalidIncomeLevelValueMessage>
+        <small class="p-error" *ngIf="isNumberInputTouchedOrDirtyAndTooSmall('incomeLevel')">
+          Please enter a value that is greater than 0
+        </small>
+      </ng-template>
+    </div>
+    <div class="p-fluid">
+      <label for="governmentId-dropdown" class="field-label">
+        <p class="required">Government Id Type</p>
+      </label>
+      <p-dropdown
+        id="governmentId-dropdown"
+        formControlName="governmentIdType"
+        [options]="governmentIdTypes"
+        placeholder="Select government id you want to provide"
+        [showClear]="true"
+        [ngClass]="{
+          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('governmentIdType')
+        }">
+      </p-dropdown>
+      <small class="p-error" *ngIf="isInputInvalidAndTouchedOrDirty('governmentIdType')">
+        This field is required
+      </small>
+    </div>
+    <div class="p-fluid" *ngIf="isGovernmentIdTypeSelected()">
+      <label for="governmentIdValue-input" class="field-label">
+        <p class="required">{{ this.getSelectedGovernmentIdType() }}</p>
+      </label>
+      <input
+        id="governmentIdValue-input"
+        type="text"
+        formControlName="governmentIdValue"
+        pInputText
+        [ngClass]="{
+          'ng-invalid ng-dirty': isGovernmentIdValueInvalidAndTouchedOrDirty()
+        }"
+        placeholder="{{ this.getSelectedGovernmentIdType() }}" /> <!--ngClass same as confirm password issue-->
+        <small class="p-error" *ngIf="isInputTouchedOrDirtyAndEmpty('governmentIdValue'); else invalidEmailFormatMessage">
+          This field is required
+        </small>
+        <ng-template #invalidEmailFormatMessage>
+          <small class="p-error" *ngIf="isGovernmentIdValueInvalidButNotEmptyAndTouchedOrDirty()">
+            Please enter valid {{ this.getSelectedGovernmentIdType() }}
+          </small>
+        </ng-template>
+    </div>
+    <div class="p-fluid">
+      <label for="loanValue-input" class="field-label">
+        <p class="required">Loan Value</p>
+      </label>
+      <p-inputNumber
+        id="loanValue-input"
+        type="number"
+        formControlName="loanValue"
+        [min]="1"
+        [ngClass]="{
+          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('loanValue')
+        }"
+        placeholder="Amount of money to loan"
+        suffix=" zł">
+      </p-inputNumber>
+      <small class="p-error" *ngIf="isInputTouchedOrDirtyAndEmpty('loanValue'); else invalidLoanValueMessage">
+        This field is required
+      </small>
+      <ng-template #invalidLoanValueMessage>
+        <small class="p-error" *ngIf="isNumberInputTouchedOrDirtyAndTooSmall('loanValue')">
+          Please enter a value that is greater than 0
+        </small>
+      </ng-template>
+    </div>
+    <div class="p-fluid">
+      <label for="numberOfInstallments-input" class="field-label">
+        <p class="required">Number Of Installments</p>
+      </label>
+      <p-inputNumber
+        id="numberOfInstallments-input"
+        type="number"
+        formControlName="numberOfInstallments"
+        [min]="1"
+        [ngClass]="{
+          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('numberOfInstallments')
+        }"
+        placeholder="Number of Installments">
+      </p-inputNumber>
+      <small class="p-error" *ngIf="isInputTouchedOrDirtyAndEmpty('numberOfInstallments'); else invalidNumberOfInstallmentsMessage">
+        This field is required
+      </small>
+      <ng-template #invalidNumberOfInstallmentsMessage>
+        <small class="p-error" *ngIf="isNumberInputTouchedOrDirtyAndTooSmall('numberOfInstallments')">
+          Please enter a value that is greater than 0
+        </small>
+      </ng-template>
+    </div>
+    <p-button type="submit" styleClass="p-button-style" label="Submit Inquiry"></p-button>
   </form>
 </p-card>

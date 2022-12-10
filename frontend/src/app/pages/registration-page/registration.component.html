@@ -94,7 +94,6 @@
         type="number"
         formControlName="incomeLevel"
         [min]="1"
-        styleClass="p-inputNumber-style"
         [ngClass]="{
           'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('incomeLevel')
         }"
@@ -223,6 +222,6 @@
         </small>
       </ng-template>
     </div>
-    <p-button pRipple type="submit" styleClass="p-button-style" label="Register"></p-button>
+    <p-button type="submit" styleClass="p-button-style" label="Register"></p-button>
   </form>
 </p-card>

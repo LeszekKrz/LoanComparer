@@ -249,28 +249,48 @@
     <ng-template pTemplate="rowexpansion" let-offerRequest>
       <tr>
         <td colspan="8">
-          <div class="p-3">
             <p-table [value]="[offerRequest]">
               <ng-template pTemplate="header">
                 <tr>
-                  <th>Government Id Type</th>
-                  <th>Government Id Value</th>
-                  <th>Inquiry Submission Date</th>
-                  <th>Offer Request Date</th>
-                  <th>Signed document</th>
+                  <th>
+                    <div class="flex justify-content-center align-items-center">Government Id Type</div>
+                  </th>
+                  <th>
+                    <div class="flex justify-content-center align-items-center">Government Id Value</div>
+                  </th>
+                  <th>
+                    <div class="flex justify-content-center align-items-center">Inquiry Submission Date</div>
+                  </th>
+                  <th>
+                    <div class="flex justify-content-center align-items-center">Offer Request Date</div>
+                  </th>
+                  <th>
+                    <div class="flex justify-content-center align-items-center">Signed document</div>
+                  </th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-offerRequest>
                 <tr>
-                  <td>hmm</td>
-                  <td>{{offerRequest.governmentIdValue}}</td>
-                  <td>{{offerRequest.dateOfInquirySubmition}}</td>
-                  <td>{{offerRequest.dateOfOfferRequest}}</td>
-                  <td><p-button type="button" icon="pi pi-search"></p-button></td>
+                  <td>
+                    <div class="center-text">{{offerRequest.governmentIdType}}</div>
+                  </td>
+                  <td>
+                    <div class="center-text">{{offerRequest.governmentIdValue}}</div>
+                  </td>
+                  <td>
+                    <div class="center-text">{{offerRequest.dateOfInquirySubmition | date: 'dd.MM.yyyy, HH:mm'}}</div>
+                  </td>
+                  <td>
+                    <div class="center-text">{{offerRequest.dateOfOfferRequest | date: 'dd.MM.yyyy, HH:mm'}}</div>
+                  </td>
+                  <td>
+                    <div class="flex justify-content-center align-items-center">
+                      <p-button label="Download" icon="pi pi-download"></p-button>
+                    </div>
+                  </td>
                 </tr>
               </ng-template>
             </p-table>
-          </div>
         </td>
       </tr>
     </ng-template>

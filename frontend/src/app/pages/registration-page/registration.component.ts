@@ -9,6 +9,7 @@ import { GovernmentIdDTO } from '../../core/models/government-id-dto';
 import { UserForRegistrationDTO } from '../../authentication/models/user-for-registration-dto';
 import { AuthenticationService } from 'src/app/authentication/services/authentication.service';
 import { environment } from 'src/environments/environment';
+import { JobType } from 'src/app/core/models/job-type';
 
 @Component({
   selector: 'app-registration',
@@ -19,7 +20,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   registerForm!: FormGroup;
   isPasswordVisible = false;
   isConfirmPasswordVisible = false;
-  jobTypes: JobTypeDTO[] = [];
+  jobTypes: JobType[] = [];
   isProgressSpinnerVisible = false;
   subscriptions: Subscription[] = [];
   governmentIdTypes = ['PESEL', 'ID Number', 'Passport Number'];
