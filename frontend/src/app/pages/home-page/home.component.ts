@@ -27,11 +27,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.authenticationHttpService.authenticationStateChanged.subscribe(isAuthenticated => {
         this.isUserAuthenticated = isAuthenticated;
     }));
-    this.inquiries = [{loanValue: 100, dateOfInquirySubmition: new Date('2022-12-07'), status: 'WAITING'},
-    {loanValue: 1000, dateOfInquirySubmition: new Date('2022-11-02'), status: 'OFFERSCREATED'},
-    {loanValue: 109.99, dateOfInquirySubmition: new Date('2022-12-01'), status: 'SUBMITTED'},
-    {loanValue: 1000, dateOfInquirySubmition: new Date('2022-11-02'), status: 'ACCEPTED'},
-    {loanValue: 109.99, dateOfInquirySubmition: new Date('2022-12-01'), status: 'REJECTED'}]; // we should fetch it here
+    this.inquiries = [{loanValue: 100, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-07'), status: 'WAITINGFORACCEPTANCE'},
+    {loanValue: 1000, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-11-02'), status: 'OFFERSCREATED'},
+    {loanValue: 109.99, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-01'), status: 'SUBMITTED'},
+    {loanValue: 1000, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-11-02'), status: 'ACCEPTED'},
+    {loanValue: 109.99, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-01'), status: 'REJECTED'}]; // we should fetch it here
   }
 
   ngOnDestroy(): void {

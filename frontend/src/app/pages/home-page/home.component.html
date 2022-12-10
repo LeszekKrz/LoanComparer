@@ -35,6 +35,9 @@
           <p class="center-text delete-margin">Loan Value</p>
         </th>
         <th>
+          <p class="center-text delete-margin">Installments</p>
+        </th>
+        <th>
           <p class="center-text delete-margin">Inquiry Submition Date</p>
         </th>
         <th>
@@ -47,6 +50,9 @@
       <tr>
         <td>
           <p class="center-text delete-margin">{{ inquiry.loanValue }}</p>
+        </td>
+        <td>
+          <p class="center-text delete-margin">{{ inquiry.numberOfInstallments }}</p>
         </td>
         <td>
           <p class="center-text delete-margin">{{ inquiry.dateOfInquirySubmition | date: 'dd.MM.yyyy, HH:mm' }}</p>

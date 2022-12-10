@@ -67,19 +67,19 @@
         <p class="required">Job Type</p>
       </label>
       <div class="width: 100%">
-      <p-dropdown
-        id="jobType-dropdown"
-        formControlName="jobType"
-        [options]="jobTypes"
-        placeholder="Select your job type"
-        optionLabel="name"
-        [filter]="true"
-        filterBy="name"
-        [showClear]="true"
-        [ngClass]="{
-          'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('jobType')
-        }">
-      </p-dropdown>
+        <p-dropdown
+          id="jobType-dropdown"
+          formControlName="jobType"
+          [options]="jobTypes"
+          placeholder="Select your job type"
+          optionLabel="name"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="true"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isInputInvalidAndTouchedOrDirty('jobType')
+          }">
+        </p-dropdown>
       </div>
       <small class="p-error" *ngIf="isInputInvalidAndTouchedOrDirty('jobType')">
         This field is required
