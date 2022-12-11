@@ -1,0 +1,50 @@
+:host ::ng-deep .p-card-style.p-card {
+  border-radius: 1rem;
+  margin: 1rem 1rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  width: 100% max-content;
+
+  .p-card-title {
+    text-align: center;
+    margin: 0 auto;
+    font-size: 2rem;
+  }
+
+  .p-card-content {
+    padding: 0;
+  }
+}
+
+:host ::ng-deep .p-button-style.p-button {
+  margin-top: 1em;
+  width: 100%;
+  border-radius: 2em;
+}
+
+:host ::ng-deep .p-fileupload-style.p-fileupload {
+  margin-top: 1em;
+  .p-progressbar {
+    display: none;
+  }
+
+  .p-fileupload-buttonbar {
+    display: none;
+  }
+
+  .p-fileupload-content {
+    border: 3px dashed #e4e8ed;
+    border-radius: 1em;
+    padding: 1em;
+  }
+}
+
+.download-icon {
+    margin-bottom: 0.5em;
+    font-size: 1.5em;
+}
+
+.browse-button {
+    color: #3366cc;
+    cursor: pointer;
+}

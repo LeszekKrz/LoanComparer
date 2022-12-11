@@ -1,0 +1,11 @@
+<div class="flex justify-content-evenly flex-wrap">
+    <div class="flex justify-content-center">
+        <app-offer-card [offerName]="'Our\'s Bank Offer'" [bankOffer]="ourBankOffer" (onRequestOffer)="handleOnRequestOffer($event)"></app-offer-card>
+    </div>
+    <div class="flex justify-content-center">
+        <app-offer-card [offerName]="'Other\'s Team Bank Offer'" [bankOffer]="otherTeamsBankOffer"></app-offer-card>
+    </div>
+    <div class="flex justify-content-center">
+        <app-offer-card [offerName]="'Lecturer\'s Bank Offer'" [bankOffer]="lecturersBankOffer"></app-offer-card>
+    </div>
+</div>
