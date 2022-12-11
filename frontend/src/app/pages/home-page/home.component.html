@@ -47,7 +47,7 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-inquiry>
-      <tr>
+      <tr (click)="onRowClickHandler(inquiry)">
         <td>
           <p class="center-text delete-margin">{{ inquiry.loanValue }}</p>
         </td>

@@ -10,16 +10,19 @@ import { AuthenticationService } from '../authentication/services/authentication
 })
 export class MenuComponent implements OnInit, OnDestroy {
   isUserAuthenticated!: boolean;
+  isUserBankEmployee!: boolean;
   subscriptions: Subscription[] = [];
 
   constructor(private router: Router, private authenticationHttpService: AuthenticationService) {
     this.isUserAuthenticated = this.authenticationHttpService.isUserAuthenticated();
+    this.isUserBankEmployee = this.authenticationHttpService.isUserBankEmployee();
   }
 
   ngOnInit(): void {
     this.subscriptions.push(
       this.authenticationHttpService.authenticationStateChanged.subscribe(isAuthenticated => {
         this.isUserAuthenticated = isAuthenticated;
+        this.isUserBankEmployee = this.authenticationHttpService.isUserBankEmployee();
     }));
   }
 
@@ -37,6 +40,10 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   logoutButtonOnClick(): void {
     this.authenticationHttpService.logout();
+  }
+
+  adminPanelButtonOnClick(): void {
+    this.router.navigate(['admin-panel']);
   }
 
   ngOnDestroy(): void {

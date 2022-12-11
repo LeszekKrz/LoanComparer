@@ -27,11 +27,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.authenticationHttpService.authenticationStateChanged.subscribe(isAuthenticated => {
         this.isUserAuthenticated = isAuthenticated;
     }));
-    this.inquiries = [{loanValue: 100, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-07'), status: 'WAITINGFORACCEPTANCE'},
-    {loanValue: 1000, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-11-02'), status: 'OFFERSCREATED'},
-    {loanValue: 109.99, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-01'), status: 'SUBMITTED'},
-    {loanValue: 1000, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-11-02'), status: 'ACCEPTED'},
-    {loanValue: 109.99, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-01'), status: 'REJECTED'}]; // we should fetch it here
+    this.inquiries = [{id: '1', loanValue: 100, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-07'), status: 'WAITINGFORACCEPTANCE'},
+    {id: '2', loanValue: 1000, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-11-02'), status: 'OFFERSCREATED'},
+    {id: '3', loanValue: 109.99, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-01'), status: 'SUBMITTED'},
+    {id: '4', loanValue: 1000, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-11-02'), status: 'ACCEPTED'},
+    {id: '5', loanValue: 109.99, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-01'), status: 'REJECTED'}]; // we should fetch it here
   }
 
   ngOnDestroy(): void {
@@ -44,11 +44,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.router.navigate(['create-inquiry']);
   }
 
+  onRowClickHandler(inquiry: Inquiry) {
+    if (inquiry.status == 'SUBMITTED' || inquiry.status == 'OFFERSCREATED') {
+      this.router.navigate([`choose-offer/${inquiry.id}`])
+    }
+  }
+
   private doWithLoading(observable$: Observable<any>): Observable<any> {
     return of(this.isProgressSpinnerVisible = true).pipe(
       switchMap(() => observable$),
       finalize(() => this.isProgressSpinnerVisible = false)
     );
   }
-
 }

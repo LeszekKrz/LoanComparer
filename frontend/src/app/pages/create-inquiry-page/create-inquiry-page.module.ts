@@ -8,6 +8,7 @@ import { InputTextModule } from 'primeng/inputtext'
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { AutoFocusModule } from 'primeng/autofocus';
 
 
 @NgModule({
@@ -26,7 +27,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
     InputTextModule,
     ProgressSpinnerModule,
     DropdownModule,
-    InputNumberModule
+    InputNumberModule,
+    AutoFocusModule
   ]
 })
 export class CreateInquiryPageModule { }

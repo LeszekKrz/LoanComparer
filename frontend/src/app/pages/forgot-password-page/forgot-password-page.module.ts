@@ -6,6 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextModule } from 'primeng/inputtext';
+import { AutoFocusModule } from 'primeng/autofocus';
 
 
 
@@ -23,7 +24,8 @@ import { InputTextModule } from 'primeng/inputtext';
     ButtonModule,
     FormsModule,
     ProgressSpinnerModule,
-    InputTextModule
+    InputTextModule,
+    AutoFocusModule
   ]
 })
 export class ForgotPasswordPageModule { }
