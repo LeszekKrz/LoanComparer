@@ -2,6 +2,7 @@ import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
 import { BankEmployeeGuard } from "./authentication/guards/bank.employee.guard";
 import { AdminPanelComponent } from "./pages/admin-panel-page/admin-panel.component";
+import { ChooseOfferComponent } from "./pages/choose-offer-page/choose-offer.component";
 import { ConfirmEmailComponent } from "./pages/confirm-email-page/confirm-email.component";
 import { CreateInquiryComponent } from "./pages/create-inquiry-page/create-inquiry.component";
 import { ForgotPasswordComponent } from "./pages/forgot-password-page/forgot-password.component";
@@ -20,6 +21,7 @@ const routes: Routes = [
   {path: 'forgot-password', component: ForgotPasswordComponent},
   {path: 'reset-password', component: ResetPasswordComponent},
   {path: 'confirm-email', component: ConfirmEmailComponent},
+  {path: 'choose-offer/:inquiryId', component: ChooseOfferComponent},
   {path: '**', component: HomeComponent}
 ];
 

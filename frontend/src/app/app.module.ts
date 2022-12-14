@@ -16,6 +16,7 @@ import { HomePageModule } from './pages/home-page/home-page.module';
 import { ForgotPasswordPageModule } from './pages/forgot-password-page/forgot-password-page.module';
 import { ResetPasswordPageModule } from './pages/reset-password-page/reset-password-page.module';
 import { ConfirmEmailPageModule } from './pages/confirm-email-page/confirm-email-page.module';
+import { ChooseOfferPageModule } from './pages/choose-offer-page/choose-offer-page.module';
 
 export function tokenGetter(): string | null {
   return localStorage.getItem('token');
@@ -40,6 +41,7 @@ export function tokenGetter(): string | null {
     ForgotPasswordPageModule,
     ResetPasswordPageModule,
     ConfirmEmailPageModule,
+    ChooseOfferPageModule,
     JwtModule.forRoot({
       config: {
         tokenGetter: tokenGetter,

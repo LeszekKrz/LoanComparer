@@ -8,6 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { HttpClientModule } from '@angular/common/http';
 import { ButtonModule } from 'primeng/button';
 import { RouterModule } from '@angular/router';
+import { AutoFocusModule } from 'primeng/autofocus';
 
 
 
@@ -25,7 +26,8 @@ import { RouterModule } from '@angular/router';
     InputTextModule,
     HttpClientModule,
     ButtonModule,
-    RouterModule
+    RouterModule,
+    AutoFocusModule
   ]
 })
 export class LoginPageModule { }

@@ -1,1 +1,74 @@
-<p>home works!</p>
+<div class="progress-spinner" *ngIf="isProgressSpinnerVisible">
+  <p-progressSpinner></p-progressSpinner>
+</div>
+
+<p-card
+  header="Loan Comparer"
+  styleClass="p-card-style shadow-7">
+  <p class="center-text">{{ applicationDescription }}</p>
+  <p class="center-text">Currently we have {{this.registeredUsersCount}} registered users.</p>
+  <p-button
+    pRipple
+    type="createInquiry"
+    styleClass="p-button-style"
+    label="Create New Inquiry"
+    (onClick)="createNewInquiryOnClickHandler()"></p-button>
+  <p-table
+    #inquiriesTable
+    [value]="inquiries"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+    [paginator]="true"
+    [rows]="10"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [rowsPerPageOptions]="[5, 10, 25]"
+    *ngIf="this.isUserAuthenticated">
+
+    <ng-template pTemplate="caption">
+      <p class="center-text delete-margin">Your inquiries</p>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>
+          <p class="center-text delete-margin">Loan Value</p>
+        </th>
+        <th>
+          <p class="center-text delete-margin">Installments</p>
+        </th>
+        <th>
+          <p class="center-text delete-margin">Inquiry Submition Date</p>
+        </th>
+        <th>
+          <p class="center-text delete-margin">Status</p>
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-inquiry>
+      <tr (click)="onRowClickHandler(inquiry)">
+        <td>
+          <p class="center-text delete-margin">{{ inquiry.loanValue }}</p>
+        </td>
+        <td>
+          <p class="center-text delete-margin">{{ inquiry.numberOfInstallments }}</p>
+        </td>
+        <td>
+          <p class="center-text delete-margin">{{ inquiry.dateOfInquirySubmition | date: 'dd.MM.yyyy, HH:mm' }}</p>
+        </td>
+        <td>
+          <p class="center-text delete-margin"><span [class]="'status-' + inquiry.status.toLowerCase()">{{ inquiry.status }}</span></p>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="3">
+          <p class="table-empty-message">Inquiries list is empty</p>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>

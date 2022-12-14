@@ -1,0 +1,65 @@
+<p-card
+    [header]="offerName"
+    styleClass="p-card-style shadow-7">
+    <div *ngIf="bankOffer != null; else bankOfferIsNull">
+        <div class="flex justify-content-between">
+            <div>Loan value:</div>
+            <div>{{bankOffer.loanValue}}</div>
+        </div>
+        <div class="flex justify-content-between">
+            <div>Number Of Installments:</div>
+            <div>{{bankOffer.numberOfInstallments}}</div>
+        </div>
+        <div class="flex justify-content-between">
+            <div>Percentage:</div>
+            <div>{{bankOffer.percentage}}</div>
+        </div>
+        <div class="flex justify-content-between">
+            <div>Monthly Installment:</div>
+            <div>{{bankOffer.monthlyInstallment}}</div>
+        </div>
+        <p-button type="download" styleClass="p-button-style" label="Download contract" icon="pi pi-download" (onClick)="downloadContract()"></p-button>
+        <p-button *ngIf="!bankOffer.selected; else requestOffer" type="select" styleClass="p-button-style" label="Select Offer" (onClick)="selectOffer()"></p-button>
+        <ng-template #requestOffer>
+            <p-fileUpload
+                #fileUpload
+                name="signedContract[]"
+                accept=".txt"
+                [multiple]="false"
+                [maxFileSize]="20480"
+                invalidFileSizeMessageSummary="Maximum file size is 20kB"
+                invalidFileSizeMessageDetail=""
+                invalidFileTypeMessageSummary="Allowed file type is .txt"
+                invalidFileTypeMessageDetail=""
+                [showUploadButton]="false"
+                [showCancelButton]="false"
+                (onSelect)="onSelectFileHandler($event)"
+                styleClass="p-fileupload-style">
+                <ng-template pTemplate="content" let-files>
+                    <div *ngIf="bankOffer.signedContract == null">
+                        <div class="flex flex-column justify-content-center">
+                            <i class="flex justify-content-center pi pi-download download-icon"></i>
+                            <div class="flex justify-content-center">
+                                Drop or&nbsp;
+                                <span class="browse-button" (click)="fileUpload.choose()">
+                                    browse
+                                </span>
+                                &nbsp;signed contract
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="file" let-file>
+                    <div class="flex justify-content-evenly flex align-items-center flex-wrap">
+                        {{file.name}}
+                        <button pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="onRemoveFileHandler()"></button>
+                    </div>
+                </ng-template>
+            </p-fileUpload>
+            <p-button type="request" styleClass="p-button-style" label="Request Offer" (onClick)="requestOfferOnClickHandeler()"></p-button>
+        </ng-template>
+    </div>
+    <ng-template #bankOfferIsNull>
+        <div class="flex justify-content-center font-bold" style="margin-top: 20px">Offer Not Posted Yet</div>
+    </ng-template>
+</p-card>

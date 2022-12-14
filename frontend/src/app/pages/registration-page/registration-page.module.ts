@@ -9,6 +9,7 @@ import { DropdownModule } from 'primeng/dropdown'
 import { HttpClientModule } from '@angular/common/http';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { AutoFocusModule } from 'primeng/autofocus';
 
 
 @NgModule({
@@ -28,7 +29,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     DropdownModule,
     HttpClientModule,
     InputNumberModule,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
+    AutoFocusModule
   ]
 })
 export class RegistrationPageModule { }

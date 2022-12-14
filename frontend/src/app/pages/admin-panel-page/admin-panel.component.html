@@ -1,1 +1,309 @@
-<p>admin-panel works!</p>
+<div class="progress-spinner" *ngIf="isProgressSpinnerVisible">
+    <p-progressSpinner></p-progressSpinner>
+</div>
+
+
+<p-card
+  header="Admin Panel"
+  styleClass="p-card-style shadow-7">
+  <p-table
+    #inquiriesTable
+    [value]="inquiriesWithUserInfo"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+    [paginator]="true"
+    [rows]="10"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [rowsPerPageOptions]="[5, 10, 25]"
+    stateStorage="session"
+    stateKey="inquiriesTableSettings">
+
+    <ng-template pTemplate="caption">
+      <div class="flex justify-content-center inline">All inquiries</div>
+
+      <button pButton pRipple label="Clear" class="flex justify-content-end" icon="pi pi-filter-slash" (click)="clearInquiriesTable()"></button>
+
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="loanValue">
+          <div class="flex justify-content-center align-items-center">
+            Loan Value
+            <p-sortIcon field="loanValue"></p-sortIcon>
+            <p-columnFilter type="numeric" field="loanValue" display="menu" [showOperator]="false" [showAddButton]="false"></p-columnFilter>
+          </div>
+        </th>
+        <th pSortableColumn="numberOfInstallments">
+          <div class="flex justify-content-center align-items-center">
+            Installments
+            <p-sortIcon field="numberOfInstallments"></p-sortIcon>
+            <p-columnFilter type="numeric" field="numberOfInstallments" display="menu" [showOperator]="false" [showAddButton]="false"></p-columnFilter>
+          </div>
+        </th>
+        <th pSortableColumn="dateOfInquirySubmition">
+          <div class="flex justify-content-center align-items-center">
+            Submition Date
+            <p-sortIcon field="dateOfInquirySubmition"></p-sortIcon>
+            <p-columnFilter type="date" field="dateOfInquirySubmition" display="menu" [showOperator]="false" [showAddButton]="false"></p-columnFilter>
+          </div>
+        </th>
+        <th>
+          <div class="flex justify-content-center align-items-center">
+            Email
+            <p-columnFilter type="text" field="email" display="menu" [showOperator]="false" [showAddButton]="false"></p-columnFilter>
+          </div>
+        </th>
+        <th>
+          <div class="flex justify-content-center align-items-center">
+            Government Id Type
+            <p-columnFilter field="governmentIdType" matchMode="equals" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+              <ng-template pTemplate="header">
+                <div class="px-3 pt-3">
+                  <span class="font-bold">Government Id Type Picker</span>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                <p-dropdown
+                  [ngModel]="value"
+                  [options]="governmentIdTypes"
+                  placeholder="Any"
+                  (onChange)="filter($event.value)">
+                  <ng-template let-option pTemplate="item">
+                      {{ option }}
+                  </ng-template>
+                </p-dropdown>
+              </ng-template>
+          </p-columnFilter>
+        </div>
+        </th>
+        <th>
+          <div class="flex justify-content-center align-items-center">
+            Government Id Value
+            <p-columnFilter type="text" field="governmentIdValue" display="menu" [showOperator]="false" [showAddButton]="false"></p-columnFilter>
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-inquiry>
+      <tr>
+        <td>
+          <div class="center-text">{{ inquiry.loanValue }}</div>
+        </td>
+        <td>
+          <div class="center-text">{{ inquiry.numberOfInstallments }}</div>
+        </td>
+        <td>
+          <div class="center-text">{{ inquiry.dateOfInquirySubmition | date: 'dd.MM.yyyy, HH:mm' }}</div>
+        </td>
+        <td>
+          <div class="center-text">{{ inquiry.email }}</div>
+        </td>
+        <td>
+          <div class="center-text">{{ inquiry.governmentIdType }}</div>
+        </td>
+        <td>
+          <div class="center-text">{{ inquiry.governmentIdValue }}</div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6">
+
+          <p class="table-empty-message" *ngIf="inquiriesWithUserInfo.length == 0; else noMatchingInquiries">Inquiries list is empty</p>
+          <ng-template #noMatchingInquiries>
+            <p class="table-empty-message">No matching inquiries found</p>
+          </ng-template>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-table
+    #offerRequestsTable
+    [value]="offerRequestsWithUserInfo"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+    [paginator]="true"
+    [rows]="10"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [rowsPerPageOptions]="[5, 10, 25]"
+    stateStorage="session"
+    stateKey="offerRequestsTableSettings"
+    dataKey="id">
+
+    <ng-template pTemplate="caption">
+      <div class="flex justify-content-center inline">All offer requests</div>
+
+      <button pButton pRipple label="Clear" class="flex justify-content-end" icon="pi pi-filter-slash" (click)="clearOfferRequestsTable()"></button>
+
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 5rem"></th>
+        <th pSortableColumn="loanValue">
+          <div class="flex justify-content-center align-items-center">
+            Loan Value
+            <p-sortIcon field="loanValue"></p-sortIcon>
+            <p-columnFilter type="numeric" field="loanValue" display="menu" [showOperator]="false" [showAddButton]="false"></p-columnFilter>
+          </div>
+        </th>
+        <th pSortableColumn="numberOfInstallments">
+          <div class="flex justify-content-center align-items-center">
+            Installments
+            <p-sortIcon field="numberOfInstallments"></p-sortIcon>
+            <p-columnFilter type="numeric" field="numberOfInstallments" display="menu" [showOperator]="false" [showAddButton]="false"></p-columnFilter>
+          </div>
+        </th>
+        <th pSortableColumn="percentage">
+          <div class="flex justify-content-center align-items-center">
+            Percentage
+            <p-sortIcon field="percentage"></p-sortIcon>
+            <p-columnFilter type="numeric" field="percentage" display="menu" [showOperator]="false" [showAddButton]="false"></p-columnFilter>
+          </div>
+        </th>
+        <th pSortableColumn="monthlyInstallment">
+          <div class="flex justify-content-center align-items-center">
+            Monthly Installment
+            <p-sortIcon field="monthlyInstallment"></p-sortIcon>
+            <p-columnFilter type="numeric" field="monthlyInstallment" display="menu" [showOperator]="false" [showAddButton]="false"></p-columnFilter>
+          </div>
+        </th>
+        <th>
+          <div class="flex justify-content-center align-items-center">
+            Email
+            <p-columnFilter type="text" field="email" display="menu" [showOperator]="false" [showAddButton]="false"></p-columnFilter>
+          </div>
+        </th>
+        <th>
+          <div class="flex justify-content-center align-items-center">
+            Status
+            <p-columnFilter field="status" matchMode="equals" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+              <ng-template pTemplate="header">
+                <div class="px-3 pt-3">
+                  <span class="font-bold">Status Picker</span>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                <p-dropdown
+                  [ngModel]="value"
+                  [options]="statuses"
+                  placeholder="Any"
+                  (onChange)="filter($event.value)">
+                  <ng-template let-option pTemplate="item">
+                    {{ option }}
+                  </ng-template>
+                </p-dropdown>
+              </ng-template>
+            </p-columnFilter>
+          </div>
+        </th>
+        <th>
+          <div class="flex justify-content-center align-items-center">
+            Accept/Reject
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-offerRequest let-expanded="expanded">
+      <tr>
+        <td>
+          <button type="button" pButton pRipple [pRowToggler]="offerRequest" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+        </td>
+        <td>
+          <div class="center-text">{{ offerRequest.loanValue }}</div>
+        </td>
+        <td>
+          <div class="center-text">{{ offerRequest.numberOfInstallments }}</div>
+        </td>
+        <td>
+          <div class="center-text">{{ offerRequest.percentage }}%</div>
+        </td>
+        <td>
+          <div class="center-text">{{ offerRequest.monthlyInstallment }}</div>
+        </td>
+        <td>
+          <div class="center-text">{{ offerRequest.email }}</div>
+        </td>
+        <td>
+          <div class="center-text delete-margin">
+            <span [class]="'status-' + offerRequest.status.toLowerCase()">{{ offerRequest.status }}</span>
+          </div>
+        </td>
+        <td>
+          <div class="flex justify-content-between align-items-center" *ngIf="offerRequest.status == 'WAITINGFORACCEPTANCE'">
+            <button pButton pRipple icon="pi pi-check" class="p-button-rounded"></button>
+            <button pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger"></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="rowexpansion" let-offerRequest>
+      <tr>
+        <td colspan="8">
+            <p-table [value]="[offerRequest]">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>
+                    <div class="flex justify-content-center align-items-center">Government Id Type</div>
+                  </th>
+                  <th>
+                    <div class="flex justify-content-center align-items-center">Government Id Value</div>
+                  </th>
+                  <th>
+                    <div class="flex justify-content-center align-items-center">Inquiry Submission Date</div>
+                  </th>
+                  <th>
+                    <div class="flex justify-content-center align-items-center">Offer Request Date</div>
+                  </th>
+                  <th>
+                    <div class="flex justify-content-center align-items-center">Signed document</div>
+                  </th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-offerRequest>
+                <tr>
+                  <td>
+                    <div class="center-text">{{offerRequest.governmentIdType}}</div>
+                  </td>
+                  <td>
+                    <div class="center-text">{{offerRequest.governmentIdValue}}</div>
+                  </td>
+                  <td>
+                    <div class="center-text">{{offerRequest.dateOfInquirySubmition | date: 'dd.MM.yyyy, HH:mm'}}</div>
+                  </td>
+                  <td>
+                    <div class="center-text">{{offerRequest.dateOfOfferRequest | date: 'dd.MM.yyyy, HH:mm'}}</div>
+                  </td>
+                  <td>
+                    <div class="flex justify-content-center align-items-center">
+                      <p-button label="Download" icon="pi pi-download"></p-button>
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7">
+          <p class="table-empty-message" *ngIf="offerRequestsWithUserInfo.length == 0; else noMatchingOfferRequests">Offer requests list is empty</p>
+          <ng-template #noMatchingOfferRequests>
+            <p class="table-empty-message" *ngIf="offerRequestsWithUserInfo.length != 0">No matching offer requests found</p>
+          </ng-template>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>
