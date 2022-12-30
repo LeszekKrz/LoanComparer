@@ -6,5 +6,5 @@ public interface IBankApiSender
 {
     Guid BankId { get; }
 
-    SentInquiryStatus SendInquiry(Inquiry inquiry);
+    Task<SentInquiryStatus> SendInquiryAsync(Inquiry inquiry);
 }

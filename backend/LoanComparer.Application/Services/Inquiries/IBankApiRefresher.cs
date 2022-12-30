@@ -12,5 +12,5 @@ public interface IBankApiRefresher
     /// </summary>
     /// <param name="status"><see cref="SentInquiryStatus" /> to update</param>
     /// <returns>Updated object</returns>
-    SentInquiryStatus RefreshStatus(SentInquiryStatus status);
+    Task<SentInquiryStatus> RefreshStatusAsync(SentInquiryStatus status);
 }

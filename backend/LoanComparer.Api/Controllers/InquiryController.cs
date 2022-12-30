@@ -27,7 +27,7 @@ public sealed class InquiryController : ControllerBase
         var statuses = _sender.SendInquiryToAllBanks(inquiry);
         await foreach (var status in statuses)
         {
-            _command.SaveInquiryStatus(status);
+            await _command.SaveInquiryStatusAsync(status);
         }
 
         return Ok();

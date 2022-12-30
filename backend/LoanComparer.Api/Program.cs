@@ -4,6 +4,7 @@ using LoanComparer.Application;
 using LoanComparer.Application.Configuration;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services;
+using LoanComparer.Application.Services.Inquiries;
 using LoanComparer.Application.Services.JwtFeatures;
 using LoanComparer.Application.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -106,6 +107,12 @@ void ConfigureServices(IServiceCollection services)
     services.AddTransient<JobTypeService>();
     services.AddTransient<UserService>();
     services.AddTransient<IEmailService, EmailService>();
+    services.AddScoped<IInquiryCommand, InquiryCommand>();
+    services.AddScoped<IInquirySender, InquirySender>();
+    services.AddScoped<IInquiryRefresher, InquiryRefresher>();
+
+    services.AddHostedService<InquiryRefreshBackgroundService>();
+    services.AddHostedService<InquiryCleanupBackgroundService>();
     
     services.AddSendGrid(options => options.ApiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY"));
 }

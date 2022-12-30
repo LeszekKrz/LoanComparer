@@ -4,15 +4,15 @@ namespace LoanComparer.Application.Services.Inquiries;
 
 public interface IInquiryQuery
 {
-    Inquiry GetById(Guid id);
+    Task<Inquiry> GetByIdAsync(Guid id);
 
-    SentInquiryStatus GetStatusById(Guid statusId);
+    Task<SentInquiryStatus> GetStatusByIdAsync(Guid statusId);
 
-    IReadOnlyList<SentInquiryStatus> GetPendingStatusesForUser(string username);
+    Task<IReadOnlyList<SentInquiryStatus>> GetPendingStatusesForUserAsync(string username);
 
-    IReadOnlyList<SentInquiryStatus> GetAllPendingStatuses();
+    Task<IReadOnlyList<SentInquiryStatus>> GetAllPendingStatusesAsync();
 
-    IReadOnlyList<SentInquiryStatus> GetPendingStatusesOlderThan(TimeSpan limit);
+    Task<IReadOnlyList<SentInquiryStatus>> GetPendingStatusesOlderThanAsync(TimeSpan limit);
 
     // GetForUser()...
 }

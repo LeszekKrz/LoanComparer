@@ -8,13 +8,13 @@ public interface IInquiryCommand
     ///     Saves <paramref name="status" /> into database. If corresponding inquiry is not yet saved, saves it as well.
     /// </summary>
     /// <param name="status"><see cref="SentInquiryStatus" /> to save</param>
-    void SaveInquiryStatus(SentInquiryStatus status);
+    Task SaveInquiryStatusAsync(SentInquiryStatus status);
 
-    SentInquiryStatus MarkAsRejected(SentInquiryStatus status);
+    Task<SentInquiryStatus> MarkAsRejectedAsync(SentInquiryStatus status);
 
-    SentInquiryStatus MarkAsBankServerError(SentInquiryStatus status);
+    Task<SentInquiryStatus> MarkAsBankServerErrorAsync(SentInquiryStatus status);
 
-    SentInquiryStatus MarkAsTimeout(SentInquiryStatus status);
+    Task<SentInquiryStatus> MarkAsTimeoutAsync(SentInquiryStatus status);
 
-    SentInquiryStatus LinkSavedOfferToInquiry(SentInquiryStatus status, Guid offerId);
+    Task<SentInquiryStatus> LinkSavedOfferToStatusAsync(SentInquiryStatus status, Guid offerId);
 }

@@ -2,9 +2,9 @@
 
 public interface IInquiryRefresher
 {
-    void RefreshStatusesForUser(string username);
+    Task RefreshStatusesForUserAsync(string username);
 
-    void MarkOldStatusesAsTimeout();
+    Task MarkOldStatusesAsTimeoutAsync();
 
-    void RefreshAllStatusesAndSendNotifications();
+    Task RefreshAllStatusesAndSendNotificationsAsync();
 }
