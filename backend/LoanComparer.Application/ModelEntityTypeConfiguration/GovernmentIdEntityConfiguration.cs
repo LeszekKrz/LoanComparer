@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LoanComparer.Application.ModelEntityTypeConfiguration
 {
-    public class GovernmentIdEntityConfiguration : IEntityTypeConfiguration<GovernmentId>
+    public class GovernmentIdEntityConfiguration : IEntityTypeConfiguration<GovernmentIdEntity>
     {
-        public void Configure(EntityTypeBuilder<GovernmentId> builder)
+        public void Configure(EntityTypeBuilder<GovernmentIdEntity> builder)
         {
             builder.Property(x => x.Type).HasMaxLength(LoanComparerConstants.MaxGovernmentIdTypeLength).HasColumnName("GovernmentIdType");
             builder.Property(x => x.Value).HasMaxLength(LoanComparerConstants.MaxGovernmentIdValueLength).HasColumnName("GovernmentIdValue");

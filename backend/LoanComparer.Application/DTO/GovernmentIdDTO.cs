@@ -2,11 +2,5 @@
 
 namespace LoanComparer.Application.DTO
 {
-    public record GovernmentIdDTO(string Type, string Value)
-    {
-        public GovernmentId ToGovernmentId()
-        {
-            throw new NotImplementedException();
-        }
-    }
+    public record GovernmentIdDTO(string Type, string Value);
 }

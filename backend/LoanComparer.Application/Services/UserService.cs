@@ -44,7 +44,7 @@ namespace LoanComparer.Application.Services
                 userForRegistration.Email,
                 await _context.JobTypes.SingleAsync(jobType => jobType.Name == userForRegistration.JobType.Name, cancellationToken),
                 userForRegistration.IncomeLevel,
-                new GovernmentId(userForRegistration.GovernmentId));
+                new GovernmentIdEntity(userForRegistration.GovernmentId));
 
             IdentityResult result = await _userManager.CreateAsync(newUser, userForRegistration.Password);
 

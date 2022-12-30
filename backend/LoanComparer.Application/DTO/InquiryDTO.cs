@@ -12,21 +12,7 @@ public sealed class InquiryDTO
 
     public JobDetailsDTO JobDetails { get; init; } = null!;
 
-    public GovernmentIdDTO GovernmentId { get; init; } = null!;
-
-    public Inquiry ToInquiry()
-    {
-        return new()
-        {
-            Id = Guid.NewGuid(),
-            AmountRequested = AmountRequested,
-            NumberOfInstallments = NumberOfInstallments,
-            PersonalData = PersonalData.ToPersonalData(),
-            JobDetails = JobDetails.ToJobDetails(),
-            GovernmentId = GovernmentId.ToGovernmentId()
-            // TODO: Change these ^^^ to static FromRequest() in model classes
-        };
-    }
+    public GovernmentIdDTO GovtId { get; init; } = null!;
 }
 
 public sealed class PersonalDataDTO
@@ -36,16 +22,6 @@ public sealed class PersonalDataDTO
     public string LastName { get; init; } = null!;
 
     public DateOnly BirthDate { get; init; }
-
-    public PersonalData ToPersonalData()
-    {
-        return new()
-        {
-            FirstName = FirstName,
-            LastName = LastName,
-            BirthDate = BirthDate
-        };
-    }
 }
 
 public sealed class JobDetailsDTO
@@ -57,15 +33,4 @@ public sealed class JobDetailsDTO
     public DateOnly? StartDate { get; init; }
 
     public DateOnly? EndDate { get; init; }
-
-    public JobDetails ToJobDetails()
-    {
-        return new()
-        {
-            JobName = JobName,
-            Description = Description,
-            StartDate = StartDate,
-            EndDate = EndDate
-        };
-    }
 }

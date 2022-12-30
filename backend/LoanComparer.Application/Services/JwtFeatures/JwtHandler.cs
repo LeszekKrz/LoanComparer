@@ -21,8 +21,8 @@ namespace LoanComparer.Application.Services.JwtFeatures
 
         public SigningCredentials GetSigningCredentials()
         {
-            var symetricSecurityKey = new SymmetricSecurityKey(_jwtSettings.SecurityKey);
-            return new SigningCredentials(symetricSecurityKey, SecurityAlgorithms.HmacSha256);
+            var symmetricSecurityKey = new SymmetricSecurityKey(_jwtSettings.SecurityKey);
+            return new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
         }
 
         public async Task<ICollection<Claim>> GetClaimsAsync(User user)
@@ -33,10 +33,7 @@ namespace LoanComparer.Application.Services.JwtFeatures
             };
 
             IList<string> roles = await _userManager.GetRolesAsync(user);
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
             return claims;
         }
 

@@ -1,4 +1,5 @@
 ﻿using LoanComparer.Application.DTO;
+using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Inquiries;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +23,7 @@ public sealed class InquiryController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateAsync(InquiryDTO request)
     {
-        var inquiry = request.ToInquiry();
+        var inquiry = Inquiry.FromDto(request);
         var statuses = _sender.SendInquiryToAllBanks(inquiry);
         await foreach (var status in statuses)
         {

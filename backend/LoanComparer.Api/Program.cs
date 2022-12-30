@@ -16,82 +16,28 @@ using SendGrid.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options => options.SwaggerDoc("v1", new OpenApiInfo { Title = "LoanComparer.Api", Version = "v1" }));
+builder.Services.AddSwaggerGen(options =>
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "LoanComparer.Api", Version = "v1" }));
 
 builder.Services.AddMvc();
 builder.Services.AddValidatorsFromAssemblyContaining<UserForRegistrationDTOValidator>();
-
-builder.Services.AddDbContext<LoanComparerContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
-
-builder.Services.AddIdentity<User, Role>(options =>
-{
-    options.Password.RequiredLength = 8;
-    options.User.RequireUniqueEmail = true;
-}).AddUserStore<
-    UserStore<
-        User,
-        Role,
-        LoanComparerContext,
-        string,
-        IdentityUserClaim<string>,
-        UserRole,
-        IdentityUserLogin<string>,
-        IdentityUserToken<string>,
-        IdentityRoleClaim<string>>>()
-    .AddRoleStore<RoleStore<Role, LoanComparerContext, string, UserRole, IdentityRoleClaim<string>>>()
-    .AddDefaultTokenProviders();
-
-builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
-    options.TokenLifespan = TimeSpan.FromHours(2));
-
-JwtSettings jwtSettings = new JwtSettings(builder.Configuration.GetSection("JWTSettings"));
-builder.Services.AddSingleton(jwtSettings);
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings.ValidIssuer,
-            ValidAudience = jwtSettings.ValidAudience,
-            IssuerSigningKey = new SymmetricSecurityKey(jwtSettings.SecurityKey)
-        };
-    });
-
-builder.Services.AddScoped<JwtHandler>();
-
-builder.Services.AddTransient<JobTypeService>();
-builder.Services.AddTransient<UserService>();
-builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
         "Allow ALL",
-        builder => builder
+        policyBuilder => policyBuilder
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowAnyOrigin());
 });
 
-builder.Services.AddOptions<FromEmailConfiguration>()
-    .Bind(builder.Configuration.GetSection("FromEmail"))
-    .ValidateDataAnnotations();
-builder.Services.AddSendGrid(options => options.ApiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY"));
-
+ConfigureOptions(builder.Services, builder.Configuration);
+ConfigureUserIdentity(builder.Services);
+ConfigureJwt(builder.Services, builder.Configuration);
+ConfigureServices(builder.Services);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -109,11 +55,8 @@ if(app.Environment.IsProduction())
 }
 
 app.UseCors("Allow ALL");
-
 app.UseHttpsRedirection();
-
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -125,3 +68,72 @@ app.UseEndpoints(endpoints => {
 });
 
 app.Run();
+
+void ConfigureOptions(IServiceCollection services, IConfiguration config)
+{
+    services.AddOptions<FromEmailConfiguration>()
+        .Bind(config.GetSection("FromEmail"))
+        .ValidateDataAnnotations();
+}
+
+void ConfigureUserIdentity(IServiceCollection services)
+{
+    services.AddIdentity<User, Role>(options =>
+        {
+            options.Password.RequiredLength = 8;
+            options.User.RequireUniqueEmail = true;
+        }).AddUserStore<
+            UserStore<
+                User,
+                Role,
+                LoanComparerContext,
+                string,
+                IdentityUserClaim<string>,
+                UserRole,
+                IdentityUserLogin<string>,
+                IdentityUserToken<string>,
+                IdentityRoleClaim<string>>>()
+        .AddRoleStore<RoleStore<Role, LoanComparerContext, string, UserRole, IdentityRoleClaim<string>>>()
+        .AddDefaultTokenProviders();
+}
+
+void ConfigureServices(IServiceCollection services)
+{
+    services.AddDbContext<LoanComparerContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
+    
+    services.AddScoped<JwtHandler>();
+    services.AddTransient<JobTypeService>();
+    services.AddTransient<UserService>();
+    services.AddTransient<IEmailService, EmailService>();
+    
+    services.AddSendGrid(options => options.ApiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY"));
+}
+
+void ConfigureJwt(IServiceCollection services, IConfiguration config)
+{
+    services.Configure<DataProtectionTokenProviderOptions>(options =>
+        options.TokenLifespan = TimeSpan.FromHours(2));
+
+    var jwtSettings = new JwtSettings(config.GetSection("JWTSettings"));
+    services.AddSingleton(jwtSettings);
+
+    services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings.ValidIssuer,
+                ValidAudience = jwtSettings.ValidAudience,
+                IssuerSigningKey = new SymmetricSecurityKey(jwtSettings.SecurityKey)
+            };
+        });
+}

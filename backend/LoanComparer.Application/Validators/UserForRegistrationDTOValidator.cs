@@ -36,7 +36,7 @@ namespace LoanComparer.Application.Validators
                 .NotNull()
                 .NotEmpty()
                 .MustAsync(async (governmentIdValue, cancellationToken) 
-                    => !await context.Users.AnyAsync(user => user.GovernmentId.Value == governmentIdValue))
+                    => !await context.Users.AnyAsync(user => user.GovernmentIdEntity.Value == governmentIdValue))
                 .WithMessage(x => $"User with specified government id already exists");
 
             When(x => x.GovernmentId.Type == "PESEL", () =>
