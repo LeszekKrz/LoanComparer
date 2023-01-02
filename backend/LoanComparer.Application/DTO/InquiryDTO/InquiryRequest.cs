@@ -1,8 +1,6 @@
-﻿using LoanComparer.Application.Model;
+﻿namespace LoanComparer.Application.DTO.InquiryDTO;
 
-namespace LoanComparer.Application.DTO;
-
-public sealed class InquiryDTO
+public sealed class InquiryRequest
 {
     public decimal AmountRequested { get; init; }
     

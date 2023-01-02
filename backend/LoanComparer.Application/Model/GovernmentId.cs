@@ -8,6 +8,11 @@ namespace LoanComparer.Application.Model
         {
             return new(dto.Type, dto.Value);
         }
+
+        public GovernmentIdDTO ToDto()
+        {
+            return new(Type, Value);
+        }
     }
     
     public class GovernmentIdEntity

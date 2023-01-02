@@ -1,4 +1,4 @@
-﻿using LoanComparer.Application.DTO;
+﻿using LoanComparer.Application.DTO.InquiryDTO;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Inquiries;
 using Microsoft.AspNetCore.Mvc;
@@ -21,9 +21,9 @@ public sealed class InquiryController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateAsync(InquiryDTO request)
+    public async Task<ActionResult> CreateAsync(InquiryRequest request)
     {
-        var inquiry = Inquiry.FromDto(request);
+        var inquiry = Inquiry.FromRequest(request);
         var statuses = _sender.SendInquiryToAllBanks(inquiry);
         await foreach (var status in statuses)
         {
@@ -32,6 +32,19 @@ public sealed class InquiryController : ControllerBase
 
         return Ok();
     }
-    
-    // GETs...
+
+    [HttpGet]
+    public async Task<ActionResult<IReadOnlyList<InquiryResponse>>> GetAllAsync()
+    {
+        return (await _query.GetAllAsync()).Select(i => i.ToResponse()).ToList();
+    }
+
+    [HttpGet]
+    [Route("{inquiryId:guid}/status")]
+    public async Task<ActionResult<IReadOnlyList<SentInquiryStatusDTO>>> GetStatusesForInquiryAsync(Guid inquiryId)
+    {
+        return (await _query.GetStatusesForInquiryAsync(inquiryId)).Select(s => s.ToDto()).ToList();
+    }
+
+    // TODO: GET offers
 }

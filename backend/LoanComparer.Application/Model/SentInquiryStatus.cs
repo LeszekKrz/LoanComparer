@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using LoanComparer.Application.DTO.InquiryDTO;
 
 namespace LoanComparer.Application.Model;
 
@@ -23,6 +24,24 @@ public sealed class SentInquiryStatus
             BankId = BankId,
             Status = Status,
             OfferId = ReceivedOffer?.Id
+        };
+    }
+
+    public SentInquiryStatusDTO ToDto()
+    {
+        return new()
+        {
+            BankId = BankId,
+            OfferId = ReceivedOffer?.Id,
+            Status = Status switch
+            {
+                InquiryStatus.Pending => "PENDING",
+                InquiryStatus.Accepted => "OFFERRECEIVED",
+                InquiryStatus.Rejected => "REJECTED",
+                InquiryStatus.Timeout => "TIMEOUT",
+                InquiryStatus.Error => "ERROR",
+                _ => throw new ArgumentOutOfRangeException()
+            }
         };
     }
 

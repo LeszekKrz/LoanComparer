@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using LoanComparer.Application.DTO;
+using LoanComparer.Application.DTO.InquiryDTO;
 
 namespace LoanComparer.Application.Model;
 
@@ -17,16 +18,29 @@ public sealed class Inquiry
 
     public GovernmentId GovernmentId { get; init; } = null!;
 
-    public static Inquiry FromDto(InquiryDTO dto)
+    public static Inquiry FromRequest(InquiryRequest request)
     {
         return new()
         {
             Id = Guid.NewGuid(),
-            AmountRequested = dto.AmountRequested,
-            NumberOfInstallments = dto.NumberOfInstallments,
-            PersonalData = PersonalData.FromDto(dto.PersonalData),
-            JobDetails = JobDetails.FromDto(dto.JobDetails),
-            GovernmentId = GovernmentId.FromDto(dto.GovtId)
+            AmountRequested = request.AmountRequested,
+            NumberOfInstallments = request.NumberOfInstallments,
+            PersonalData = PersonalData.FromDto(request.PersonalData),
+            JobDetails = JobDetails.FromDto(request.JobDetails),
+            GovernmentId = GovernmentId.FromDto(request.GovtId)
+        };
+    }
+
+    public InquiryResponse ToResponse()
+    {
+        return new()
+        {
+            Id = Id,
+            AmountRequested = AmountRequested,
+            NumberOfInstallments = NumberOfInstallments,
+            PersonalData = PersonalData.ToDto(),
+            JobDetails = JobDetails.ToDto(),
+            GovtId = GovernmentId.ToDto()
         };
     }
 
@@ -91,6 +105,16 @@ public sealed class PersonalData
             BirthDate = dto.BirthDate
         };
     }
+
+    public PersonalDataDTO ToDto()
+    {
+        return new()
+        {
+            FirstName = FirstName,
+            LastName = LastName,
+            BirthDate = BirthDate
+        };
+    }
 }
 
 public sealed class JobDetails
@@ -111,6 +135,17 @@ public sealed class JobDetails
             Description = dto.Description,
             StartDate = dto.StartDate,
             EndDate = dto.EndDate
+        };
+    }
+
+    public JobDetailsDTO ToDto()
+    {
+        return new()
+        {
+            JobName = JobName,
+            Description = Description,
+            StartDate = StartDate,
+            EndDate = EndDate
         };
     }
 }
