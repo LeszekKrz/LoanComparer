@@ -35,24 +35,25 @@ namespace LoanComparer.Application.Validators
             RuleFor(x => x.GovernmentId.Value)
                 .NotNull()
                 .NotEmpty()
-                .MustAsync(async (governmentIdValue, cancellationToken) 
+                .MustAsync(async (governmentIdValue, _) 
                     => !await context.Users.AnyAsync(user => user.GovernmentIdEntity.Value == governmentIdValue))
                 .WithMessage(x => $"User with specified government id already exists");
 
             When(x => x.GovernmentId.Type == "PESEL", () =>
             {
-                RuleFor(x => x.GovernmentId.Value).Length(LoanComparerConstants.PeselLength).Matches(@"^\d{11}$"); // 11 jako argument jak?
-            }); // jest jeszcze bardziej skomplikowana logika na pesel jakies tam dodawanie tych liczb ale to moze sie pozniej doda
+                RuleFor(x => x.GovernmentId.Value).Length(LoanComparerConstants.PeselLength).Matches(@"^\d{11}$");
+            });
 
             When(x => x.GovernmentId.Type == "ID Number", () =>
             {
-                RuleFor(x => x.GovernmentId.Value).Length(LoanComparerConstants.IDNumberLength).Matches(@"^[a-zA-Z]{3}\d{6}$");
-            }); // tez tu jest jakas zwalona logika
+                RuleFor(x => x.GovernmentId.Value).Length(LoanComparerConstants.IdNumberLength).Matches(@"^[a-zA-Z]{3}\d{6}$");
+            });
 
             When(x => x.GovernmentId.Type == "Passport Number", () =>
             {
                 RuleFor(x => x.GovernmentId.Value).Length(LoanComparerConstants.PassportNumberLength).Matches(@"^[a-zA-Z]{2}\d{7}$");
-            }); // a tu to nawet nie wiem bo nie ma za duzo o tym
+            });
+            // TODO: Improve validation logic here ^^^
 
             RuleFor(x => x.Password).NotNull().NotEmpty();
             RuleFor(x => x.ConfirmPassword).NotNull().NotEmpty();
