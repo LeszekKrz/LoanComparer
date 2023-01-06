@@ -2,7 +2,7 @@
 
 public sealed class SentInquiryStatusDTO
 {
-    public Guid BankId { get; init; }
+    public string BankName { get; init; } = null!;
 
     public string Status { get; init; } = null!;
 

@@ -1,11 +1,14 @@
-﻿using LoanComparer.Application.DTO.InquiryDTO;
+﻿using System.Security.Claims;
+using LoanComparer.Application.DTO.InquiryDTO;
 using LoanComparer.Application.DTO.OfferDTO;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Inquiries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LoanComparer.Api.Controllers;
 
+// TODO: Check if user exists
 [ApiController]
 [Route("api/inquiries")]
 public sealed class InquiryController : ControllerBase
@@ -22,40 +25,64 @@ public sealed class InquiryController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateAsync(InquiryRequest request)
+    [AllowAnonymous]
+    public async Task<ActionResult<InquiryResponse>> CreateAsync(InquiryRequest request)
     {
-        var inquiry = Inquiry.FromRequest(request);
+        var inquiry = Inquiry.FromRequest(request, GetUsername());
         var statuses = _sender.SendInquiryToAllBanks(inquiry);
         await foreach (var status in statuses)
         {
             await _command.SaveInquiryStatusAsync(status);
         }
 
-        return Ok();
+        return inquiry.ToResponse();
     }
 
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<InquiryResponse>>> GetAllAsync()
     {
-        return (await _query.GetAllAsync()).Select(i => i.ToResponse()).ToList();
+        var username = GetUsername();
+        if (username is null)
+        {
+            return Unauthorized();
+        }
+        
+        return (await _query.GetAllForUserAsync(username)).Select(i => i.ToResponse()).ToList();
     }
 
     [HttpGet]
+    [AllowAnonymous]
     [Route("{inquiryId:guid}/status")]
     public async Task<ActionResult<IReadOnlyList<SentInquiryStatusDTO>>> GetStatusesForInquiryAsync(Guid inquiryId)
     {
-        return (await _query.GetStatusesForInquiryAsync(inquiryId)).Select(s => s.ToDto()).ToList();
+        var checkResult = await _query.CheckOwnerAsync(inquiryId, GetUsername());
+        return checkResult switch
+        {
+            OwnershipTestResult.DoesNotExist => BadRequest(),
+            OwnershipTestResult.Unauthorized => Unauthorized(),
+            _ => (await _query.GetStatusesForInquiryAsync(inquiryId)).Select(s => s.ToDto()).ToList()
+        };
     }
 
     [HttpGet]
     [Route("{inquiryId:guid}/offers")]
     public async Task<ActionResult<IReadOnlyList<OfferWithBankName>>> GetOffersForInquiry(Guid inquiryId)
     {
-        return (await _query.GetStatusesForInquiryAsync(inquiryId)).Where(s => s.ReceivedOffer is not null).Select(s =>
-            new OfferWithBankName
-            {
-                BankName = s.BankId.ToString(),
-                Offer = s.ReceivedOffer!.ToDto()
-            }).ToList();
+        var checkResult = await _query.CheckOwnerAsync(inquiryId, GetUsername());
+        return checkResult switch
+        {
+            OwnershipTestResult.DoesNotExist => BadRequest(),
+            OwnershipTestResult.Unauthorized => Unauthorized(),
+            _ => (await _query.GetStatusesForInquiryAsync(inquiryId)).
+                Select(OfferWithBankName.FromSentInquiryStatus).
+                Where(o => o is not null).
+                Select(o => o!).
+                ToList()
+        };
+    }
+
+    private string? GetUsername()
+    {
+        return User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;   
     }
 }

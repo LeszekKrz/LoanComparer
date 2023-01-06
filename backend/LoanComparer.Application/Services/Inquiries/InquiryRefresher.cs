@@ -6,15 +6,15 @@ namespace LoanComparer.Application.Services.Inquiries;
 
 public sealed class InquiryRefresher : IInquiryRefresher
 {
-    private readonly IReadOnlyList<IBankApiRefresher> _refreshers;
+    private readonly IReadOnlyList<IBankInterface> _bankInterfaces;
     private readonly IInquiryQuery _query;
     private readonly IInquiryCommand _command;
     private readonly IOptionsMonitor<InquiryConfiguration> _config;
 
-    public InquiryRefresher(IEnumerable<IBankApiRefresher> refreshers, IInquiryQuery query, IInquiryCommand command,
+    public InquiryRefresher(IBankInterfaceCreator bankInterfaceCreator, IInquiryQuery query, IInquiryCommand command,
         IOptionsMonitor<InquiryConfiguration> config)
     {
-        _refreshers = refreshers.ToList();
+        _bankInterfaces = bankInterfaceCreator.CreateBankInterfaces();
         _query = query;
         _command = command;
         _config = config;
@@ -25,7 +25,7 @@ public sealed class InquiryRefresher : IInquiryRefresher
         var statusesToRefresh = await _query.GetPendingStatusesForUserAsync(username);
         foreach (var status in statusesToRefresh)
         {
-            var refresher = GetRefresherForStatus(status);
+            var refresher = GetBankInterfaceForStatus(status);
             await refresher.RefreshStatusAsync(status);
         }
     }
@@ -44,7 +44,7 @@ public sealed class InquiryRefresher : IInquiryRefresher
         var statusesToRefresh = await _query.GetAllPendingStatusesAsync();
         foreach (var inquiryStatus in statusesToRefresh)
         {
-            var refresher = GetRefresherForStatus(inquiryStatus);
+            var refresher = GetBankInterfaceForStatus(inquiryStatus);
             var previousStatus = inquiryStatus.Status;
             var updated = await refresher.RefreshStatusAsync(inquiryStatus);
             if(updated.Status == previousStatus) continue;
@@ -52,12 +52,12 @@ public sealed class InquiryRefresher : IInquiryRefresher
         }
     }
 
-    private IBankApiRefresher GetRefresherForStatus(SentInquiryStatus status)
+    private IBankInterface GetBankInterfaceForStatus(SentInquiryStatus status)
     {
-        var refresher = _refreshers.FirstOrDefault(r => r.BankId == status.BankId);
+        var refresher = _bankInterfaces.FirstOrDefault(r => r.BankName == status.BankName);
         if (refresher is null)
             throw new InvalidOperationException(
-                $"There is no refresher with bank id {status.BankId}, but status with id {status.Id} references it");
+                $"There is no known bank with name {status.BankName}, but status with id {status.Id} references it");
         return refresher;
     }
 }

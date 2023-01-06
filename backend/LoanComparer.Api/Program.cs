@@ -111,6 +111,7 @@ void ConfigureServices(IServiceCollection services)
     services.AddTransient<UserService>();
     services.AddTransient<IEmailService, EmailService>();
     services.AddScoped<IInquiryCommand, InquiryCommand>();
+    services.AddScoped<IInquiryQuery, InquiryQuery>();
     services.AddScoped<IInquirySender, InquirySender>();
     services.AddScoped<IInquiryRefresher, InquiryRefresher>();
 

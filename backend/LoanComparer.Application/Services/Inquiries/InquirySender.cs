@@ -4,16 +4,16 @@ namespace LoanComparer.Application.Services.Inquiries;
 
 public sealed class InquirySender : IInquirySender
 {
-    private readonly IReadOnlyList<IBankApiSender> _senders;
+    private readonly IReadOnlyList<IBankInterface> _bankInterfaces;
 
-    public InquirySender(IEnumerable<IBankApiSender> senders)
+    public InquirySender(IBankInterfaceCreator bankInterfaceCreator)
     {
-        _senders = senders.ToList();
+        _bankInterfaces = bankInterfaceCreator.CreateBankInterfaces();
     }
 
     public async IAsyncEnumerable<SentInquiryStatus> SendInquiryToAllBanks(Inquiry inquiry)
     {
-        foreach (var sender in _senders)
+        foreach (var sender in _bankInterfaces)
         {
             yield return await sender.SendInquiryAsync(inquiry);
         }

@@ -9,7 +9,7 @@ public sealed class SentInquiryStatus
     
     public Inquiry Inquiry { get; init; } = null!;
 
-    public Guid BankId { get; init; }
+    public string BankName { get; init; } = null!;
 
     public InquiryStatus Status { get; init; }
 
@@ -21,7 +21,7 @@ public sealed class SentInquiryStatus
         {
             Id = Id,
             InquiryId = Inquiry.Id,
-            BankId = BankId,
+            BankName = BankName,
             Status = Status,
             OfferId = ReceivedOffer?.Id
         };
@@ -31,7 +31,7 @@ public sealed class SentInquiryStatus
     {
         return new()
         {
-            BankId = BankId,
+            BankName = BankName,
             OfferId = ReceivedOffer?.Id,
             Status = Status switch
             {
@@ -51,7 +51,7 @@ public sealed class SentInquiryStatus
         {
             Id = e.Id,
             Inquiry = Inquiry.FromEntity(e.Inquiry),
-            BankId = e.BankId,
+            BankName = e.BankName,
             Status = e.Status,
             ReceivedOffer = e.Offer is not null ? Offer.FromEntity(e.Offer) : null,
         };
@@ -69,9 +69,9 @@ public sealed class SentInquiryStatusEntity
     
     [Required]
     public Guid InquiryId { get; init; }
-    
-    [Required]
-    public Guid BankId { get; init; }
+
+    [Required] 
+    public string BankName { get; init; } = null!;
     
     [Required]
     public InquiryStatus Status { get; set; }

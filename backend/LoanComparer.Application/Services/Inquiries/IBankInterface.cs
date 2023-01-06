@@ -2,9 +2,9 @@
 
 namespace LoanComparer.Application.Services.Inquiries;
 
-public interface IBankApiRefresher
+public interface IBankInterface
 {
-    Guid BankId { get; }
+    string BankName { get; }
 
     /// <summary>
     ///     Refreshes <paramref name="status" /> by querying a remote API and updating data in database. If an offer is
@@ -13,4 +13,6 @@ public interface IBankApiRefresher
     /// <param name="status"><see cref="SentInquiryStatus" /> to update</param>
     /// <returns>Updated object</returns>
     Task<SentInquiryStatus> RefreshStatusAsync(SentInquiryStatus status);
+    
+    Task<SentInquiryStatus> SendInquiryAsync(Inquiry inquiry);
 }

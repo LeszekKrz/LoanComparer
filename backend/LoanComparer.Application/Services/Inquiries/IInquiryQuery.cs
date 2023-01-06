@@ -10,7 +10,16 @@ public interface IInquiryQuery
 
     Task<IReadOnlyList<SentInquiryStatus>> GetPendingStatusesOlderThanAsync(TimeSpan limit);
 
-    Task<IReadOnlyList<Inquiry>> GetAllAsync();
+    Task<IReadOnlyList<Inquiry>> GetAllForUserAsync(string username);
 
     Task<IReadOnlyList<SentInquiryStatus>> GetStatusesForInquiryAsync(Guid inquiryId);
+
+    Task<OwnershipTestResult> CheckOwnerAsync(Guid inquiryId, string? username);
+}
+
+public enum OwnershipTestResult
+{
+    Allowed,
+    Unauthorized,
+    DoesNotExist
 }

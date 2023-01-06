@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using LoanComparer.Application.DTO;
 using LoanComparer.Application.DTO.InquiryDTO;
 
 namespace LoanComparer.Application.Model;
@@ -7,6 +6,10 @@ namespace LoanComparer.Application.Model;
 public sealed class Inquiry
 {
     public Guid Id { get; init; }
+    
+    public string? OwnerUsername { get; init; }
+    
+    public DateTimeOffset CreationTime { get; init; }
 
     public decimal AmountRequested { get; init; }
 
@@ -18,13 +21,15 @@ public sealed class Inquiry
 
     public GovernmentId GovernmentId { get; init; } = null!;
 
-    public static Inquiry FromRequest(InquiryRequest request)
+    public static Inquiry FromRequest(InquiryRequest request, string? ownerUsername)
     {
         return new()
         {
             Id = Guid.NewGuid(),
+            OwnerUsername = ownerUsername,
             AmountRequested = request.AmountRequested,
             NumberOfInstallments = request.NumberOfInstallments,
+            CreationTime = DateTimeOffset.Now,
             PersonalData = PersonalData.FromDto(request.PersonalData),
             JobDetails = JobDetails.FromDto(request.JobDetails),
             GovernmentId = GovernmentId.FromDto(request.GovtId)
@@ -36,6 +41,8 @@ public sealed class Inquiry
         return new()
         {
             Id = Id,
+            OwnerUsername = OwnerUsername,
+            CreationTime = CreationTime,
             AmountRequested = AmountRequested,
             NumberOfInstallments = NumberOfInstallments,
             PersonalData = PersonalData.ToDto(),
@@ -49,6 +56,8 @@ public sealed class Inquiry
         return new()
         {
             Id = Id,
+            OwnerUsername = OwnerUsername,
+            CreationTimestamp = CreationTime.ToUnixTimeMilliseconds(),
             AmountRequested = AmountRequested,
             NumberOfInstallments = NumberOfInstallments,
             FirstName = PersonalData.FirstName,
@@ -68,6 +77,8 @@ public sealed class Inquiry
         return new()
         {
             Id = entity.Id,
+            OwnerUsername = entity.OwnerUsername,
+            CreationTime = DateTimeOffset.FromUnixTimeMilliseconds(entity.CreationTimestamp),
             AmountRequested = entity.AmountRequested,
             NumberOfInstallments = entity.NumberOfInstallments,
             PersonalData = new()
@@ -158,6 +169,11 @@ public sealed class InquiryEntity
     [Required]
     public Guid Id { get; init; }
     
+    public string? OwnerUsername { get; init; }
+    
+    [Required]
+    public long CreationTimestamp { get; init; }
+    
     [Required]
     public decimal AmountRequested { get; init; }
 
@@ -176,7 +192,7 @@ public sealed class InquiryEntity
     [Required]
     public string JobName { get; init; } = null!;
     
-    public string? JobDescription { get; init; } = null!;
+    public string? JobDescription { get; init; }
     
     public DateOnly? JobStartDate { get; init; }
 
