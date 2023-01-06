@@ -40,14 +40,11 @@
         <th>
           <p class="center-text delete-margin">Inquiry Submition Date</p>
         </th>
-        <th>
-          <p class="center-text delete-margin">Status</p>
-        </th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-inquiry>
-      <tr (click)="onRowClickHandler(inquiry)">
+      <tr class="cursor-pointer" (click)="onRowClickHandler(inquiry)">
         <td>
           <p class="center-text delete-margin">{{ inquiry.loanValue }}</p>
         </td>
@@ -56,9 +53,6 @@
         </td>
         <td>
           <p class="center-text delete-margin">{{ inquiry.dateOfInquirySubmition | date: 'dd.MM.yyyy, HH:mm' }}</p>
-        </td>
-        <td>
-          <p class="center-text delete-margin"><span [class]="'status-' + inquiry.status.toLowerCase()">{{ inquiry.status }}</span></p>
         </td>
       </tr>
     </ng-template>

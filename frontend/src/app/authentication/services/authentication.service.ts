@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { Observable, Subject } from "rxjs";
@@ -50,7 +50,7 @@ export class AuthenticationService {
   }
 
   isUserBankEmployee(): boolean {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (!token) {
       return false;
     }

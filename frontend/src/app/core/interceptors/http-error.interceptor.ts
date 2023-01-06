@@ -4,7 +4,6 @@ import { MessageService } from 'primeng/api';
 import { catchError, Observable } from 'rxjs';
 import { ErrorResponseDTO } from '../models/error-response-dto';
 import { insuficcientAccessMessage, internalServerErrorMessage } from '../messages';
-import { AuthenticationResponseDTO } from 'src/app/authentication/models/authentication-response-dto';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {

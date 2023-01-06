@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { finalize, Observable, of, Subscription, switchMap } from 'rxjs';
+import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { AuthenticationService } from 'src/app/authentication/services/authentication.service';
 import { applicationDescription } from './home-page-constants';
-import { Inquiry } from './models/inquiry';
+import { InquiryDTO } from './models/inquiry-dto';
+import { HomeHttpServiceService } from './services/home.http.service';
 
 @Component({
   selector: 'app-home',
@@ -12,13 +13,15 @@ import { Inquiry } from './models/inquiry';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   registeredUsersCount: number = 100; // we should fetch it from backend
-  inquiries: Inquiry[] = []; // we should fetch it
+  inquiries: InquiryDTO[] = []; // we should fetch it
   isProgressSpinnerVisible: boolean = false;
   subscriptions: Subscription[] = [];
   isUserAuthenticated!: boolean;
   applicationDescription: String = applicationDescription;
 
-  constructor(private authenticationHttpService: AuthenticationService, private router: Router) {
+  constructor(private authenticationHttpService: AuthenticationService,
+    private router: Router,
+    private homeHttpService: HomeHttpServiceService) {
     this.isUserAuthenticated = this.authenticationHttpService.isUserAuthenticated();
   }
 
@@ -27,11 +30,21 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.authenticationHttpService.authenticationStateChanged.subscribe(isAuthenticated => {
         this.isUserAuthenticated = isAuthenticated;
     }));
-    this.inquiries = [{id: '1', loanValue: 100, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-07'), status: 'WAITINGFORACCEPTANCE'},
-    {id: '2', loanValue: 1000, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-11-02'), status: 'OFFERSCREATED'},
-    {id: '3', loanValue: 109.99, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-01'), status: 'SUBMITTED'},
-    {id: '4', loanValue: 1000, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-11-02'), status: 'ACCEPTED'},
-    {id: '5', loanValue: 109.99, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-01'), status: 'REJECTED'}]; // we should fetch it here
+
+    this.inquiries = [{id: '1', loanValue: 100, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-07')},
+    {id: '2', loanValue: 1000, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-11-02')},
+    {id: '3', loanValue: 109.99, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-01')},
+    {id: '4', loanValue: 1000, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-11-02')},
+    {id: '5', loanValue: 109.99, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-01')}]; // we should fetch it here
+
+    // if (this.authenticationHttpService.isUserAuthenticated()) {
+    //   const getInquiries$ = this.homeHttpService.getInquiries().pipe(
+    //     tap((inquiries: InquiryDTO[]) => {
+    //       this.inquiries = inquiries;
+    //     })
+    //   );
+    //   this.subscriptions.push(this.doWithLoading(getInquiries$).subscribe());
+    // }
   }
 
   ngOnDestroy(): void {
@@ -44,10 +57,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.router.navigate(['create-inquiry']);
   }
 
-  onRowClickHandler(inquiry: Inquiry) {
-    if (inquiry.status == 'SUBMITTED' || inquiry.status == 'OFFERSCREATED') {
-      this.router.navigate([`choose-offer/${inquiry.id}`])
-    }
+  onRowClickHandler(inquiry: InquiryDTO) {
+    this.router.navigate([`choose-offer/${inquiry.id}`]);
   }
 
   private doWithLoading(observable$: Observable<any>): Observable<any> {
