@@ -32,7 +32,7 @@ public sealed class SentInquiryStatus
         return new()
         {
             BankName = BankName,
-            OfferId = ReceivedOffer?.Id,
+            Offer = ReceivedOffer?.ToDto(),
             Status = Status switch
             {
                 InquiryStatus.Pending => "PENDING",

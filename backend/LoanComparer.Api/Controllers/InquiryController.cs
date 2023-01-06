@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using LoanComparer.Application.DTO.InquiryDTO;
-using LoanComparer.Application.DTO.OfferDTO;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Inquiries;
 using Microsoft.AspNetCore.Authorization;
@@ -61,23 +60,6 @@ public sealed class InquiryController : ControllerBase
             OwnershipTestResult.DoesNotExist => BadRequest(),
             OwnershipTestResult.Unauthorized => Unauthorized(),
             _ => (await _query.GetStatusesForInquiryAsync(inquiryId)).Select(s => s.ToDto()).ToList()
-        };
-    }
-
-    [HttpGet]
-    [Route("{inquiryId:guid}/offers")]
-    public async Task<ActionResult<IReadOnlyList<OfferWithBankName>>> GetOffersForInquiry(Guid inquiryId)
-    {
-        var checkResult = await _query.CheckOwnerAsync(inquiryId, GetUsername());
-        return checkResult switch
-        {
-            OwnershipTestResult.DoesNotExist => BadRequest(),
-            OwnershipTestResult.Unauthorized => Unauthorized(),
-            _ => (await _query.GetStatusesForInquiryAsync(inquiryId)).
-                Select(OfferWithBankName.FromSentInquiryStatus).
-                Where(o => o is not null).
-                Select(o => o!).
-                ToList()
         };
     }
 
