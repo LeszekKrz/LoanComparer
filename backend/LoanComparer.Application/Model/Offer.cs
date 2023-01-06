@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using LoanComparer.Application.DTO.OfferDTO;
 
 namespace LoanComparer.Application.Model;
 
@@ -14,6 +15,14 @@ public sealed class Offer
     public static Offer FromEntity(OfferEntity entity)
     {
         throw new NotImplementedException();
+    }
+
+    public OfferResponse ToDto()
+    {
+        return new()
+        {
+            Id = Id
+        };
     }
 }
 

@@ -75,6 +75,9 @@ void ConfigureOptions(IServiceCollection services, IConfiguration config)
     services.AddOptions<FromEmailConfiguration>()
         .Bind(config.GetSection("FromEmail"))
         .ValidateDataAnnotations();
+    services.AddOptions<InquiryConfiguration>()
+        .Bind(config.GetSection(InquiryConfiguration.SectionName))
+        .ValidateDataAnnotations();
 }
 
 void ConfigureUserIdentity(IServiceCollection services)

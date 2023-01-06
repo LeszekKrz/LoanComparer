@@ -1,4 +1,6 @@
-﻿using LoanComparer.Application.Model;
+﻿using LoanComparer.Application.Configuration;
+using LoanComparer.Application.Model;
+using Microsoft.Extensions.Options;
 
 namespace LoanComparer.Application.Services.Inquiries;
 
@@ -7,12 +9,15 @@ public sealed class InquiryRefresher : IInquiryRefresher
     private readonly IReadOnlyList<IBankApiRefresher> _refreshers;
     private readonly IInquiryQuery _query;
     private readonly IInquiryCommand _command;
+    private readonly IOptionsMonitor<InquiryConfiguration> _config;
 
-    public InquiryRefresher(IEnumerable<IBankApiRefresher> refreshers, IInquiryQuery query, IInquiryCommand command)
+    public InquiryRefresher(IEnumerable<IBankApiRefresher> refreshers, IInquiryQuery query, IInquiryCommand command,
+        IOptionsMonitor<InquiryConfiguration> config)
     {
         _refreshers = refreshers.ToList();
         _query = query;
         _command = command;
+        _config = config;
     }
     
     public async Task RefreshStatusesForUserAsync(string username)
@@ -27,8 +32,7 @@ public sealed class InquiryRefresher : IInquiryRefresher
 
     public async Task MarkOldStatusesAsTimeoutAsync()
     {
-        var oldStatuses = await _query.GetPendingStatusesOlderThanAsync(TimeSpan.FromHours(1));
-        // TODO: Use value from config ^^^
+        var oldStatuses = await _query.GetPendingStatusesOlderThanAsync(_config.CurrentValue.TimeoutInterval);
         foreach (var status in oldStatuses)
         {
             await _command.MarkAsTimeoutAsync(status);

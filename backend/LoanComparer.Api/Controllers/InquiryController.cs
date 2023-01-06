@@ -1,4 +1,5 @@
 ﻿using LoanComparer.Application.DTO.InquiryDTO;
+using LoanComparer.Application.DTO.OfferDTO;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Inquiries;
 using Microsoft.AspNetCore.Mvc;
@@ -46,5 +47,15 @@ public sealed class InquiryController : ControllerBase
         return (await _query.GetStatusesForInquiryAsync(inquiryId)).Select(s => s.ToDto()).ToList();
     }
 
-    // TODO: GET offers
+    [HttpGet]
+    [Route("{inquiryId:guid}/offers")]
+    public async Task<ActionResult<IReadOnlyList<OfferWithBankName>>> GetOffersForInquiry(Guid inquiryId)
+    {
+        return (await _query.GetStatusesForInquiryAsync(inquiryId)).Where(s => s.ReceivedOffer is not null).Select(s =>
+            new OfferWithBankName
+            {
+                BankName = s.BankId.ToString(),
+                Offer = s.ReceivedOffer!.ToDto()
+            }).ToList();
+    }
 }
