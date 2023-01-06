@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LoanComparer.Api.Controllers;
 
-// TODO: Check if user exists
 [ApiController]
 [Route("api/inquiries")]
 public sealed class InquiryController : ControllerBase
