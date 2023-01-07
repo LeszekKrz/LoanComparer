@@ -8,7 +8,7 @@
   styleClass="p-card-style shadow-7">
   <p-table
     #inquiriesTable
-    [value]="inquiriesWithUserInfo"
+    [value]="inquiries"
     [rowHover]="true"
     responsiveLayout="scroll"
     [paginator]="true"
@@ -99,13 +99,13 @@
           <div class="center-text">{{ inquiry.dateOfInquirySubmition | date: 'dd.MM.yyyy, HH:mm' }}</div>
         </td>
         <td>
-          <div class="center-text">{{ inquiry.email }}</div>
+          <div class="center-text">{{ inquiry.personalData.email }}</div>
         </td>
         <td>
-          <div class="center-text">{{ inquiry.governmentIdType }}</div>
+          <div class="center-text">{{ inquiry.governmentId.type }}</div>
         </td>
         <td>
-          <div class="center-text">{{ inquiry.governmentIdValue }}</div>
+          <div class="center-text">{{ inquiry.governmentId.value }}</div>
         </td>
       </tr>
     </ng-template>
@@ -114,7 +114,7 @@
       <tr>
         <td colspan="6">
 
-          <p class="table-empty-message" *ngIf="inquiriesWithUserInfo.length == 0; else noMatchingInquiries">Inquiries list is empty</p>
+          <p class="table-empty-message" *ngIf="inquiries.length == 0; else noMatchingInquiries">Inquiries list is empty</p>
           <ng-template #noMatchingInquiries>
             <p class="table-empty-message">No matching inquiries found</p>
           </ng-template>
