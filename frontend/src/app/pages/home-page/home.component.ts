@@ -37,14 +37,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     {id: '4', loanValue: 1000, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-11-02')},
     {id: '5', loanValue: 109.99, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-01')}]; // we should fetch it here
 
-    // if (this.authenticationHttpService.isUserAuthenticated()) {
-    //   const getInquiries$ = this.homeHttpService.getInquiries().pipe(
-    //     tap((inquiries: InquiryDTO[]) => {
-    //       this.inquiries = inquiries;
-    //     })
-    //   );
-    //   this.subscriptions.push(this.doWithLoading(getInquiries$).subscribe());
-    // }
+    if (this.authenticationHttpService.isUserAuthenticated()) {
+      const getInquiries$ = this.homeHttpService.getInquiries().pipe(
+        tap((inquiries: InquiryDTO[]) => {
+          this.inquiries = inquiries;
+        })
+      );
+      this.subscriptions.push(this.doWithLoading(getInquiries$).subscribe());
+    }
   }
 
   ngOnDestroy(): void {
