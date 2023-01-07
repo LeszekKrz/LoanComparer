@@ -7,7 +7,7 @@ import { AppComponent } from './app.component';
 import { CreateInquiryPageModule } from './pages/create-inquiry-page/create-inquiry-page.module';
 import { CoreModule } from './core/core.module';
 import { RegistrationPageModule } from './pages/registration-page/registration-page.module';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { LoginPageModule } from './pages/login-page/login-page.module';
 import { MenuModule } from './menu/menu.module';
 import { JwtModule } from '@auth0/angular-jwt';
@@ -50,7 +50,7 @@ export function tokenGetter(): string | null {
       }
     })
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

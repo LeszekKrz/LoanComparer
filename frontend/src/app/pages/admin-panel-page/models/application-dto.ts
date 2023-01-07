@@ -1,6 +1,6 @@
 import { GovernmentIdDTO } from "./government-id-dto";
 
-export interface OfferRequestDTO {
+export interface ApplicationDTO {
     id: string;
     loanValue: number;
     numberOfInstallments: number;
