@@ -11,7 +11,7 @@ public sealed class Offer
     
     public int NumberOfInstallments { get; init; }
     
-    public decimal Percentage { get; init; }
+    public double Percentage { get; init; }
     
     public decimal MonthlyInstallment { get; init; }
     
@@ -20,10 +20,10 @@ public sealed class Offer
         return new()
         {
             Id = Id,
-            LoanValue = LoanValue,
+            LoanValueAsSmallestNominal = (long)(LoanValue * 100),
             NumberOfInstallments = NumberOfInstallments,
             Percentage = Percentage,
-            MonthlyInstallment = MonthlyInstallment
+            MonthlyInstallmentAsSmallestNominal = (long)(MonthlyInstallment * 100)
         };
     }
 
@@ -32,10 +32,10 @@ public sealed class Offer
         return new()
         {
             Id = entity.Id,
-            LoanValue = entity.LoanValue,
+            LoanValue = entity.LoanValueAsSmallestNominal / 100m,
             NumberOfInstallments = entity.NumberOfInstallments,
             Percentage = entity.Percentage,
-            MonthlyInstallment = entity.MonthlyInstallment
+            MonthlyInstallment = entity.MonthlyInstallmentAsSmallestNominal / 100m
         };
     }
 
@@ -59,14 +59,14 @@ public sealed class OfferEntity
     public Guid Id { get; init; }
     
     [Required]
-    public decimal LoanValue { get; init; }
+    public long LoanValueAsSmallestNominal { get; init; }
     
     [Required]
     public int NumberOfInstallments { get; init; }
     
     [Required]
-    public decimal Percentage { get; init; }
+    public double Percentage { get; init; }
     
     [Required]
-    public decimal MonthlyInstallment { get; init; }
+    public long MonthlyInstallmentAsSmallestNominal { get; init; }
 }

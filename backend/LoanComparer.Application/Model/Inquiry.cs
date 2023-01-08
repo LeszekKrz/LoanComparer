@@ -65,15 +65,15 @@ public sealed class Inquiry
             OwnerUsername = OwnerUsername,
             NotificationEmail = NotificationEmail,
             CreationTimestamp = CreationTime.ToUnixTimeMilliseconds(),
-            AmountRequested = AmountRequested,
+            AmountRequestedAsSmallestNominal = (long)(AmountRequested * 100),
             NumberOfInstallments = NumberOfInstallments,
             FirstName = PersonalData.FirstName,
             LastName = PersonalData.LastName,
-            BirthDate = PersonalData.BirthDate,
+            BirthDateTimestamp = DateOnlyToTimestamp(PersonalData.BirthDate),
             JobName = JobDetails.JobName,
             JobDescription = JobDetails.Description,
-            JobStartDate = JobDetails.StartDate,
-            JobEndDate = JobDetails.EndDate,
+            JobStartDateTimestamp = JobDetails.StartDate is null ? null : DateOnlyToTimestamp(JobDetails.StartDate.Value),
+            JobEndDateTimestamp = JobDetails.EndDate is null ? null : DateOnlyToTimestamp(JobDetails.EndDate.Value),
             GovtIdType = GovernmentId.Type,
             GovtIdValue = GovernmentId.Value
         };
@@ -87,23 +87,33 @@ public sealed class Inquiry
             OwnerUsername = entity.OwnerUsername,
             NotificationEmail = entity.NotificationEmail,
             CreationTime = DateTimeOffset.FromUnixTimeMilliseconds(entity.CreationTimestamp),
-            AmountRequested = entity.AmountRequested,
+            AmountRequested = entity.AmountRequestedAsSmallestNominal / 100m,
             NumberOfInstallments = entity.NumberOfInstallments,
             PersonalData = new()
             {
                 FirstName = entity.FirstName,
                 LastName = entity.LastName,
-                BirthDate = entity.BirthDate
+                BirthDate = DateOnlyFromTimestamp(entity.BirthDateTimestamp)
             },
             JobDetails = new()
             {
                 JobName = entity.JobName,
                 Description = entity.JobDescription,
-                StartDate = entity.JobStartDate,
-                EndDate = entity.JobEndDate
+                StartDate = entity.JobStartDateTimestamp is null ? null : DateOnlyFromTimestamp(entity.JobStartDateTimestamp.Value),
+                EndDate = entity.JobEndDateTimestamp is null ? null : DateOnlyFromTimestamp(entity.JobEndDateTimestamp.Value)
             },
             GovernmentId = new(entity.GovtIdType, entity.GovtIdValue)
         };
+    }
+
+    private static long DateOnlyToTimestamp(DateOnly date)
+    {
+        return date.ToDateTime(new TimeOnly(0)).ToFileTimeUtc();
+    }
+
+    private static DateOnly DateOnlyFromTimestamp(long timestamp)
+    {
+        return DateOnly.FromDateTime(DateTime.FromFileTimeUtc(timestamp));
     }
 }
 
@@ -140,7 +150,7 @@ public sealed class JobDetails
 {
     public string JobName { get; init; } = null!;
 
-    public string? Description { get; init; } = null!;
+    public string? Description { get; init; }
 
     public DateOnly? StartDate { get; init; }
 
@@ -186,7 +196,7 @@ public sealed class InquiryEntity
     public long CreationTimestamp { get; init; }
     
     [Required]
-    public decimal AmountRequested { get; init; }
+    public long AmountRequestedAsSmallestNominal { get; init; }
 
     [Required]
     public int NumberOfInstallments { get; init; }
@@ -198,16 +208,16 @@ public sealed class InquiryEntity
     public string LastName { get; init; } = null!;
 
     [Required]
-    public DateOnly BirthDate { get; init; }
+    public long BirthDateTimestamp { get; init; }
 
     [Required]
     public string JobName { get; init; } = null!;
     
     public string? JobDescription { get; init; }
     
-    public DateOnly? JobStartDate { get; init; }
+    public long? JobStartDateTimestamp { get; init; }
 
-    public DateOnly? JobEndDate { get; init; }
+    public long? JobEndDateTimestamp { get; init; }
 
     [Required] 
     public string GovtIdType { get; init; } = null!;

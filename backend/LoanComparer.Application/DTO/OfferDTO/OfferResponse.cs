@@ -8,7 +8,7 @@ public sealed class OfferResponse
     
     public int NumberOfInstallments { get; init; }
     
-    public decimal Percentage { get; init; }
+    public double Percentage { get; init; }
     
     public decimal MonthlyInstallment { get; init; }
 }
