@@ -2,13 +2,14 @@
     <p-progressSpinner></p-progressSpinner>
 </div>
 
+<p-confirmPopup></p-confirmPopup>
 
 <p-card
   header="Admin Panel"
   styleClass="p-card-style shadow-7">
   <p-table
     #inquiriesTable
-    [value]="inquiriesWithUserInfo"
+    [value]="inquiries"
     [rowHover]="true"
     responsiveLayout="scroll"
     [paginator]="true"
@@ -99,13 +100,13 @@
           <div class="center-text">{{ inquiry.dateOfInquirySubmition | date: 'dd.MM.yyyy, HH:mm' }}</div>
         </td>
         <td>
-          <div class="center-text">{{ inquiry.email }}</div>
+          <div class="center-text">{{ inquiry.personalData.email }}</div>
         </td>
         <td>
-          <div class="center-text">{{ inquiry.governmentIdType }}</div>
+          <div class="center-text">{{ inquiry.governmentId.type }}</div>
         </td>
         <td>
-          <div class="center-text">{{ inquiry.governmentIdValue }}</div>
+          <div class="center-text">{{ inquiry.governmentId.value }}</div>
         </td>
       </tr>
     </ng-template>
@@ -114,7 +115,7 @@
       <tr>
         <td colspan="6">
 
-          <p class="table-empty-message" *ngIf="inquiriesWithUserInfo.length == 0; else noMatchingInquiries">Inquiries list is empty</p>
+          <p class="table-empty-message" *ngIf="inquiries.length == 0; else noMatchingInquiries">Inquiries list is empty</p>
           <ng-template #noMatchingInquiries>
             <p class="table-empty-message">No matching inquiries found</p>
           </ng-template>
@@ -124,8 +125,8 @@
   </p-table>
 
   <p-table
-    #offerRequestsTable
-    [value]="offerRequestsWithUserInfo"
+    #applicationsTable
+    [value]="applications"
     [rowHover]="true"
     responsiveLayout="scroll"
     [paginator]="true"
@@ -134,13 +135,13 @@
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
     [rowsPerPageOptions]="[5, 10, 25]"
     stateStorage="session"
-    stateKey="offerRequestsTableSettings"
+    stateKey="applicationsTableSettings"
     dataKey="id">
 
     <ng-template pTemplate="caption">
-      <div class="flex justify-content-center inline">All offer requests</div>
+      <div class="flex justify-content-center inline">All applications</div>
 
-      <button pButton pRipple label="Clear" class="flex justify-content-end" icon="pi pi-filter-slash" (click)="clearOfferRequestsTable()"></button>
+      <button pButton pRipple label="Clear" class="flex justify-content-end" icon="pi pi-filter-slash" (click)="clearApplicationsTable()"></button>
 
     </ng-template>
 
@@ -212,44 +213,44 @@
       </tr>
     </ng-template>
 
-    <ng-template pTemplate="body" let-offerRequest let-expanded="expanded">
+    <ng-template pTemplate="body" let-application let-expanded="expanded">
       <tr>
         <td>
-          <button type="button" pButton pRipple [pRowToggler]="offerRequest" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+          <button type="button" pButton pRipple [pRowToggler]="application" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
         </td>
         <td>
-          <div class="center-text">{{ offerRequest.loanValue }}</div>
+          <div class="center-text">{{ application.loanValue }}</div>
         </td>
         <td>
-          <div class="center-text">{{ offerRequest.numberOfInstallments }}</div>
+          <div class="center-text">{{ application.numberOfInstallments }}</div>
         </td>
         <td>
-          <div class="center-text">{{ offerRequest.percentage }}%</div>
+          <div class="center-text">{{ application.percentage }}%</div>
         </td>
         <td>
-          <div class="center-text">{{ offerRequest.monthlyInstallment }}</div>
+          <div class="center-text">{{ application.monthlyInstallment }}</div>
         </td>
         <td>
-          <div class="center-text">{{ offerRequest.email }}</div>
+          <div class="center-text">{{ application.email }}</div>
         </td>
         <td>
-          <div class="center-text delete-margin">
-            <span [class]="'status-' + offerRequest.status.toLowerCase()">{{ offerRequest.status }}</span>
+          <div class="center-text">
+            <span [class]="'status-' + application.status.toLowerCase()">{{ application.status }}</span>
           </div>
         </td>
         <td>
-          <div class="flex justify-content-between align-items-center" *ngIf="offerRequest.status == 'WAITINGFORACCEPTANCE'">
-            <button pButton pRipple icon="pi pi-check" class="p-button-rounded"></button>
-            <button pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger"></button>
+          <div class="flex justify-content-between align-items-center" *ngIf="application.status == 'WAITINGFORACCEPTANCE'">
+            <button pButton pRipple icon="pi pi-check" class="p-button-rounded" (click)="reviewApplicationPopUp(application, true, $event.target!)"></button>
+            <button pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="reviewApplicationPopUp(application, false, $event.target!)"></button>
           </div>
         </td>
       </tr>
     </ng-template>
 
-    <ng-template pTemplate="rowexpansion" let-offerRequest>
+    <ng-template pTemplate="rowexpansion" let-application>
       <tr>
         <td colspan="8">
-            <p-table [value]="[offerRequest]">
+            <p-table [value]="[application]">
               <ng-template pTemplate="header">
                 <tr>
                   <th>
@@ -269,23 +270,23 @@
                   </th>
                 </tr>
               </ng-template>
-              <ng-template pTemplate="body" let-offerRequest>
+              <ng-template pTemplate="body" let-application>
                 <tr>
                   <td>
-                    <div class="center-text">{{offerRequest.governmentIdType}}</div>
+                    <div class="center-text">{{application.governmentId.type}}</div>
                   </td>
                   <td>
-                    <div class="center-text">{{offerRequest.governmentIdValue}}</div>
+                    <div class="center-text">{{application.governmentId.value}}</div>
                   </td>
                   <td>
-                    <div class="center-text">{{offerRequest.dateOfInquirySubmition | date: 'dd.MM.yyyy, HH:mm'}}</div>
+                    <div class="center-text">{{application.dateOfInquiry | date: 'dd.MM.yyyy, HH:mm'}}</div>
                   </td>
                   <td>
-                    <div class="center-text">{{offerRequest.dateOfOfferRequest | date: 'dd.MM.yyyy, HH:mm'}}</div>
+                    <div class="center-text">{{application.dateOfApplication | date: 'dd.MM.yyyy, HH:mm'}}</div>
                   </td>
                   <td>
                     <div class="flex justify-content-center align-items-center">
-                      <p-button label="Download" icon="pi pi-download"></p-button>
+                      <p-button label="Download" icon="pi pi-download" (onClick)="downloadContract(application.id)"></p-button>
                     </div>
                   </td>
                 </tr>
@@ -298,9 +299,9 @@
     <ng-template pTemplate="emptymessage">
       <tr>
         <td colspan="7">
-          <p class="table-empty-message" *ngIf="offerRequestsWithUserInfo.length == 0; else noMatchingOfferRequests">Offer requests list is empty</p>
-          <ng-template #noMatchingOfferRequests>
-            <p class="table-empty-message" *ngIf="offerRequestsWithUserInfo.length != 0">No matching offer requests found</p>
+          <p class="table-empty-message" *ngIf="applications.length == 0; else noMatchingapplications">Offer requests list is empty</p>
+          <ng-template #noMatchingapplications>
+            <p class="table-empty-message" *ngIf="applications.length != 0">No matching offer requests found</p>
           </ng-template>
         </td>
       </tr>
