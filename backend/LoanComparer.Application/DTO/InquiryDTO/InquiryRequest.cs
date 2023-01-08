@@ -2,6 +2,8 @@
 
 public sealed class InquiryRequest
 {
+    public string? NotificationEmail { get; init; }
+    
     public decimal AmountRequested { get; init; }
 
     public int NumberOfInstallments { get; init; }

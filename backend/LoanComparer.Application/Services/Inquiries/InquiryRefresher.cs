@@ -10,14 +10,16 @@ public sealed class InquiryRefresher : IInquiryRefresher
     private readonly IInquiryQuery _query;
     private readonly IInquiryCommand _command;
     private readonly IOptionsMonitor<InquiryConfiguration> _config;
+    private readonly IEmailService _emailService;
 
     public InquiryRefresher(IBankInterfaceCreator bankInterfaceCreator, IInquiryQuery query, IInquiryCommand command,
-        IOptionsMonitor<InquiryConfiguration> config)
+        IOptionsMonitor<InquiryConfiguration> config, IEmailService emailService)
     {
         _bankInterfaces = bankInterfaceCreator.CreateBankInterfaces();
         _query = query;
         _command = command;
         _config = config;
+        _emailService = emailService;
     }
     
     public async Task RefreshStatusesForUserAsync(string username)
@@ -48,7 +50,10 @@ public sealed class InquiryRefresher : IInquiryRefresher
             var previousStatus = inquiryStatus.Status;
             var updated = await refresher.RefreshStatusAsync(inquiryStatus);
             if(updated.Status == previousStatus) continue;
-            // TODO: Send mail
+
+            var inquiry = inquiryStatus.Inquiry;
+            var email = new StatusChangedEmail(inquiry.NotificationEmail, inquiry.PersonalData.FirstName, "Link");  // TODO: Use actual link
+            await _emailService.SendEmailAsync(email, CancellationToken.None);
         }
     }
 

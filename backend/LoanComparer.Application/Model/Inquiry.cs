@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using LoanComparer.Application.DTO;
 using LoanComparer.Application.DTO.InquiryDTO;
+using LoanComparer.Application.Exceptions;
 
 namespace LoanComparer.Application.Model;
 
@@ -8,6 +10,8 @@ public sealed class Inquiry
     public Guid Id { get; init; }
     
     public string? OwnerUsername { get; init; }
+
+    public string NotificationEmail { get; init; } = null!;
     
     public DateTimeOffset CreationTime { get; init; }
 
@@ -27,6 +31,8 @@ public sealed class Inquiry
         {
             Id = Guid.NewGuid(),
             OwnerUsername = ownerUsername,
+            NotificationEmail = request.NotificationEmail ?? ownerUsername ?? throw new BadRequestException(new[]
+                { new ErrorResponseDTO("Notification email is required for anonymous inquiries") }),
             AmountRequested = request.AmountRequested,
             NumberOfInstallments = request.NumberOfInstallments,
             CreationTime = DateTimeOffset.Now,
@@ -57,6 +63,7 @@ public sealed class Inquiry
         {
             Id = Id,
             OwnerUsername = OwnerUsername,
+            NotificationEmail = NotificationEmail,
             CreationTimestamp = CreationTime.ToUnixTimeMilliseconds(),
             AmountRequested = AmountRequested,
             NumberOfInstallments = NumberOfInstallments,
@@ -78,6 +85,7 @@ public sealed class Inquiry
         {
             Id = entity.Id,
             OwnerUsername = entity.OwnerUsername,
+            NotificationEmail = entity.NotificationEmail,
             CreationTime = DateTimeOffset.FromUnixTimeMilliseconds(entity.CreationTimestamp),
             AmountRequested = entity.AmountRequested,
             NumberOfInstallments = entity.NumberOfInstallments,
@@ -170,6 +178,9 @@ public sealed class InquiryEntity
     public Guid Id { get; init; }
     
     public string? OwnerUsername { get; init; }
+    
+    [Required]
+    public string NotificationEmail { get; init; } = null!;
     
     [Required]
     public long CreationTimestamp { get; init; }

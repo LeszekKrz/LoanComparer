@@ -14,9 +14,5 @@
         internal const int PassportNumberLength = 9;
         public const string ClientRoleName = "Client";
         internal const string BankEmployeeRoleName = "BankEmployee";
-        internal const string PasswordResetEmailSubject = "Loan Comparer password reset";
-        internal const string PasswordResetHtmlContent = @"Dear {0},<br>Click the link to reset your password: <a href=""{1}"">Reset password</a>";
-        internal const string EmailConfirmEmailSubject = "Loan Comparer confirm email";
-        internal const string EmailConfirmHtmlContent = @"Dear {0},<br>Please confirm your email: <a href=""{1}"">Confirm email</a><br>If you have not created account or Loan Comparer website please do nothing.";
     }
 }
