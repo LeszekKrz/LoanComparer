@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: deploy_dist
-          path: dist/loan-comparer
+          path: D:\a\LoanComparer\LoanComparer\frontend\dist\loan-comparer
         
       - name: check files after
         run: |
