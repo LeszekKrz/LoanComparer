@@ -2,8 +2,6 @@
 
 public sealed class InquiryRequest
 {
-    public string? NotificationEmail { get; init; }
-    
     public decimal AmountRequested { get; init; }
 
     public int NumberOfInstallments { get; init; }
@@ -22,11 +20,15 @@ public sealed class PersonalDataDTO
     public string LastName { get; init; } = null!;
 
     public DateOnly BirthDate { get; init; }
+
+    public string NotificationEmail { get; init; } = null!;
 }
 
 public sealed class JobDetailsDTO
 {
     public string JobName { get; init; } = null!;
+    
+    public decimal IncomeLevel { get; init; }
 
     public string? Description { get; init; }
 

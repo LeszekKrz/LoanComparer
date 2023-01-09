@@ -52,7 +52,7 @@ public sealed class InquiryRefresher : IInquiryRefresher
             if(updated.Status == previousStatus) continue;
 
             var inquiry = inquiryStatus.Inquiry;
-            var email = new StatusChangedEmail(inquiry.NotificationEmail, inquiry.PersonalData.FirstName,
+            var email = new StatusChangedEmail(inquiry.PersonalData.NotificationEmail, inquiry.PersonalData.FirstName,
                 string.Format(_config.CurrentValue.CheckInquiryStatusUrl, inquiry.Id));
             await _emailService.SendEmailAsync(email, CancellationToken.None);
         }

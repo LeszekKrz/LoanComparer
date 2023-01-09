@@ -17,6 +17,7 @@ public sealed class InquiryEntityConfiguration : IEntityTypeConfiguration<Inquir
         builder.Property(i => i.LastName).IsRequired();
         builder.Property(i => i.BirthDateTimestamp).IsRequired();
         builder.Property(i => i.JobName).IsRequired();
+        builder.Property(i => i.IncomeLevelAsSmallestNominal).IsRequired();
         builder.Property(i => i.GovernmentIdType).IsRequired();
         builder.Property(i => i.GovernmentIdValue).IsRequired();
     }
