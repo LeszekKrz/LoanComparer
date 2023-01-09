@@ -11,8 +11,6 @@ public sealed class Inquiry
     
     public string? OwnerUsername { get; init; }
 
-    public string NotificationEmail { get; init; } = null!;
-    
     public DateTimeOffset CreationTime { get; init; }
 
     public decimal AmountRequested { get; init; }
@@ -31,8 +29,6 @@ public sealed class Inquiry
         {
             Id = Guid.NewGuid(),
             OwnerUsername = ownerUsername,
-            NotificationEmail = request.NotificationEmail ?? ownerUsername ?? throw new BadRequestException(new[]
-                { new ErrorResponseDTO("Notification email is required for anonymous inquiries") }),
             AmountRequested = request.AmountRequested,
             NumberOfInstallments = request.NumberOfInstallments,
             CreationTime = DateTimeOffset.Now,
@@ -47,7 +43,6 @@ public sealed class Inquiry
         return new()
         {
             Id = Id,
-            OwnerUsername = OwnerUsername,
             CreationTime = CreationTime,
             AmountRequested = AmountRequested,
             NumberOfInstallments = NumberOfInstallments,
@@ -63,7 +58,7 @@ public sealed class Inquiry
         {
             Id = Id,
             OwnerUsername = OwnerUsername,
-            NotificationEmail = NotificationEmail,
+            NotificationEmail = PersonalData.NotificationEmail,
             CreationTimestamp = CreationTime.ToUnixTimeMilliseconds(),
             AmountRequestedAsSmallestNominal = (long)(AmountRequested * 100),
             NumberOfInstallments = NumberOfInstallments,
@@ -74,6 +69,7 @@ public sealed class Inquiry
             JobDescription = JobDetails.Description,
             JobStartDateTimestamp = JobDetails.StartDate is null ? null : DateOnlyToTimestamp(JobDetails.StartDate.Value),
             JobEndDateTimestamp = JobDetails.EndDate is null ? null : DateOnlyToTimestamp(JobDetails.EndDate.Value),
+            IncomeLevelAsSmallestNominal = (long)(JobDetails.IncomeLevel * 100),
             GovernmentIdType = GovernmentId.Type,
             GovernmentIdValue = GovernmentId.Value
         };
@@ -85,7 +81,6 @@ public sealed class Inquiry
         {
             Id = entity.Id,
             OwnerUsername = entity.OwnerUsername,
-            NotificationEmail = entity.NotificationEmail,
             CreationTime = DateTimeOffset.FromUnixTimeMilliseconds(entity.CreationTimestamp),
             AmountRequested = entity.AmountRequestedAsSmallestNominal / 100m,
             NumberOfInstallments = entity.NumberOfInstallments,
@@ -93,14 +88,16 @@ public sealed class Inquiry
             {
                 FirstName = entity.FirstName,
                 LastName = entity.LastName,
-                BirthDate = DateOnlyFromTimestamp(entity.BirthDateTimestamp)
+                BirthDate = DateOnlyFromTimestamp(entity.BirthDateTimestamp),
+                NotificationEmail = entity.NotificationEmail
             },
             JobDetails = new()
             {
                 JobName = entity.JobName,
                 Description = entity.JobDescription,
                 StartDate = entity.JobStartDateTimestamp is null ? null : DateOnlyFromTimestamp(entity.JobStartDateTimestamp.Value),
-                EndDate = entity.JobEndDateTimestamp is null ? null : DateOnlyFromTimestamp(entity.JobEndDateTimestamp.Value)
+                EndDate = entity.JobEndDateTimestamp is null ? null : DateOnlyFromTimestamp(entity.JobEndDateTimestamp.Value),
+                IncomeLevel = entity.IncomeLevelAsSmallestNominal / 100m
             },
             GovernmentId = new(entity.GovernmentIdType, entity.GovernmentIdValue)
         };
@@ -124,6 +121,8 @@ public sealed class PersonalData
     public string LastName { get; init; } = null!;
 
     public DateOnly BirthDate { get; init; }
+    
+    public string NotificationEmail { get; init; } = null!;
 
     public static PersonalData FromDto(PersonalDataDTO dto)
     {
@@ -131,7 +130,8 @@ public sealed class PersonalData
         {
             FirstName = dto.FirstName,
             LastName = dto.LastName,
-            BirthDate = dto.BirthDate
+            BirthDate = dto.BirthDate,
+            NotificationEmail = dto.NotificationEmail
         };
     }
 
@@ -141,7 +141,8 @@ public sealed class PersonalData
         {
             FirstName = FirstName,
             LastName = LastName,
-            BirthDate = BirthDate
+            BirthDate = BirthDate,
+            NotificationEmail = NotificationEmail
         };
     }
 }
@@ -149,6 +150,8 @@ public sealed class PersonalData
 public sealed class JobDetails
 {
     public string JobName { get; init; } = null!;
+    
+    public decimal IncomeLevel { get; init; }
 
     public string? Description { get; init; }
 
@@ -163,7 +166,8 @@ public sealed class JobDetails
             JobName = dto.JobName,
             Description = dto.Description,
             StartDate = dto.StartDate,
-            EndDate = dto.EndDate
+            EndDate = dto.EndDate,
+            IncomeLevel = dto.IncomeLevel
         };
     }
 
@@ -174,7 +178,8 @@ public sealed class JobDetails
             JobName = JobName,
             Description = Description,
             StartDate = StartDate,
-            EndDate = EndDate
+            EndDate = EndDate,
+            IncomeLevel = IncomeLevel
         };
     }
 }
@@ -206,6 +211,8 @@ public sealed class InquiryEntity
     public long? JobStartDateTimestamp { get; init; }
 
     public long? JobEndDateTimestamp { get; init; }
+    
+    public long IncomeLevelAsSmallestNominal { get; init; }
 
     public string GovernmentIdType { get; init; } = null!;
 

@@ -3,9 +3,7 @@
 public sealed class InquiryResponse
 {
     public Guid Id { get; init; }
-    
-    public string? OwnerUsername { get; init; }
-    
+
     public DateTimeOffset CreationTime { get; init; }
     
     public decimal AmountRequested { get; init; }

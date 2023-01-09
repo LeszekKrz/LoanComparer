@@ -41,6 +41,7 @@ public sealed class InquiryRequestValidator : AbstractValidator<InquiryRequest>
                 Matches(@"^[a-zA-Z]{2}\d{7}$");
         });
 
+        RuleFor(x => x.JobDetails.IncomeLevel).GreaterThan(0);
         RuleFor(x => x.JobDetails.JobName).
             MustAsync(async (jobType, cancellationToken) =>
                 await context.JobTypes.AnyAsync(jt => jt.Name == jobType, cancellationToken)).
@@ -48,6 +49,7 @@ public sealed class InquiryRequestValidator : AbstractValidator<InquiryRequest>
 
         RuleFor(i => i.PersonalData.FirstName).NotEmpty();
         RuleFor(i => i.PersonalData.LastName).NotEmpty();
+        RuleFor(i => i.PersonalData.NotificationEmail).NotEmpty().EmailAddress();
         RuleFor(i => i.PersonalData.BirthDate).
             LessThan(DateOnly.FromDateTime(DateTime.Now)).
             GreaterThan(DateOnly.FromDateTime(DateTime.Now.AddYears(-150)));
