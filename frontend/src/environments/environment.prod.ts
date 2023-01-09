@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  webApiUrl: 'https://localhost:7282/api', // probably we should change it later
-  webUrl: 'https://localhost:4200' // probably we should change it
+  webApiUrl: 'https://loancomparerapi20230107125759.azurewebsites.net/api',
+  webUrl: 'https://loancomparerclient.azurewebsites.net'
 };
