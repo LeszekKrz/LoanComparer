@@ -1,6 +1,6 @@
 ﻿namespace LoanComparer.Application.Services.Inquiries;
 
-public interface IBankInterfaceCreator
+public interface IBankInterfaceFactory
 {
     IReadOnlyList<IBankInterface> CreateBankInterfaces();
 }

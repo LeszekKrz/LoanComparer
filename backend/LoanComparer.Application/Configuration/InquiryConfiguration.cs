@@ -17,6 +17,9 @@ public sealed class InquiryConfiguration : IEquatable<InquiryConfiguration>
     [Required]
     [Range(typeof(TimeSpan), "00:01:00", "24:00:00")]
     public TimeSpan TimeoutInterval { get; init; }
+    
+    [Required]
+    public string CheckInquiryStatusUrl { get; init; } = null!;
 
     public bool Equals(InquiryConfiguration? other)
     {

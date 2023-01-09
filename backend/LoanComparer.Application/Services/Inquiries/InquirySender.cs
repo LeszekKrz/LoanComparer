@@ -6,9 +6,9 @@ public sealed class InquirySender : IInquirySender
 {
     private readonly IReadOnlyList<IBankInterface> _bankInterfaces;
 
-    public InquirySender(IBankInterfaceCreator bankInterfaceCreator)
+    public InquirySender(IBankInterfaceFactory bankInterfaceFactory)
     {
-        _bankInterfaces = bankInterfaceCreator.CreateBankInterfaces();
+        _bankInterfaces = bankInterfaceFactory.CreateBankInterfaces();
     }
 
     public async IAsyncEnumerable<SentInquiryStatus> SendInquiryToAllBanks(Inquiry inquiry)

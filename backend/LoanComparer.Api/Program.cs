@@ -114,7 +114,7 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<IInquiryQuery, InquiryQuery>();
     services.AddScoped<IInquirySender, InquirySender>();
     services.AddScoped<IInquiryRefresher, InquiryRefresher>();
-    services.AddScoped<IBankInterfaceCreator, NullBankInterfaceCreator>();
+    services.AddScoped<IBankInterfaceFactory, NullBankInterfaceFactory>();
 
     services.AddHostedService<InquiryRefreshBackgroundService>();
     services.AddHostedService<InquiryCleanupBackgroundService>();

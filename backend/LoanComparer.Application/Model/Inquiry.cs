@@ -74,8 +74,8 @@ public sealed class Inquiry
             JobDescription = JobDetails.Description,
             JobStartDateTimestamp = JobDetails.StartDate is null ? null : DateOnlyToTimestamp(JobDetails.StartDate.Value),
             JobEndDateTimestamp = JobDetails.EndDate is null ? null : DateOnlyToTimestamp(JobDetails.EndDate.Value),
-            GovtIdType = GovernmentId.Type,
-            GovtIdValue = GovernmentId.Value
+            GovernmentIdType = GovernmentId.Type,
+            GovernmentIdValue = GovernmentId.Value
         };
     }
 
@@ -102,7 +102,7 @@ public sealed class Inquiry
                 StartDate = entity.JobStartDateTimestamp is null ? null : DateOnlyFromTimestamp(entity.JobStartDateTimestamp.Value),
                 EndDate = entity.JobEndDateTimestamp is null ? null : DateOnlyFromTimestamp(entity.JobEndDateTimestamp.Value)
             },
-            GovernmentId = new(entity.GovtIdType, entity.GovtIdValue)
+            GovernmentId = new(entity.GovernmentIdType, entity.GovernmentIdValue)
         };
     }
 
@@ -181,36 +181,24 @@ public sealed class JobDetails
 
 public sealed class InquiryEntity
 {
-    // TODO: Move validators to separate class
-    
-    [Key]
-    [Required]
     public Guid Id { get; init; }
     
     public string? OwnerUsername { get; init; }
-    
-    [Required]
+
     public string NotificationEmail { get; init; } = null!;
-    
-    [Required]
+
     public long CreationTimestamp { get; init; }
-    
-    [Required]
+
     public long AmountRequestedAsSmallestNominal { get; init; }
 
-    [Required]
     public int NumberOfInstallments { get; init; }
 
-    [Required]
     public string FirstName { get; init; } = null!;
 
-    [Required]
     public string LastName { get; init; } = null!;
 
-    [Required]
     public long BirthDateTimestamp { get; init; }
 
-    [Required]
     public string JobName { get; init; } = null!;
     
     public string? JobDescription { get; init; }
@@ -219,9 +207,7 @@ public sealed class InquiryEntity
 
     public long? JobEndDateTimestamp { get; init; }
 
-    [Required] 
-    public string GovtIdType { get; init; } = null!;
+    public string GovernmentIdType { get; init; } = null!;
 
-    [Required] 
-    public string GovtIdValue { get; init; } = null!;
+    public string GovernmentIdValue { get; init; } = null!;
 }

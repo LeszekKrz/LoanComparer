@@ -3,7 +3,7 @@
 /// <summary>
 ///     This class was created so that migrations can be made
 /// </summary>
-public sealed class NullBankInterfaceCreator : IBankInterfaceCreator
+public sealed class NullBankInterfaceFactory : IBankInterfaceFactory
 {
     public IReadOnlyList<IBankInterface> CreateBankInterfaces()
     {

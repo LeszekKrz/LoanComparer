@@ -12,10 +12,10 @@ public sealed class InquiryRefresher : IInquiryRefresher
     private readonly IOptionsMonitor<InquiryConfiguration> _config;
     private readonly IEmailService _emailService;
 
-    public InquiryRefresher(IBankInterfaceCreator bankInterfaceCreator, IInquiryQuery query, IInquiryCommand command,
+    public InquiryRefresher(IBankInterfaceFactory bankInterfaceFactory, IInquiryQuery query, IInquiryCommand command,
         IOptionsMonitor<InquiryConfiguration> config, IEmailService emailService)
     {
-        _bankInterfaces = bankInterfaceCreator.CreateBankInterfaces();
+        _bankInterfaces = bankInterfaceFactory.CreateBankInterfaces();
         _query = query;
         _command = command;
         _config = config;
@@ -46,13 +46,14 @@ public sealed class InquiryRefresher : IInquiryRefresher
         var statusesToRefresh = await _query.GetAllPendingStatusesAsync();
         foreach (var inquiryStatus in statusesToRefresh)
         {
-            var refresher = GetBankInterfaceForStatus(inquiryStatus);
+            var bankInterface = GetBankInterfaceForStatus(inquiryStatus);
             var previousStatus = inquiryStatus.Status;
-            var updated = await refresher.RefreshStatusAsync(inquiryStatus);
+            var updated = await bankInterface.RefreshStatusAsync(inquiryStatus);
             if(updated.Status == previousStatus) continue;
 
             var inquiry = inquiryStatus.Inquiry;
-            var email = new StatusChangedEmail(inquiry.NotificationEmail, inquiry.PersonalData.FirstName, "Link");  // TODO: Use actual link
+            var email = new StatusChangedEmail(inquiry.NotificationEmail, inquiry.PersonalData.FirstName,
+                string.Format(_config.CurrentValue.CheckInquiryStatusUrl, inquiry.Id));
             await _emailService.SendEmailAsync(email, CancellationToken.None);
         }
     }
