@@ -45,7 +45,7 @@ jobs:
         
       - name: check files after
         run: |
-          ls dist\loancomparer
+          ls dist\loan-comparer
 
   deploy:
     runs-on: ubuntu-latest
