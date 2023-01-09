@@ -32,6 +32,12 @@ jobs:
       - name: npm build
         run: |
           npm run build-prod
+          
+      - name: check files
+        run: |
+          ls 
+          ls dist
+          ls dist\loan-comparer
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
