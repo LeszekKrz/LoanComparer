@@ -53,7 +53,7 @@ namespace LoanComparer.Application.Migrations
                     b.Property<long>("AmountRequestedAsSmallestNominal")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("BirthDateTimestamp")
+                    b.Property<long?>("BirthDateTimestamp")
                         .HasColumnType("bigint");
 
                     b.Property<long>("CreationTimestamp")
