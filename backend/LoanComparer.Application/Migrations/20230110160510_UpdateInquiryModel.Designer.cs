@@ -4,6 +4,7 @@ using LoanComparer.Application;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoanComparer.Application.Migrations
 {
     [DbContext(typeof(LoanComparerContext))]
-    partial class LoanComparerContextModelSnapshot : ModelSnapshot
+    [Migration("20230110160510_UpdateInquiryModel")]
+    partial class UpdateInquiryModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -275,15 +277,15 @@ namespace LoanComparer.Application.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "d638564c-1e0b-4e08-8266-40e3fbd8459a",
-                            ConcurrencyStamp = "bcbc5e1c-969c-4178-a77b-a775cd302091",
+                            Id = "f0f4076a-331b-4118-b3fa-f6dcc9ba1b46",
+                            ConcurrencyStamp = "395a07b2-3423-490e-87f8-00481492d9d7",
                             Name = "Client",
                             NormalizedName = "CLIENT"
                         },
                         new
                         {
-                            Id = "662de062-f4a8-4f66-945a-802bf78efd7c",
-                            ConcurrencyStamp = "2d6bae29-7d05-4a84-9c58-b20833029953",
+                            Id = "895b0c75-32b8-48f9-ad58-c6bb011780fe",
+                            ConcurrencyStamp = "d780c420-e788-4f0b-8537-184b0926b811",
                             Name = "BankEmployee",
                             NormalizedName = "BANKEMPLOYEE"
                         });

@@ -19,7 +19,7 @@ public sealed class PersonalDataDTO
 
     public string LastName { get; init; } = null!;
 
-    public DateOnly BirthDate { get; init; }
+    public DateOnly? BirthDate { get; init; }
 
     public string NotificationEmail { get; init; } = null!;
 }

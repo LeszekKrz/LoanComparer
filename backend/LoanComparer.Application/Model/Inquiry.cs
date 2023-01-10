@@ -64,7 +64,7 @@ public sealed class Inquiry
             NumberOfInstallments = NumberOfInstallments,
             FirstName = PersonalData.FirstName,
             LastName = PersonalData.LastName,
-            BirthDateTimestamp = DateOnlyToTimestamp(PersonalData.BirthDate),
+            BirthDateTimestamp = PersonalData.BirthDate is null ? null : DateOnlyToTimestamp(PersonalData.BirthDate.Value),
             JobName = JobDetails.JobName,
             JobDescription = JobDetails.Description,
             JobStartDateTimestamp = JobDetails.StartDate is null ? null : DateOnlyToTimestamp(JobDetails.StartDate.Value),
@@ -88,7 +88,7 @@ public sealed class Inquiry
             {
                 FirstName = entity.FirstName,
                 LastName = entity.LastName,
-                BirthDate = DateOnlyFromTimestamp(entity.BirthDateTimestamp),
+                BirthDate = entity.BirthDateTimestamp is null ? null :DateOnlyFromTimestamp(entity.BirthDateTimestamp.Value),
                 NotificationEmail = entity.NotificationEmail
             },
             JobDetails = new()
@@ -120,7 +120,7 @@ public sealed class PersonalData
 
     public string LastName { get; init; } = null!;
 
-    public DateOnly BirthDate { get; init; }
+    public DateOnly? BirthDate { get; init; }
     
     public string NotificationEmail { get; init; } = null!;
 
@@ -202,7 +202,7 @@ public sealed class InquiryEntity
 
     public string LastName { get; init; } = null!;
 
-    public long BirthDateTimestamp { get; init; }
+    public long? BirthDateTimestamp { get; init; }
 
     public string JobName { get; init; } = null!;
     
