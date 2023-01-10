@@ -3,10 +3,10 @@
 /// <summary>
 ///     This class was created so that migrations can be made
 /// </summary>
-public sealed class NullBankInterfaceFactory : IBankInterfaceFactory
+public sealed class MockBankInterfaceFactory : IBankInterfaceFactory
 {
     public IReadOnlyList<IBankInterface> CreateBankInterfaces()
     {
-        return Array.Empty<IBankInterface>();
+        return new IBankInterface[] { new RejectingBankInterface(), new AcceptingBankInterface() };
     }
 }
