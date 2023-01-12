@@ -58,6 +58,16 @@ public sealed class InquiryRefresher : IInquiryRefresher
         }
     }
 
+    public async Task RefreshStatusesForInquiryAsync(Guid inquiryId)
+    {
+        var statusesToRefresh = await _query.GetStatusesForInquiryAsync(inquiryId);
+        foreach (var status in statusesToRefresh)
+        {
+            var refresher = GetBankInterfaceForStatus(status);
+            await refresher.RefreshStatusAsync(status);
+        }
+    }
+
     private IBankInterface GetBankInterfaceForStatus(SentInquiryStatus status)
     {
         var refresher = _bankInterfaces.FirstOrDefault(r => r.BankName == status.BankName);

@@ -1,3 +1,4 @@
+using System.Security.Authentication;
 using FluentValidation;
 using LoanComparer.Api.Middleware;
 using LoanComparer.Application;
@@ -6,6 +7,7 @@ using LoanComparer.Application.Model;
 using LoanComparer.Application.Services;
 using LoanComparer.Application.Services.Inquiries;
 using LoanComparer.Application.Services.JwtFeatures;
+using LoanComparer.Application.Services.Offers;
 using LoanComparer.Application.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -119,11 +121,14 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<IInquirySender, InquirySender>();
     services.AddScoped<IInquiryRefresher, InquiryRefresher>();
     services.AddScoped<IBankInterfaceFactory, MockBankInterfaceFactory>();
+    services.AddScoped<IOfferCommand, OfferCommand>();
 
     services.AddHostedService<InquiryRefreshBackgroundService>();
     services.AddHostedService<InquiryCleanupBackgroundService>();
-    
-    services.AddSendGrid(options => options.ApiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY"));
+
+    services.AddSendGrid(options => options.ApiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY") ??
+                                                     throw new InvalidCredentialException(
+                                                         "Environment variable SENDGRID_API_KEY is not defined"));
 }
 
 void ConfigureJwt(IServiceCollection services, IConfiguration config)

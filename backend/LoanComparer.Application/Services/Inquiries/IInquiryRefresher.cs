@@ -7,4 +7,6 @@ public interface IInquiryRefresher
     Task MarkOldStatusesAsTimeoutAsync();
 
     Task RefreshAllStatusesAndSendNotificationsAsync();
+
+    Task RefreshStatusesForInquiryAsync(Guid inquiryId);
 }

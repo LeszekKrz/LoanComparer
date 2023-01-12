@@ -1,12 +1,18 @@
 ﻿using LoanComparer.Application.Model;
+using LoanComparer.Application.Services.Offers;
 
 namespace LoanComparer.Application.Services.Inquiries;
 
-public sealed class RejectingBankInterface : IBankInterface
+public sealed class RejectingBankInterface : BankInterfaceBase
 {
-    public string BankName => "RejectBank";
+    public RejectingBankInterface(IInquiryCommand inquiryCommand, IOfferCommand offerCommand) : base(inquiryCommand,
+        offerCommand)
+    {
+    }
     
-    public Task<SentInquiryStatus> RefreshStatusAsync(SentInquiryStatus status)
+    public override string BankName => "RejectBank";
+    
+    protected override Task<SentInquiryStatus> GetRefreshedStatusAsync(SentInquiryStatus status)
     {
         var updatedStatus = new SentInquiryStatus
         {
@@ -19,7 +25,7 @@ public sealed class RejectingBankInterface : IBankInterface
         return Task.FromResult(updatedStatus);
     }
 
-    public Task<SentInquiryStatus> SendInquiryAsync(Inquiry inquiry)
+    public override Task<SentInquiryStatus> SendInquiryAsync(Inquiry inquiry)
     {
         return Task.FromResult(new SentInquiryStatus
         {

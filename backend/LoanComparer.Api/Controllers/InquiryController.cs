@@ -14,12 +14,14 @@ public sealed class InquiryController : ControllerBase
     private readonly IInquiryQuery _query;
     private readonly IInquiryCommand _command;
     private readonly IInquirySender _sender;
+    private readonly IInquiryRefresher _refresher;
 
-    public InquiryController(IInquiryQuery query, IInquiryCommand command, IInquirySender sender)
+    public InquiryController(IInquiryQuery query, IInquiryCommand command, IInquirySender sender, IInquiryRefresher refresher)
     {
         _query = query;
         _command = command;
         _sender = sender;
+        _refresher = refresher;
     }
 
     [HttpPost]
@@ -50,16 +52,17 @@ public sealed class InquiryController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    [Route("{inquiryId:guid}/status")]
+    [Route("{inquiryId:guid}/offers")]
     public async Task<ActionResult<IReadOnlyList<SentInquiryStatusDTO>>> GetStatusesForInquiryAsync(Guid inquiryId)
     {
         var checkResult = await _query.CheckOwnerAsync(inquiryId, GetUsername());
-        return checkResult switch
-        {
-            OwnershipTestResult.DoesNotExist => BadRequest(),
-            OwnershipTestResult.Unauthorized => Unauthorized(),
-            _ => (await _query.GetStatusesForInquiryAsync(inquiryId)).Select(s => s.ToDto()).ToList()
-        };
+        if (checkResult == OwnershipTestResult.DoesNotExist)
+            return BadRequest();
+        if (checkResult == OwnershipTestResult.Unauthorized)
+            return Unauthorized();
+
+        await _refresher.RefreshStatusesForInquiryAsync(inquiryId);
+        return (await _query.GetStatusesForInquiryAsync(inquiryId)).Select(s => s.ToDto()).ToList();
     }
 
     private string? GetUsername()
