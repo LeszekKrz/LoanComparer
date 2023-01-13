@@ -1,5 +1,7 @@
 ﻿using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LoanComparer.Application.Services.Inquiries;
 
@@ -35,5 +37,15 @@ public sealed class RejectingBankInterface : BankInterfaceBase
             ReceivedOffer = null,
             Status = InquiryStatus.Pending
         });
+    }
+
+    public override Task<FileResult> GetDocumentAsync(Guid offerId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override Task<SentInquiryStatus> ApplyForAnOfferAsync(Guid offerId, IFormFile file)
+    {
+        throw new NotImplementedException();
     }
 }

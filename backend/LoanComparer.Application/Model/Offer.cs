@@ -69,4 +69,6 @@ public sealed class OfferEntity
     
     [Required]
     public long MonthlyInstallmentAsSmallestNominal { get; init; }
+
+    public SentInquiryStatusEntity SentInquiryStatus { get; init; }
 }

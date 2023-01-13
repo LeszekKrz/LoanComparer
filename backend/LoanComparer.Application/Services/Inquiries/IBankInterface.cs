@@ -1,4 +1,6 @@
 ﻿using LoanComparer.Application.Model;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LoanComparer.Application.Services.Inquiries;
 
@@ -15,4 +17,8 @@ public interface IBankInterface
     Task<SentInquiryStatus> RefreshStatusAsync(SentInquiryStatus status);
     
     Task<SentInquiryStatus> SendInquiryAsync(Inquiry inquiry);
+
+    Task<FileResult> GetDocumentAsync(Guid offerId);
+
+    Task<SentInquiryStatus> ApplyForAnOfferAsync(Guid offerId, IFormFile file);
 }
