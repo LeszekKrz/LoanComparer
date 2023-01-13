@@ -46,5 +46,23 @@ namespace LoanComparer.Application.Services.JwtFeatures
                 expires: DateTime.Now.AddDays(_jwtSettings.ExpiresInDays),
                 signingCredentials: signingCredentials);
         }
+
+        public static string GenerateTestToken(string username)
+        {
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.Name, username)
+            };
+
+            var jwtSecurityToken = new JwtSecurityToken(
+                issuer: "issuer",
+                audience: "audience",
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(5),
+                signingCredentials: new SigningCredentials(
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes("testKey1234567890")),
+                    SecurityAlgorithms.HmacSha256));
+            return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+        } 
     }
 }

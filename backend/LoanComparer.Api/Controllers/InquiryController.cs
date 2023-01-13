@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using FluentValidation;
 using LoanComparer.Application.DTO.InquiryDTO;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Inquiries;
@@ -15,19 +16,23 @@ public sealed class InquiryController : ControllerBase
     private readonly IInquiryCommand _command;
     private readonly IInquirySender _sender;
     private readonly IInquiryRefresher _refresher;
+    private readonly IValidator<InquiryRequest> _validator;
 
-    public InquiryController(IInquiryQuery query, IInquiryCommand command, IInquirySender sender, IInquiryRefresher refresher)
+    public InquiryController(IInquiryQuery query, IInquiryCommand command, IInquirySender sender,
+        IInquiryRefresher refresher, IValidator<InquiryRequest> validator)
     {
         _query = query;
         _command = command;
         _sender = sender;
         _refresher = refresher;
+        _validator = validator;
     }
 
     [HttpPost]
     [AllowAnonymous]
     public async Task<ActionResult<InquiryResponse>> CreateAsync(InquiryRequest request)
     {
+        await _validator.ValidateAndThrowAsync(request);
         var inquiry = Inquiry.FromRequest(request, GetUsername());
         var statuses = _sender.SendInquiryToAllBanks(inquiry);
         await foreach (var status in statuses)
