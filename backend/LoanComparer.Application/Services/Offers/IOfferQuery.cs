@@ -1,4 +1,5 @@
-﻿using LoanComparer.Application.Services.Inquiries;
+﻿using LoanComparer.Application.Model;
+using LoanComparer.Application.Services.Inquiries;
 
 namespace LoanComparer.Application.Services.Offers
 {
@@ -6,6 +7,6 @@ namespace LoanComparer.Application.Services.Offers
     {
         public Task<OwnershipTestResult> CheckOwnerAsync(Guid offerId, string? username);
 
-        public Task<byte[]> GetDocumentContentAsync(Guid offerId);
+        public Task<OfferEntity> GetOfferEntityWithStatusOrThrow(Guid offerId);
     }
 }

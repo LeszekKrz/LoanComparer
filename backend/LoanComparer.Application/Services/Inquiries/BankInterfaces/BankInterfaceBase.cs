@@ -1,8 +1,6 @@
-﻿using LoanComparer.Application.DTO.OfferDTO;
-using LoanComparer.Application.Model;
+﻿using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace LoanComparer.Application.Services.Inquiries.BankInterfaces;
 
@@ -31,10 +29,10 @@ public abstract class BankInterfaceBase : IBankInterface
             case InquiryStatus.Pending:
                 throw new InvalidOperationException(
                     $"Inquiry status changed to {InquiryStatus.Pending} from {status.Status}");
-            case InquiryStatus.Accepted:
+            case InquiryStatus.OfferReceived:
                 if (newStatus.ReceivedOffer is null)
                     throw new InvalidOperationException(
-                        "Inquiry status is marked as accepted, but offer is set to null");
+                        "Inquiry status is marked as offer received, but offer is set to null");
                 await _offerCommand.SaveOfferAsync(newStatus.ReceivedOffer);
                 await _inquiryCommand.LinkSavedOfferToStatusAsync(newStatus, newStatus.ReceivedOffer.Id);
                 break;

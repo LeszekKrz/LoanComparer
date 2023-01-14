@@ -16,8 +16,9 @@ namespace LoanComparer.Application.DTO.OfferDTO
             string status = inquiryStatus switch
             {
                 InquiryStatus.Pending => "PENDING",
-                InquiryStatus.Accepted => "OFFERRECEIVED",
+                InquiryStatus.OfferReceived => "OFFERRECEIVED",
                 InquiryStatus.Rejected => "REJECTED",
+                InquiryStatus.Accepted => "ACCEPTED",
                 InquiryStatus.WaitingForAcceptance => "WAITINGFORACCEPTANCE",
                 InquiryStatus.Timeout => "TIMEOUT",
                 InquiryStatus.Error => "ERROR",

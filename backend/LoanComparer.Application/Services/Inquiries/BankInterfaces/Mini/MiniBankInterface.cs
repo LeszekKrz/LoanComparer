@@ -237,7 +237,7 @@ public sealed class MiniBankInterface : BankInterfaceBase
             BankName = status.BankName,
             Inquiry = status.Inquiry,
             ReceivedOffer = offer,
-            Status = InquiryStatus.Accepted
+            Status = InquiryStatus.OfferReceived
         };
     }
 

@@ -186,7 +186,7 @@ public sealed class InquiriesControllerTests
                     InquiryId = inquiryEntity.Id,
                     Offer = offerEntity,
                     OfferId = offerEntity.Id,
-                    Status = InquiryStatus.Accepted
+                    Status = InquiryStatus.OfferReceived
                 }
             };
             context.InquiryStatuses.AddRange(statuses);

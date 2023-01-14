@@ -85,12 +85,12 @@ namespace LoanComparer.Api.Tests.IntegrationTests
             {
                 public string BankName => "TestBank";
 
-                public Task<SentInquiryStatus> ApplyForAnOfferAsync(Guid offerId, IFormFile file)
+                public Task<InquiryStatus> ApplyForAnOfferAsync(OfferEntity offerEntity, IFormFile file)
                 {
                     throw new NotImplementedException();
                 }
 
-                public Task<FileResult> GetDocumentAsync(Guid offerId)
+                public Task<byte[]> GetDocumentContentAsync(OfferEntity offerEntity)
                 {
                     throw new NotImplementedException();
                 }

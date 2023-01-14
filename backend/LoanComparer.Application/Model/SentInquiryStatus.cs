@@ -39,8 +39,9 @@ public sealed class SentInquiryStatus
             Status = Status switch
             {
                 InquiryStatus.Pending => "PENDING",
-                InquiryStatus.Accepted => "OFFERRECEIVED",
+                InquiryStatus.OfferReceived => "OFFERRECEIVED",
                 InquiryStatus.Rejected => "REJECTED",
+                InquiryStatus.Accepted => "ACCEPTED",
                 InquiryStatus.WaitingForAcceptance => "WAITINGFORACCEPTANCE",
                 InquiryStatus.Timeout => "TIMEOUT",
                 InquiryStatus.Error => "ERROR",
@@ -91,9 +92,10 @@ public sealed class SentInquiryStatusEntity
 public enum InquiryStatus
 {
     Pending,
+    OfferReceived,
+    WaitingForAcceptance,
     Accepted,
     Rejected,
-    WaitingForAcceptance,
     Timeout,
     Error
 }

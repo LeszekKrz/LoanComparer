@@ -1,7 +1,6 @@
 ﻿using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace LoanComparer.Application.Services.Inquiries.BankInterfaces.Mock;
 
@@ -31,7 +30,7 @@ public sealed class AcceptingBankInterface : BankInterfaceBase
             BankName = BankName,
             Inquiry = status.Inquiry,
             ReceivedOffer = offer,
-            Status = InquiryStatus.Accepted
+            Status = InquiryStatus.OfferReceived
         };
         return Task.FromResult(updatedStatus);
     }
@@ -48,12 +47,12 @@ public sealed class AcceptingBankInterface : BankInterfaceBase
         });
     }
 
-    public override Task<FileResult> GetDocumentAsync(Guid offerId)
+    public override Task<byte[]> GetDocumentContentAsync(OfferEntity offerEntity)
     {
         throw new NotImplementedException();
     }
 
-    public override Task<SentInquiryStatus> ApplyForAnOfferAsync(Guid offerId, IFormFile file)
+    public override Task<InquiryStatus> ApplyForAnOfferAsync(OfferEntity offerEntity, IFormFile file)
     {
         throw new NotImplementedException();
     }

@@ -1,8 +1,4 @@
-﻿using LoanComparer.Application.DTO.OfferDTO;
-using LoanComparer.Application.Model;
-using LoanComparer.Application.Services.Inquiries;
-using LoanComparer.Application.Services.Inquiries.BankInterfaces;
-using Microsoft.AspNetCore.Http;
+﻿using LoanComparer.Application.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace LoanComparer.Application.Services.Offers;
@@ -10,23 +6,10 @@ namespace LoanComparer.Application.Services.Offers;
 public sealed class OfferCommand : IOfferCommand
 {
     private readonly LoanComparerContext _context;
-    private readonly IReadOnlyCollection<IBankInterface> _banks;
 
-    public OfferCommand(LoanComparerContext context, IBankInterfaceFactory bankInterfaceFactory)
+    public OfferCommand(LoanComparerContext context)
     {
         _context = context;
-        _banks = bankInterfaceFactory.CreateBankInterfaces();
-    }
-
-    public async Task<InquiryStatus> ApplyForAnOfferAsync(Guid offerId, IFormFile file)
-    {
-        OfferEntity entity = await GetOfferEntityWithStatusOrThrow(offerId);
-        var bank = _banks.SingleOrDefault(r => r.BankName == entity.SentInquiryStatus.BankName);
-        if (bank is null)
-            throw new InvalidOperationException(
-                $@"There is no known bank with name {entity.SentInquiryStatus.BankName},
-                    but status with id {entity.SentInquiryStatus.Id} references it");
-        return await bank.ApplyForAnOfferAsync(entity, file);
     }
 
     public async Task SaveOfferAsync(Offer offer)

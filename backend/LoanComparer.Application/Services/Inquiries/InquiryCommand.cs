@@ -62,7 +62,7 @@ public sealed class InquiryCommand : IInquiryCommand
     public async Task<SentInquiryStatus> LinkSavedOfferToStatusAsync(SentInquiryStatus status, Guid offerId)
     {
         var entity = await GetEntityAndThrowIfNotPresent(status);
-        entity.Status = InquiryStatus.Accepted;
+        entity.Status = InquiryStatus.OfferReceived;
         entity.OfferId = offerId;
         await _context.SaveChangesAsync();
         return SentInquiryStatus.FromEntity(await GetEntityAndThrowIfNotPresent(status));
