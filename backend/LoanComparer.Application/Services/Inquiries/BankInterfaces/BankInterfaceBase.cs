@@ -19,7 +19,7 @@ public abstract class BankInterfaceBase : IBankInterface
 
     protected abstract Task<SentInquiryStatus> GetRefreshedStatusAsync(SentInquiryStatus status);
     
-    public async Task<SentInquiryStatus> RefreshStatusAsync(SentInquiryStatus status)
+    public virtual async Task<SentInquiryStatus> RefreshStatusAsync(SentInquiryStatus status)
     {
         var newStatus = await GetRefreshedStatusAsync(status);
         if (newStatus.Status == status.Status) return newStatus;

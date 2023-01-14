@@ -1,10 +1,13 @@
-﻿using LoanComparer.Application.DTO.OfferDTO;
+﻿using EllipticCurve.Utils;
+using LoanComparer.Application.DTO.OfferDTO;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Inquiries;
 using LoanComparer.Application.Services.Inquiries.BankInterfaces;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Mime;
 using System.Security.Claims;
+using System.Text;
 
 namespace LoanComparer.Api.Controllers
 {
@@ -25,7 +28,7 @@ namespace LoanComparer.Api.Controllers
 
         [HttpGet]
         [Route("offers/{offerId:guid}/document")]
-        public async Task<ActionResult<FileResult>> GetContractAsync(Guid offerId)
+        public async Task<ActionResult> GetContractAsync(Guid offerId)
         {
             var checkResult = await _query.CheckOwnerAsync(offerId, GetUsername());
             if (checkResult == OwnershipTestResult.DoesNotExist)
@@ -36,7 +39,18 @@ namespace LoanComparer.Api.Controllers
             OfferEntity offerEntity = await _query.GetOfferEntityWithStatusOrThrow(offerId);
             var bank = GetBankInterfaceOrThrow(offerEntity.SentInquiryStatus.BankName);
             byte[] fileContent = await bank.GetDocumentContentAsync(offerEntity);
-            return File(fileContent, "text/txt", "contract.txt");
+            var fileName = "contract.txt";
+            SetContentDispositionHeader(fileName);
+            return File(fileContent, "text/plain", fileName);
+        }
+
+        private void SetContentDispositionHeader(string fileName)
+        {
+            ContentDisposition contentDisposition = new()
+            {
+                FileName = fileName,
+            };
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
         }
 
         [HttpPost]

@@ -86,7 +86,7 @@ public sealed class SentInquiryStatusEntity
     
     public Guid? OfferId { get; set; }
     
-    public string? AdditionalData { get; init; }
+    public string? AdditionalData { get; set; }
 }
 
 public enum InquiryStatus

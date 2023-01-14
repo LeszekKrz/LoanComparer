@@ -63,6 +63,7 @@ public sealed class InquiryCommand : IInquiryCommand
     {
         var entity = await GetEntityAndThrowIfNotPresent(status);
         entity.Status = InquiryStatus.OfferReceived;
+        entity.AdditionalData = status.AdditionalData;
         entity.OfferId = offerId;
         await _context.SaveChangesAsync();
         return SentInquiryStatus.FromEntity(await GetEntityAndThrowIfNotPresent(status));

@@ -1,7 +1,6 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using System.Security.Authentication;
+﻿using System.Security.Authentication;
+using System.Text;
 using Flurl.Http;
-using LoanComparer.Application.DTO.OfferDTO;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
@@ -227,7 +226,8 @@ public sealed class MiniBankInterface : BankInterfaceBase
             LoanValue = (decimal)response.RequestedValue,
             MonthlyInstallment = (decimal)response.MonthlyInstallment,
             NumberOfInstallments = response.RequestedPeriodInMonth,
-            Percentage = response.Percentage
+            Percentage = response.Percentage,
+            DocumentLink = response.DocumentLink,
         };
 
         // TODO: Save document link (and valid date) somewhere
@@ -237,7 +237,12 @@ public sealed class MiniBankInterface : BankInterfaceBase
             BankName = status.BankName,
             Inquiry = status.Inquiry,
             ReceivedOffer = offer,
-            Status = InquiryStatus.OfferReceived
+            Status = InquiryStatus.OfferReceived,
+            AdditionalData = new AdditionalStatusData
+            {
+                InquireId = response.InquireId,
+                OfferId = offerId,
+            }.Serialize()
         };
     }
 
@@ -251,16 +256,9 @@ public sealed class MiniBankInterface : BankInterfaceBase
             throw new InvalidOperationException($@"Error trying to get the document from mini bank because offerid was null.
                                                 Related offerid in our system: {offerEntity.Id}");
 
-        var offerResponse = await (
-                await _clientWithToken!.Client.
-                    Request("Offer", additionalData.OfferId).
-                    GetAsync()
-            ).
-            GetJsonAsync<OfferResponse>();
-
         return await _clientWithToken!
             .Client
-            .Request("Offer", additionalData.OfferId, "document", offerResponse.DocumentLink.Split('/')[^1])
+            .Request("Offer", additionalData.OfferId, "document", offerEntity.DocumentLink.Split('/')[^1])
             .GetBytesAsync();
     }
 
@@ -426,7 +424,7 @@ public sealed class MiniBankInterface : BankInterfaceBase
         public DateTime UpdateDate { get; init; }
         public string? ApprovedBy { get; init; }
         public string DocumentLink { get; init; } = null!;
-        public DateTime DocumentLinkValidDate { get; init; }
+        public DateTime? DocumentLinkValidDate { get; init; }
     }
 
     private sealed class MiniBankApplyForAnOfferRequest

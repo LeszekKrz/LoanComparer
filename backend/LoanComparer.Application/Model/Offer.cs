@@ -14,6 +14,8 @@ public sealed class Offer
     public double Percentage { get; init; }
     
     public decimal MonthlyInstallment { get; init; }
+
+    public string DocumentLink { get; init; } = null!;
     
     public OfferEntity ToEntity()
     {
@@ -23,7 +25,8 @@ public sealed class Offer
             LoanValueAsSmallestNominal = (long)(LoanValue * 100),
             NumberOfInstallments = NumberOfInstallments,
             Percentage = Percentage,
-            MonthlyInstallmentAsSmallestNominal = (long)(MonthlyInstallment * 100)
+            MonthlyInstallmentAsSmallestNominal = (long)(MonthlyInstallment * 100),
+            DocumentLink = DocumentLink,
         };
     }
 
@@ -35,7 +38,8 @@ public sealed class Offer
             LoanValue = entity.LoanValueAsSmallestNominal / 100m,
             NumberOfInstallments = entity.NumberOfInstallments,
             Percentage = entity.Percentage,
-            MonthlyInstallment = entity.MonthlyInstallmentAsSmallestNominal / 100m
+            MonthlyInstallment = entity.MonthlyInstallmentAsSmallestNominal / 100m,
+            DocumentLink = entity.DocumentLink,
         };
     }
 
@@ -69,6 +73,9 @@ public sealed class OfferEntity
     
     [Required]
     public long MonthlyInstallmentAsSmallestNominal { get; init; }
+
+    [Required]
+    public string DocumentLink { get; init; } = null!;
 
     public SentInquiryStatusEntity SentInquiryStatus { get; init; }
 }
