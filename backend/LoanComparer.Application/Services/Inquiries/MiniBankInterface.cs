@@ -31,27 +31,38 @@ public sealed class MiniBankInterface : BankInterfaceBase
                 Status = InquiryStatus.Error
             };
 
-        var request = await ConvertInquiryToRequestAsync(inquiry);
-        var response = await (
-            await _clientWithToken!.Client.
-                Request("Inquire").
-                PostJsonAsync(request)
-            ).
-            GetJsonAsync<InquiryCreatedResponse>();
-
-        return new SentInquiryStatus
+        try
         {
-            Id = Guid.NewGuid(),
-            BankName = BankName,
-            Inquiry = inquiry,
-            ReceivedOffer = null,
-            Status = InquiryStatus.Pending,
-            AdditionalData = new AdditionalStatusData
+            var request = await ConvertInquiryToRequestAsync(inquiry);
+            var response = await (
+                await _clientWithToken!.Client.Request("Inquire").PostJsonAsync(request)
+            ).GetJsonAsync<InquiryCreatedResponse>();
+
+            return new SentInquiryStatus
             {
-                InquireId = response.InquireId,
-                OfferId = null
-            }.Serialize()
-        };
+                Id = Guid.NewGuid(),
+                BankName = BankName,
+                Inquiry = inquiry,
+                ReceivedOffer = null,
+                Status = InquiryStatus.Pending,
+                AdditionalData = new AdditionalStatusData
+                {
+                    InquireId = response.InquireId,
+                    OfferId = null
+                }.Serialize()
+            };
+        }
+        catch (FlurlHttpException)
+        {
+            return new()
+            {
+                Id = Guid.NewGuid(),
+                BankName = BankName,
+                Inquiry = inquiry,
+                ReceivedOffer = null,
+                Status = InquiryStatus.Error
+            };
+        }
     }
     
     protected override async Task<SentInquiryStatus> GetRefreshedStatusAsync(SentInquiryStatus status)
@@ -126,12 +137,13 @@ public sealed class MiniBankInterface : BankInterfaceBase
                     GetAsync()
             ).
             GetJsonAsync<IReadOnlyList<GovernmentDocumentTypeResponse>>();
-        var matchedGovernmentDocumentType = jobTypes.FirstOrDefault(t => t.Name.Equals(inquiry.GovernmentId.Type switch
-        {
-            "ID Number" => "Government Id",
-            "Passport Number" => "Passport",
-            _ => "Other"
-        }, StringComparison.OrdinalIgnoreCase));
+        var matchedGovernmentDocumentType = governmentDocumentTypes.FirstOrDefault(t =>
+            t.Name.Equals(inquiry.GovernmentId.Type switch
+            {
+                "ID Number" => "Government Id",
+                "Passport Number" => "Passport",
+                _ => "Other"
+            }, StringComparison.OrdinalIgnoreCase));
 
         return new()
         {
@@ -178,8 +190,9 @@ public sealed class MiniBankInterface : BankInterfaceBase
     
     private static async Task<BearerToken?> GetTokenAsync()
     {
-        var authClient = new FlurlClient(AuthUrl).AllowAnyHttpStatus()
-            .WithBasicAuth("team2b", "EAF5C5C1-ADF4-4F35-AE02-44C61B0CE842");
+        var authClient = new FlurlClient(AuthUrl).
+            AllowAnyHttpStatus().
+            WithBasicAuth("team2b", "EAF5C5C1-ADF4-4F35-AE02-44C61B0CE842");
         var requestTime = DateTime.Now;
         var response = await authClient.Request().PostUrlEncodedAsync(new
         {
@@ -234,8 +247,9 @@ public sealed class MiniBankInterface : BankInterfaceBase
             _expirationTime = expirationTime;
         }
 
-        public static BearerToken FromResponse(AuthenticationResponse response, DateTime requestTime)
+        public static BearerToken? FromResponse(AuthenticationResponse response, DateTime requestTime)
         {
+            if (response.AccessToken is null || response.ExpiresIn <= 0) return null;
             return new(response.AccessToken, requestTime + TimeSpan.FromSeconds(response.ExpiresIn));
         }
     }
@@ -256,9 +270,15 @@ public sealed class MiniBankInterface : BankInterfaceBase
     
     private sealed class AuthenticationResponse
     {
-        public string AccessToken { get; init; } = null!;
+        [JsonProperty("access_token")]
+        public string? AccessToken { get; init; }
+        
+        [JsonProperty("expires_in")]
         public int ExpiresIn { get; init; }
+        
+        [JsonProperty("token_type")]
         public string TokenType { get; init; } = null!;
+        
         public string Scope { get; init; } = null!;
     }
 
