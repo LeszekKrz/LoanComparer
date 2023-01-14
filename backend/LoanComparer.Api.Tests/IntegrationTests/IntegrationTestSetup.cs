@@ -2,6 +2,8 @@
 using LoanComparer.Application.Services;
 using LoanComparer.Application.Services.Inquiries;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -82,6 +84,17 @@ namespace LoanComparer.Api.Tests.IntegrationTests
             private class TestBankInterface : IBankInterface
             {
                 public string BankName => "TestBank";
+
+                public Task<SentInquiryStatus> ApplyForAnOfferAsync(Guid offerId, IFormFile file)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public Task<FileResult> GetDocumentAsync(Guid offerId)
+                {
+                    throw new NotImplementedException();
+                }
+
                 public Task<SentInquiryStatus> RefreshStatusAsync(SentInquiryStatus status)
                 {
                     return Task.FromResult(new SentInquiryStatus

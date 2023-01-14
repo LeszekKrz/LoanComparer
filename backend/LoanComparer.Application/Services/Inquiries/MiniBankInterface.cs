@@ -2,6 +2,7 @@
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace LoanComparer.Application.Services.Inquiries;
@@ -220,7 +221,17 @@ public sealed class MiniBankInterface : BankInterfaceBase
             Status = InquiryStatus.Accepted
         };
     }
-    
+
+    public override Task<FileResult> GetDocumentAsync(Guid offerId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override Task<SentInquiryStatus> ApplyForAnOfferAsync(Guid offerId, IFormFile file)
+    {
+        throw new NotImplementedException();
+    }
+
     private sealed record ClientWithToken(IFlurlClient Client, BearerToken Token); 
     
     private sealed record BearerToken(string Value)

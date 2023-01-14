@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LoanComparer.Application.Services.Offers
 {
-    internal class OfferQuery : IOfferQuery
+    public class OfferQuery : IOfferQuery
     {
         private readonly LoanComparerContext _context;
         private readonly IReadOnlyCollection<IBankInterface> _bankInterfaces;
