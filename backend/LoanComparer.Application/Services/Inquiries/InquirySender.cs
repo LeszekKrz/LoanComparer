@@ -1,4 +1,5 @@
 ﻿using LoanComparer.Application.Model;
+using LoanComparer.Application.Services.Inquiries.BankInterfaces;
 
 namespace LoanComparer.Application.Services.Inquiries;
 

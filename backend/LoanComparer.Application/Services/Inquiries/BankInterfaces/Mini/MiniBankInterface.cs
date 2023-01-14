@@ -1,22 +1,24 @@
-﻿using Flurl.Http;
+﻿using System.Security.Authentication;
+using Flurl.Http;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
-namespace LoanComparer.Application.Services.Inquiries;
+namespace LoanComparer.Application.Services.Inquiries.BankInterfaces.Mini;
 
 public sealed class MiniBankInterface : BankInterfaceBase
 {
-    private const string AuthUrl = "https://indentitymanager.snet.com.pl/connect/token";
-    private const string BaseUrl = "https://mini.loanbank.api.snet.com.pl/api/v1";
-
+    private readonly IOptionsSnapshot<MiniBankConfiguration> _config;
     private ClientWithToken? _clientWithToken;
     
     public override string BankName => "MiNI Bank";
-    
-    public MiniBankInterface(IInquiryCommand inquiryCommand, IOfferCommand offerCommand) : base(inquiryCommand, offerCommand)
+
+    public MiniBankInterface(IInquiryCommand inquiryCommand, IOfferCommand offerCommand,
+        IOptionsSnapshot<MiniBankConfiguration> config) : base(inquiryCommand, offerCommand)
     {
+        _config = config;
     }
 
     public override async Task<SentInquiryStatus> SendInquiryAsync(Inquiry inquiry)
@@ -184,15 +186,18 @@ public sealed class MiniBankInterface : BankInterfaceBase
             return false;
         }
 
-        _clientWithToken = new(new FlurlClient(BaseUrl).WithOAuthBearerToken(token.Value), token);
+        _clientWithToken = new(new FlurlClient(_config.Value.BaseUrl).WithOAuthBearerToken(token.Value), token);
         return true;
     }
     
-    private static async Task<BearerToken?> GetTokenAsync()
+    private async Task<BearerToken?> GetTokenAsync()
     {
-        var authClient = new FlurlClient(AuthUrl).
+        var password = Environment.GetEnvironmentVariable("MINI_BANK_API_PASSWORD") ??
+                       throw new InvalidCredentialException(
+                           "Environment variable MINI_BANK_API_PASSWORD is not defined");
+        var authClient = new FlurlClient(_config.Value.AuthUrl).
             AllowAnyHttpStatus().
-            WithBasicAuth("team2b", "EAF5C5C1-ADF4-4F35-AE02-44C61B0CE842");
+            WithBasicAuth(_config.Value.AuthUsername, password);
         var requestTime = DateTime.Now;
         var response = await authClient.Request().PostUrlEncodedAsync(new
         {
@@ -253,7 +258,26 @@ public sealed class MiniBankInterface : BankInterfaceBase
             return new(response.AccessToken, requestTime + TimeSpan.FromSeconds(response.ExpiresIn));
         }
     }
+    
+    private sealed record AdditionalStatusData
+    {
+        public int InquireId { get; init; }
+        public int? OfferId { get; init; }
 
+        public string Serialize()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+
+        public static AdditionalStatusData Deserialize(string? serialized)
+        {
+            if (serialized is null) throw new ArgumentNullException(nameof(serialized));
+            return JsonConvert.DeserializeObject<AdditionalStatusData>(serialized) ??
+                   throw new InvalidOperationException($"Additional status data is in invalid format: [{serialized}]");
+        }
+    }
+    
+    #region Dto classes
     private sealed class JobTypeResponse
     {
         public int Id { get; init; }
@@ -321,24 +345,6 @@ public sealed class MiniBankInterface : BankInterfaceBase
         public DateTime CreateDate { get; init; }
     }
 
-    private sealed record AdditionalStatusData
-    {
-        public int InquireId { get; init; }
-        public int? OfferId { get; init; }
-
-        public string Serialize()
-        {
-            return JsonConvert.SerializeObject(this);
-        }
-
-        public static AdditionalStatusData Deserialize(string? serialized)
-        {
-            if (serialized is null) throw new ArgumentNullException(nameof(serialized));
-            return JsonConvert.DeserializeObject<AdditionalStatusData>(serialized) ??
-                   throw new InvalidOperationException($"Additional status data is in invalid format: [{serialized}]");
-        }
-    }
-
     private sealed class InquiryStatusResponse
     {
         public int InquireId { get; init; }
@@ -364,4 +370,5 @@ public sealed class MiniBankInterface : BankInterfaceBase
         public string DocumentLink { get; init; } = null!;
         public DateTime DocumentLinkValidDate { get; init; }
     }
+    #endregion
 }

@@ -1,4 +1,4 @@
-﻿namespace LoanComparer.Application.Services.Inquiries;
+﻿namespace LoanComparer.Application.Services.Inquiries.BankInterfaces;
 
 public interface IBankInterfaceFactory
 {

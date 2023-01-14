@@ -1,6 +1,6 @@
 ﻿using LoanComparer.Application.Services.Offers;
 
-namespace LoanComparer.Application.Services.Inquiries;
+namespace LoanComparer.Application.Services.Inquiries.BankInterfaces.Mock;
 
 /// <summary>
 ///     This class was created so that migrations can be made

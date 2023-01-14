@@ -1,7 +1,7 @@
 ﻿using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 
-namespace LoanComparer.Application.Services.Inquiries;
+namespace LoanComparer.Application.Services.Inquiries.BankInterfaces;
 
 public abstract class BankInterfaceBase : IBankInterface
 {
