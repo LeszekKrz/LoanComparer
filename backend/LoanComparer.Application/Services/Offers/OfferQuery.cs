@@ -1,5 +1,6 @@
 ﻿using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Inquiries;
+using LoanComparer.Application.Services.Inquiries.BankInterfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,7 +30,7 @@ namespace LoanComparer.Application.Services.Offers
                 : OwnershipTestResult.Unauthorized;
         }
 
-        public async Task<FileResult> GetDocumentAsync(Guid offerId)
+        public async Task<byte[]> GetDocumentAsync(Guid offerId)
         {
             OfferEntity? entity = await _context.Offers
                 .Include(offer => offer.SentInquiryStatus)
@@ -41,7 +42,7 @@ namespace LoanComparer.Application.Services.Offers
                 throw new InvalidOperationException(
                     $@"There is no known bank with name {entity.SentInquiryStatus.BankName},
                     but status with id {entity.SentInquiryStatus.Id} references it");
-            return await bank.GetDocumentAsync(offerId);
+            return await bank.GetDocumentContentAsync(entity);
         }
     }
 }

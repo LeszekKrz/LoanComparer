@@ -41,6 +41,7 @@ public sealed class SentInquiryStatus
                 InquiryStatus.Pending => "PENDING",
                 InquiryStatus.Accepted => "OFFERRECEIVED",
                 InquiryStatus.Rejected => "REJECTED",
+                InquiryStatus.WaitingForAcceptance => "WAITINGFORACCEPTANCE",
                 InquiryStatus.Timeout => "TIMEOUT",
                 InquiryStatus.Error => "ERROR",
                 _ => throw new ArgumentOutOfRangeException()
@@ -92,6 +93,7 @@ public enum InquiryStatus
     Pending,
     Accepted,
     Rejected,
+    WaitingForAcceptance,
     Timeout,
     Error
 }

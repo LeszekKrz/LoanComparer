@@ -1,4 +1,5 @@
-﻿using LoanComparer.Application.Model;
+﻿using LoanComparer.Application.DTO.OfferDTO;
+using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -55,7 +56,7 @@ public abstract class BankInterfaceBase : IBankInterface
 
     public abstract Task<SentInquiryStatus> SendInquiryAsync(Inquiry inquiry);
 
-    public abstract Task<FileResult> GetDocumentAsync(Guid offerId);
+    public abstract Task<byte[]> GetDocumentContentAsync(OfferEntity offerEntity);
 
-    public abstract Task<SentInquiryStatus> ApplyForAnOfferAsync(Guid offerId, IFormFile file);
+    public abstract Task<InquiryStatus> ApplyForAnOfferAsync(OfferEntity offerEntity, IFormFile file);
 }

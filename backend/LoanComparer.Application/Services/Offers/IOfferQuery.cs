@@ -1,5 +1,4 @@
 ﻿using LoanComparer.Application.Services.Inquiries;
-using Microsoft.AspNetCore.Mvc;
 
 namespace LoanComparer.Application.Services.Offers
 {
@@ -7,6 +6,6 @@ namespace LoanComparer.Application.Services.Offers
     {
         public Task<OwnershipTestResult> CheckOwnerAsync(Guid offerId, string? username);
 
-        public Task<FileResult> GetDocumentAsync(Guid offerId);
+        public Task<byte[]> GetDocumentContentAsync(Guid offerId);
     }
 }

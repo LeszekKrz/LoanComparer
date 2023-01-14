@@ -1,5 +1,7 @@
-﻿using System.Security.Authentication;
+﻿using System.Reflection.Metadata.Ecma335;
+using System.Security.Authentication;
 using Flurl.Http;
+using LoanComparer.Application.DTO.OfferDTO;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
@@ -238,7 +240,63 @@ public sealed class MiniBankInterface : BankInterfaceBase
             Status = InquiryStatus.Accepted
         };
     }
-    
+
+    public override async Task<byte[]> GetDocumentContentAsync(OfferEntity offerEntity)
+    {
+        if (!await EnsureClientIsValidAsync())
+            throw new InvalidCredentialException("An error has occured while trying to get mini bank interface credentials");
+
+        var additionalData = AdditionalStatusData.Deserialize(offerEntity.SentInquiryStatus.AdditionalData);
+        if (additionalData.OfferId is null)
+            throw new InvalidOperationException($@"Error trying to get the document from mini bank because offerid was null.
+                                                Related offerid in our system: {offerEntity.Id}");
+
+        var offerResponse = await (
+                await _clientWithToken!.Client.
+                    Request("Offer", additionalData.OfferId).
+                    GetAsync()
+            ).
+            GetJsonAsync<OfferResponse>();
+
+        return await _clientWithToken!
+            .Client
+            .Request("Offer", additionalData.OfferId, "document", offerResponse.DocumentLink.Split('/')[^1])
+            .GetBytesAsync();
+    }
+
+    public override async Task<InquiryStatus> ApplyForAnOfferAsync(OfferEntity offerEntity, IFormFile file)
+    {
+        if (!await EnsureClientIsValidAsync())
+            throw new InvalidCredentialException("An error has occured while trying to get mini bank interface credentials");
+
+        var additionalData = AdditionalStatusData.Deserialize(offerEntity.SentInquiryStatus.AdditionalData);
+        if (additionalData.OfferId is null)
+            throw new InvalidOperationException($@"Error trying to get the document from mini bank because offerid was null.
+                                                Related offerid in our system: {offerEntity.Id}");
+
+        var applyRequest = ConvertFormFileToApplyRequest(file);
+
+        var response = await _clientWithToken!
+            .Client
+            .Request("Offer", additionalData.OfferId, "document/upload")
+            .PostJsonAsync(applyRequest);
+
+        if (response == null)
+            throw new Exception("Mini bank didn't respond");
+        else if (response!.StatusCode == 200)
+            return InquiryStatus.WaitingForAcceptance;
+        else
+            throw new Exception($"Mini bank responded with a status code {response!.StatusCode}");
+    }
+
+    private MiniBankApplyForAnOfferRequest ConvertFormFileToApplyRequest(IFormFile formFile)
+    {
+        return new()
+        {
+            FormFile = formFile,
+        };
+    }
+
     private sealed record ClientWithToken(IFlurlClient Client, BearerToken Token); 
     
     private sealed record BearerToken(string Value)
@@ -369,6 +427,11 @@ public sealed class MiniBankInterface : BankInterfaceBase
         public string? ApprovedBy { get; init; }
         public string DocumentLink { get; init; } = null!;
         public DateTime DocumentLinkValidDate { get; init; }
+    }
+
+    private sealed class MiniBankApplyForAnOfferRequest
+    {
+        public IFormFile? FormFile { get; init; }
     }
     #endregion
 }

@@ -30,7 +30,8 @@ namespace LoanComparer.Api.Controllers
                 return BadRequest();
             if (checkResult == OwnershipTestResult.Unauthorized)
                 return Unauthorized();
-            return await _query.GetDocumentAsync(offerId);
+            byte[] fileContent = await _query.GetDocumentContentAsync(offerId);
+            return File(fileContent, "text/txt", "contract.txt");
         }
 
         [HttpPost]
@@ -42,8 +43,9 @@ namespace LoanComparer.Api.Controllers
                 return BadRequest();
             if (checkResult == OwnershipTestResult.Unauthorized)
                 return Unauthorized();
-            SentInquiryStatus inquiryStatus = await _command.ApplyForAnOfferAsync(offerId, formFile);
-            return new ApplyForAnOfferResponse(inquiryStatus.Status.ToString());
+            InquiryStatus updatedStatus = await _command.ApplyForAnOfferAsync(offerId, formFile);
+            await _command.SetStatusOfAnOfferAsync(offerId, updatedStatus);
+            return ApplyForAnOfferResponse.FromInquiryStatus(updatedStatus);
         }
 
         private string? GetUsername()
