@@ -14,6 +14,8 @@ public sealed class SentInquiryStatus
     public InquiryStatus Status { get; init; }
 
     public Offer? ReceivedOffer { get; init; }
+    
+    public string? AdditionalData { get; init; }
 
     public SentInquiryStatusEntity ToEntity()
     {
@@ -23,7 +25,8 @@ public sealed class SentInquiryStatus
             InquiryId = Inquiry.Id,
             BankName = BankName,
             Status = Status,
-            OfferId = ReceivedOffer?.Id
+            OfferId = ReceivedOffer?.Id,
+            AdditionalData = AdditionalData
         };
     }
 
@@ -45,15 +48,16 @@ public sealed class SentInquiryStatus
         };
     }
 
-    public static SentInquiryStatus FromEntity(SentInquiryStatusEntity e)
+    public static SentInquiryStatus FromEntity(SentInquiryStatusEntity entity)
     {
         return new()
         {
-            Id = e.Id,
-            Inquiry = Inquiry.FromEntity(e.Inquiry),
-            BankName = e.BankName,
-            Status = e.Status,
-            ReceivedOffer = e.Offer is not null ? Offer.FromEntity(e.Offer) : null,
+            Id = entity.Id,
+            Inquiry = Inquiry.FromEntity(entity.Inquiry),
+            BankName = entity.BankName,
+            Status = entity.Status,
+            ReceivedOffer = entity.Offer is not null ? Offer.FromEntity(entity.Offer) : null,
+            AdditionalData = entity.AdditionalData
         };
     }
 }
@@ -79,6 +83,8 @@ public sealed class SentInquiryStatusEntity
     public OfferEntity? Offer { get; set; }
     
     public Guid? OfferId { get; set; }
+    
+    public string? AdditionalData { get; init; }
 }
 
 public enum InquiryStatus

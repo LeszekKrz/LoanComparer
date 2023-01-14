@@ -120,7 +120,7 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<IInquiryQuery, InquiryQuery>();
     services.AddScoped<IInquirySender, InquirySender>();
     services.AddScoped<IInquiryRefresher, InquiryRefresher>();
-    services.AddScoped<IBankInterfaceFactory, MockBankInterfaceFactory>();
+    services.AddScoped<IBankInterfaceFactory, BankInterfaceFactory>();
     services.AddScoped<IOfferCommand, OfferCommand>();
 
     services.AddHostedService<InquiryRefreshBackgroundService>();
