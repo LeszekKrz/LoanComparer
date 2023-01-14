@@ -3,35 +3,26 @@ using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LoanComparer.Application.Services.Inquiries;
+namespace LoanComparer.Application.Services.Inquiries.BankInterfaces.Mock;
 
-public sealed class AcceptingBankInterface : BankInterfaceBase
+public sealed class RejectingBankInterface : BankInterfaceBase
 {
-    public AcceptingBankInterface(IInquiryCommand inquiryCommand, IOfferCommand offerCommand) : base(inquiryCommand,
+    public RejectingBankInterface(IInquiryCommand inquiryCommand, IOfferCommand offerCommand) : base(inquiryCommand,
         offerCommand)
     {
     }
     
-    public override string BankName => "AcceptBank";
+    public override string BankName => "RejectBank";
     
     protected override Task<SentInquiryStatus> GetRefreshedStatusAsync(SentInquiryStatus status)
     {
-        var offer = new Offer
-        {
-            Id = Guid.NewGuid(),
-            LoanValue = status.Inquiry.AmountRequested,
-            NumberOfInstallments = status.Inquiry.NumberOfInstallments,
-            Percentage = 10,
-            MonthlyInstallment = status.Inquiry.AmountRequested * 1.1m / status.Inquiry.NumberOfInstallments
-        };
-        
         var updatedStatus = new SentInquiryStatus
         {
             Id = status.Id,
             BankName = BankName,
             Inquiry = status.Inquiry,
-            ReceivedOffer = offer,
-            Status = InquiryStatus.Accepted
+            ReceivedOffer = status.ReceivedOffer,
+            Status = InquiryStatus.Rejected
         };
         return Task.FromResult(updatedStatus);
     }

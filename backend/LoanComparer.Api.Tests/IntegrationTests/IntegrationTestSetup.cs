@@ -1,6 +1,6 @@
 ﻿using LoanComparer.Application.Model;
 using LoanComparer.Application.Services;
-using LoanComparer.Application.Services.Inquiries;
+using LoanComparer.Application.Services.Inquiries.BankInterfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
