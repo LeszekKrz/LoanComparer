@@ -1,11 +1,12 @@
-﻿using System.Security.Authentication;
-using System.Text;
+﻿using System.Net.Http.Headers;
+using System.Security.Authentication;
 using Flurl.Http;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace LoanComparer.Application.Services.Inquiries.BankInterfaces.Mini;
 
@@ -274,17 +275,39 @@ public sealed class MiniBankInterface : BankInterfaceBase
 
         var applyRequest = ConvertFormFileToApplyRequest(file);
 
-        var response = await _clientWithToken!
-            .Client
-            .Request("Offer", additionalData.OfferId, "document/upload")
-            .PostJsonAsync(applyRequest);
+        byte[] fileContent = await GetBytes(file);
 
-        if (response == null)
-            throw new Exception("Mini bank didn't respond");
-        else if (response!.StatusCode == 200)
-            return InquiryStatus.WaitingForAcceptance;
-        else
-            throw new Exception($"Mini bank responded with a status code {response!.StatusCode}");
+        try
+        {
+            using var stream = file.OpenReadStream();
+            var response = await _clientWithToken!
+                    .Client
+                    .Request("Offer", additionalData.OfferId, "document", "upload")
+                    .AllowAnyHttpStatus()
+                    .WithHeader("Content-Type", "text/plain")
+                    .PostMultipartAsync(mp =>
+                    {
+                        mp.AddFile("file", stream, file.FileName);
+                    });
+
+            if (response == null)
+                throw new Exception("Mini bank didn't respond");
+            else if (response!.StatusCode == 200)
+                return InquiryStatus.WaitingForAcceptance;
+            else
+                throw new Exception($"Mini bank responded with a status code {response!.StatusCode}");
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
+    }
+
+    private async Task<byte[]> GetBytes(IFormFile file)
+    {
+        using MemoryStream memoryStream = new();
+        await file.CopyToAsync(memoryStream);
+        return memoryStream.ToArray();
     }
 
     private MiniBankApplyForAnOfferRequest ConvertFormFileToApplyRequest(IFormFile formFile)
@@ -429,7 +452,7 @@ public sealed class MiniBankInterface : BankInterfaceBase
 
     private sealed class MiniBankApplyForAnOfferRequest
     {
-        public IFormFile? FormFile { get; init; }
+        public IFormFile FormFile { get; init; } = null!;
     }
     #endregion
 }
