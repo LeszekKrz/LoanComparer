@@ -17,9 +17,9 @@ namespace LoanComparer.Application.ModelEntityTypeConfiguration
                 .WithMany(x => x.Users)
                 .HasForeignKey("JobTypeName");
 
-            builder.HasOne(x => x.GovernmentId)
+            builder.HasOne(x => x.GovernmentIdEntity)
                 .WithOne(x => x.User)
-                .HasForeignKey<GovernmentId>(x => x.Id);
+                .HasForeignKey<GovernmentIdEntity>(x => x.Id);
 
             builder.HasMany(x => x.UserRoles)
                 .WithOne(x => x.User)

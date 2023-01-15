@@ -16,7 +16,13 @@ namespace LoanComparer.Application
         IdentityRoleClaim<string>,
         IdentityUserToken<string>>
     {
-        public DbSet<JobType> JobTypes { get; private set; }
+        public DbSet<JobType> JobTypes => Set<JobType>();
+
+        public DbSet<InquiryEntity> Inquiries => Set<InquiryEntity>();
+
+        public DbSet<SentInquiryStatusEntity> InquiryStatuses => Set<SentInquiryStatusEntity>();
+
+        public DbSet<OfferEntity> Offers => Set<OfferEntity>();
 
         public LoanComparerContext(DbContextOptions<LoanComparerContext> options) : base(options) { }
 

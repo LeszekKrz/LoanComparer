@@ -22,7 +22,7 @@ namespace LoanComparer.Application.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("LoanComparer.Application.Model.GovernmentId", b =>
+            modelBuilder.Entity("LoanComparer.Application.Model.GovernmentIdEntity", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -42,6 +42,68 @@ namespace LoanComparer.Application.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("LoanComparer.Application.Model.InquiryEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("AmountRequestedAsSmallestNominal")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("BirthDateTimestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CreationTimestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GovernmentIdType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GovernmentIdValue")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("IncomeLevelAsSmallestNominal")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("JobDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("JobEndDateTimestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("JobName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("JobStartDateTimestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NotificationEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NumberOfInstallments")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OwnerUsername")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Inquiries");
                 });
 
             modelBuilder.Entity("LoanComparer.Application.Model.JobType", b =>
@@ -161,6 +223,29 @@ namespace LoanComparer.Application.Migrations
                         });
                 });
 
+            modelBuilder.Entity("LoanComparer.Application.Model.OfferEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("LoanValueAsSmallestNominal")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("MonthlyInstallmentAsSmallestNominal")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("NumberOfInstallments")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Percentage")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Offers");
+                });
+
             modelBuilder.Entity("LoanComparer.Application.Model.Role", b =>
                 {
                     b.Property<string>("Id")
@@ -190,18 +275,49 @@ namespace LoanComparer.Application.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "bba87489-0938-47dc-8210-f09b8c05fe99",
-                            ConcurrencyStamp = "c77b2f83-dc8e-4220-96d0-02b465db7cc0",
+                            Id = "e7527a1b-63e0-43be-a111-7804ae2426d1",
+                            ConcurrencyStamp = "0b5d7a25-31bc-40f7-8c04-7804c6853784",
                             Name = "Client",
                             NormalizedName = "CLIENT"
                         },
                         new
                         {
-                            Id = "310ccae3-8559-4385-91dc-bb172a737428",
-                            ConcurrencyStamp = "7eeaa674-eb66-4a01-b3f9-de5d38bbe621",
+                            Id = "7a3c43ec-03a3-40ff-8334-fe2849855b60",
+                            ConcurrencyStamp = "9b4c5545-6062-4de7-b0b4-1cd7bfcaaab7",
                             Name = "BankEmployee",
                             NormalizedName = "BANKEMPLOYEE"
                         });
+                });
+
+            modelBuilder.Entity("LoanComparer.Application.Model.SentInquiryStatusEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AdditionalData")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BankName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("InquiryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("OfferId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InquiryId");
+
+                    b.HasIndex("OfferId");
+
+                    b.ToTable("InquiryStatuses");
                 });
 
             modelBuilder.Entity("LoanComparer.Application.Model.User", b =>
@@ -391,15 +507,32 @@ namespace LoanComparer.Application.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("LoanComparer.Application.Model.GovernmentId", b =>
+            modelBuilder.Entity("LoanComparer.Application.Model.GovernmentIdEntity", b =>
                 {
                     b.HasOne("LoanComparer.Application.Model.User", "User")
-                        .WithOne("GovernmentId")
-                        .HasForeignKey("LoanComparer.Application.Model.GovernmentId", "Id")
+                        .WithOne("GovernmentIdEntity")
+                        .HasForeignKey("LoanComparer.Application.Model.GovernmentIdEntity", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LoanComparer.Application.Model.SentInquiryStatusEntity", b =>
+                {
+                    b.HasOne("LoanComparer.Application.Model.InquiryEntity", "Inquiry")
+                        .WithMany()
+                        .HasForeignKey("InquiryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LoanComparer.Application.Model.OfferEntity", "Offer")
+                        .WithMany()
+                        .HasForeignKey("OfferId");
+
+                    b.Navigation("Inquiry");
+
+                    b.Navigation("Offer");
                 });
 
             modelBuilder.Entity("LoanComparer.Application.Model.User", b =>
@@ -478,7 +611,7 @@ namespace LoanComparer.Application.Migrations
 
             modelBuilder.Entity("LoanComparer.Application.Model.User", b =>
                 {
-                    b.Navigation("GovernmentId")
+                    b.Navigation("GovernmentIdEntity")
                         .IsRequired();
 
                     b.Navigation("UserRoles");

@@ -1,10 +1,12 @@
-﻿using LoanComparer.Application.Services;
+﻿using LoanComparer.Application.Model;
+using LoanComparer.Application.Services;
+using LoanComparer.Application.Services.Inquiries.BankInterfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Respawn;
 using Respawn.Graph;
 
@@ -39,6 +41,11 @@ namespace LoanComparer.Api.Tests.IntegrationTests
                 builder.ConfigureAppConfiguration((_, conf) =>
                 {
                     conf.AddJsonFile(configPath, false);
+                }).ConfigureServices(services =>
+                {
+                    services.RemoveAll<IHostedService>();
+                    services.RemoveAll<IBankInterfaceFactory>();
+                    services.AddScoped<IBankInterfaceFactory, TestBankApplicationFactory>();
                 });
             });
         }
@@ -48,7 +55,7 @@ namespace LoanComparer.Api.Tests.IntegrationTests
             var projectDir = Directory.GetCurrentDirectory();
             var configPath = Path.Combine(projectDir, @"..\..\..\appsettings.test.json");
 
-            return  new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+            return new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
             {
                 builder.UseEnvironment("Test");
                 builder.ConfigureAppConfiguration((_, conf) =>
@@ -58,8 +65,47 @@ namespace LoanComparer.Api.Tests.IntegrationTests
                 builder.ConfigureServices(services =>
                 {
                     services.Replace(new ServiceDescriptor(typeof(IEmailService), emailService));
+                    services.RemoveAll<IHostedService>();
+                    services.RemoveAll<IBankInterfaceFactory>();
+                    services.AddScoped<IBankInterfaceFactory, TestBankApplicationFactory>();
                 });
             });
+        }
+
+        private class TestBankApplicationFactory : IBankInterfaceFactory
+        {
+            public IReadOnlyList<IBankInterface> CreateBankInterfaces()
+            {
+                return new[] { new TestBankInterface() };
+            }
+
+            private class TestBankInterface : IBankInterface
+            {
+                public string BankName => "TestBank";
+                public Task<SentInquiryStatus> RefreshStatusAsync(SentInquiryStatus status)
+                {
+                    return Task.FromResult(new SentInquiryStatus
+                    {
+                        Id = status.Id,
+                        BankName = status.BankName,
+                        Inquiry = status.Inquiry,
+                        ReceivedOffer = status.ReceivedOffer,
+                        Status = status.Status
+                    });
+                }
+
+                public Task<SentInquiryStatus> SendInquiryAsync(Inquiry inquiry)
+                {
+                    return Task.FromResult(new SentInquiryStatus
+                    {
+                        Id = Guid.NewGuid(),
+                        BankName = BankName,
+                        Inquiry = inquiry,
+                        ReceivedOffer = null,
+                        Status = InquiryStatus.Pending
+                    });
+                }
+            }
         }
     }
 }
