@@ -21,10 +21,17 @@ public sealed class OfferCommand : IOfferCommand
 
     public async Task UpdateStatusAndAddSignedContractAsync(Guid offerId, InquiryStatus inquiryStatus, IFormFile formFile)
     {
-        OfferEntity entity = await GetOfferEntityWithStatusOrThrow(offerId);
-        entity.SentInquiryStatus.Status = inquiryStatus;
-        // Add file here
+        OfferEntity offerEntity = await GetOfferEntityWithStatusOrThrow(offerId);
+        offerEntity.SentInquiryStatus.Status = inquiryStatus;
+        offerEntity.SignedContractContent = await GetIFormFileContentInBytes(formFile);
         await _context.SaveChangesAsync();
+    }
+
+    private async Task<byte[]> GetIFormFileContentInBytes(IFormFile formFile)
+    {
+        await using var memoryStream = new MemoryStream();
+        await formFile.CopyToAsync(memoryStream);
+        return memoryStream.ToArray();
     }
 
     private async Task<OfferEntity> GetOfferEntityWithStatusOrThrow(Guid offerId)
