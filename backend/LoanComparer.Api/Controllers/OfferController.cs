@@ -1,5 +1,4 @@
-﻿using EllipticCurve.Utils;
-using LoanComparer.Application.DTO.OfferDTO;
+﻿using LoanComparer.Application.DTO.OfferDTO;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Inquiries;
 using LoanComparer.Application.Services.Inquiries.BankInterfaces;
@@ -7,12 +6,11 @@ using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
 using System.Security.Claims;
-using System.Text;
 
 namespace LoanComparer.Api.Controllers
 {
     [ApiController]
-    [Route("api")]
+    [Route("api/offers/{offerId:guid}")]
     public class OfferController : ControllerBase
     {
         private readonly IOfferQuery _query;
@@ -27,7 +25,7 @@ namespace LoanComparer.Api.Controllers
         }
 
         [HttpGet]
-        [Route("offers/{offerId:guid}/document")]
+        [Route("document")]
         public async Task<ActionResult> GetContractAsync(Guid offerId)
         {
             var checkResult = await _query.CheckOwnerAsync(offerId, GetUsername());
@@ -36,9 +34,9 @@ namespace LoanComparer.Api.Controllers
             if (checkResult == OwnershipTestResult.Unauthorized)
                 return Unauthorized();
 
-            (var offer, var sentInquiryStatus) = await _query.GetOfferWithStatusOrThrow(offerId);
+            var (offer, sentInquiryStatus) = await _query.GetOfferWithStatusOrThrowAsync(offerId);
             var bank = GetBankInterfaceOrThrow(sentInquiryStatus.BankName);
-            byte[] fileContent = await bank.GetDocumentContentAsync(offer, sentInquiryStatus);
+            var fileContent = await bank.GetDocumentContentAsync(offer, sentInquiryStatus);
             var fileName = "contract.txt";
             SetContentDispositionHeader(fileName);
             return File(fileContent, "text/plain", fileName);
@@ -54,7 +52,7 @@ namespace LoanComparer.Api.Controllers
         }
 
         [HttpPost]
-        [Route("offers/{offerId:guid}/apply")]
+        [Route("apply")]
         public async Task<ActionResult<ApplyForAnOfferResponse>> ApplyForAnOfferAsync(Guid offerId, IFormFile formFile)
         {
             var checkResult = await _query.CheckOwnerAsync(offerId, GetUsername());
@@ -62,7 +60,7 @@ namespace LoanComparer.Api.Controllers
                 return BadRequest();
             if (checkResult == OwnershipTestResult.Unauthorized)
                 return Unauthorized();
-            (var offer, var sentInquiryStatus) = await _query.GetOfferWithStatusOrThrow(offerId);
+            var (offer, sentInquiryStatus) = await _query.GetOfferWithStatusOrThrowAsync(offerId);
             if (sentInquiryStatus.Status != InquiryStatus.OfferReceived)
                 return BadRequest($"Tried to apply for an offer which status was {sentInquiryStatus.Status}."
                     + $"You can only apply for offers with status {InquiryStatus.OfferReceived}.");

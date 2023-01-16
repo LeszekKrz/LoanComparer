@@ -77,6 +77,7 @@ public sealed class OfferEntity
     [Required]
     public string DocumentLink { get; init; } = null!;
 
+    [Required]
     public SentInquiryStatusEntity SentInquiryStatus { get; init; } = null!;
 
     public byte[]? SignedContractContent { get; set; }

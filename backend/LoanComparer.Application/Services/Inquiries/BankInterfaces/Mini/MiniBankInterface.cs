@@ -229,7 +229,6 @@ public sealed class MiniBankInterface : BankInterfaceBase
             DocumentLink = response.DocumentLink,
         };
 
-        // TODO: Save document link (and valid date) somewhere
         return new()
         {
             Id = status.Id,
@@ -245,7 +244,7 @@ public sealed class MiniBankInterface : BankInterfaceBase
         };
     }
     
-    public override async Task<byte[]> GetDocumentContentAsync(Offer offer, SentInquiryStatus sentInquiryStatus)
+    public override async Task<Stream> GetDocumentContentAsync(Offer offer, SentInquiryStatus sentInquiryStatus)
     {
         if (!await EnsureClientIsValidAsync())
             throw new InvalidCredentialException("An error has occured while trying to get mini bank interface credentials");
@@ -258,7 +257,7 @@ public sealed class MiniBankInterface : BankInterfaceBase
         return await _clientWithToken!
             .Client
             .Request("Offer", additionalData.OfferId, "document", offer.DocumentLink.Split('/')[^1])
-            .GetBytesAsync();
+            .GetStreamAsync();
     }
 
     public override async Task ApplyForAnOfferAsync(Offer offer, SentInquiryStatus sentInquiryStatus, IFormFile file)
@@ -271,8 +270,8 @@ public sealed class MiniBankInterface : BankInterfaceBase
             throw new InvalidOperationException("Error trying to get the document from mini bank because offerid was null."
                 + $" Related offerid in our system: {offer.Id}");
 
-        using var stream = file.OpenReadStream();
-        var response = await _clientWithToken!
+        await using var stream = file.OpenReadStream();
+        await _clientWithToken!
             .Client
             .Request("Offer", additionalData.OfferId, "document", "upload")
             .AllowAnyHttpStatus()
@@ -281,12 +280,7 @@ public sealed class MiniBankInterface : BankInterfaceBase
                 mp.AddFile("formFile", stream, file.FileName, file.ContentType);
             });
 
-        if (response == null)
-            throw new Exception("Mini bank didn't respond");
-        else if (response!.StatusCode == 200)
-            sentInquiryStatus.Status = InquiryStatus.WaitingForAcceptance;
-        else
-            throw new Exception($"Mini bank responded with a status code {response!.StatusCode}");
+        sentInquiryStatus.Status = InquiryStatus.WaitingForAcceptance;
     }
 
     private sealed record ClientWithToken(IFlurlClient Client, BearerToken Token); 

@@ -27,7 +27,7 @@ namespace LoanComparer.Application.Services.Offers
                 : OwnershipTestResult.Unauthorized;
         }
 
-        public async Task<(Offer, SentInquiryStatus)> GetOfferWithStatusOrThrow(Guid offerId)
+        public async Task<(Offer, SentInquiryStatus)> GetOfferWithStatusOrThrowAsync(Guid offerId)
         {
             OfferEntity? offerEntity = await _context.Offers
                 .Include(offer => offer.SentInquiryStatus)

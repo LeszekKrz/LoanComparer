@@ -54,7 +54,7 @@ public abstract class BankInterfaceBase : IBankInterface
 
     public abstract Task<SentInquiryStatus> SendInquiryAsync(Inquiry inquiry);
 
-    public abstract Task<byte[]> GetDocumentContentAsync(Offer offer, SentInquiryStatus sentInquiryStatus);
+    public abstract Task<Stream> GetDocumentContentAsync(Offer offer, SentInquiryStatus sentInquiryStatus);
 
     public abstract Task ApplyForAnOfferAsync(Offer offer, SentInquiryStatus sentInquiryStatus, IFormFile file);
 }
