@@ -1,4 +1,5 @@
 ﻿using LoanComparer.Application.DTO.OfferDTO;
+using LoanComparer.Application.Exceptions;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Inquiries;
 using LoanComparer.Application.Services.Inquiries.BankInterfaces;
@@ -36,10 +37,19 @@ namespace LoanComparer.Api.Controllers
 
             var sentInquiryStatus = await _query.GetStatusWithOfferOrThrowAsync(offerId);
             var bank = GetBankInterfaceOrThrow(sentInquiryStatus.BankName);
-            var fileContent = await bank.GetDocumentContentAsync(sentInquiryStatus);
+            Stream fileStream;
+            try
+            {
+                fileStream = await bank.GetDocumentContentAsync(sentInquiryStatus);
+            }
+            catch (InquiryErrorException e)
+            {
+                await _command.UpdateStatusAsync(offerId, InquiryStatus.Error);
+                return BadRequest(e.Message);
+            }
             var fileName = "contract.txt";
             SetContentDispositionHeader(fileName);
-            return File(fileContent, "text/plain", fileName);
+            return File(fileStream, "text/plain", fileName);
         }
 
         private void SetContentDispositionHeader(string fileName)

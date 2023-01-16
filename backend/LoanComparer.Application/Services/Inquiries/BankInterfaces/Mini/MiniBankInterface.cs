@@ -1,5 +1,6 @@
 ﻿using System.Security.Authentication;
 using Flurl.Http;
+using LoanComparer.Application.Exceptions;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
@@ -251,7 +252,7 @@ public sealed class MiniBankInterface : BankInterfaceBase
 
         var additionalData = AdditionalStatusData.Deserialize(sentInquiryStatus.AdditionalData);
         if (additionalData.OfferId is null)
-            throw new InvalidOperationException("Error trying to get the document from mini bank because offerid was null."
+            throw new InquiryErrorException("Error trying to get the document from mini bank because offerid was null."
                 + $"Related offerid in our system: {sentInquiryStatus.ReceivedOffer!.Id}");
 
         return await _clientWithToken!
