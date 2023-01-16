@@ -1,9 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { JobType } from 'src/app/core/models/job-type';
 import { JobTypeDTO } from 'src/app/core/models/job-type-dto';
 import { JobTypesHttpService } from 'src/app/core/services/job.type.http.service';
+import { CreateInquiryResponse } from './models/create-inquiry-response';
+import { InquiryDTO } from './models/inquiry-dto';
+import { InquiryHttpServiceService } from './services/inquiry.http.service.service';
 
 @Component({
   selector: 'app-create-inquiry',
@@ -18,7 +23,10 @@ export class CreateInquiryComponent implements OnInit, OnDestroy {
   jobTypes: JobType[] = [];
 
   constructor(private formBuilder: FormBuilder,
-    private jobTypesHttpService: JobTypesHttpService) { }
+    private jobTypesHttpService: JobTypesHttpService,
+    private inquiryHttpService: InquiryHttpServiceService,
+    private messageService: MessageService,
+    private router: Router) { }
 
   ngOnInit(): void {
     // jesli zalogowany to pobierz dane
@@ -81,7 +89,48 @@ export class CreateInquiryComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    // to do submit a form
+    if (this.createInquiryForm.invalid) {
+      this.createInquiryForm.markAllAsTouched();
+      return;
+    }
+
+    const createInquiryDTO: InquiryDTO = {
+      loanValue: this.createInquiryForm.get('loanValue')!.value,
+      numberOfInstallments: this.createInquiryForm.get('numberOfInstallments')!.value,
+      personalDataDTO: {
+        email: this.createInquiryForm.get('email')!.value,
+        firstName: this.createInquiryForm.get('firstName')!.value,
+        lastName: this.createInquiryForm.get('lastName')!.value,
+        birthDate: null,
+      },
+      governmentIdDTO: {
+        type: this.createInquiryForm.get('governmentIdType')!.value,
+        value: this.createInquiryForm.get('governmentIdValue')!.value,
+      },
+      jobDetailsDTO: {
+        name: this.createInquiryForm.get('jobType')!.value,
+        incomeLevel: this.createInquiryForm.get('incomeLevel')!.value,
+        description: null,
+        startDate: null,
+        endDate: null,
+      },
+    };
+
+    const createInquiry$ = this.inquiryHttpService.createInquiry(createInquiryDTO).pipe(
+      tap(() => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Inquiry created'
+        })
+      }),
+    );
+
+    this.subscriptions.push(this.doWithLoading(createInquiry$).subscribe({
+      next: (createInquiryResponse: CreateInquiryResponse) => {
+        this.router.navigate(['choose-offer', {inquiryId: createInquiryResponse.inquiryId}]);
+      }
+    }));
   }
 
   isInputInvalidAndTouchedOrDirty(inputName: string): boolean {

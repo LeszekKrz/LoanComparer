@@ -12,7 +12,7 @@ public sealed class OfferCommand : IOfferCommand
     {
         _context = context;
     }
-
+    
     public async Task SaveOfferAsync(Offer offer)
     {
         _context.Add(offer.ToEntity());

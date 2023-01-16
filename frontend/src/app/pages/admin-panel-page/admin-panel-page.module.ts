@@ -8,8 +8,7 @@ import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
 import { RippleModule } from 'primeng/ripple';
-
-
+import {ConfirmPopupModule} from 'primeng/confirmpopup';
 
 @NgModule({
   declarations: [
@@ -26,7 +25,8 @@ import { RippleModule } from 'primeng/ripple';
     ButtonModule,
     DropdownModule,
     FormsModule,
-    RippleModule
+    RippleModule,
+    ConfirmPopupModule,
   ]
 })
 export class AdminPanelPageModule { }

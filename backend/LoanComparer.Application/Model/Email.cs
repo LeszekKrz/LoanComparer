@@ -7,8 +7,8 @@ public sealed record ConfirmEmailAddressEmail : Email
 {
     public ConfirmEmailAddressEmail(string recipientEmail, string? recipientName, string confirmationLink) : base(
         new[] { recipientEmail }, "[Loan Comparer] Confirm email", string.Empty,
-        $@"Dear {recipientName ?? "user"},<br>Please confirm your email: <a href=""{confirmationLink}"">Confirm email</a><br>" 
-        + "If you have not created account on Loan Comparer website please do nothing.")
+        $@"Dear {recipientName ?? "user"},<br>Please confirm your email: <a href=""{confirmationLink}"">Confirm email</a><br>
+        If you have not created account on Loan Comparer website please do nothing.")
     {
     }
 }

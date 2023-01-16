@@ -1,26 +1,30 @@
 <p-card
     [header]="offerName"
     styleClass="p-card-style shadow-7">
-    <div *ngIf="bankOffer != null; else bankOfferIsNull">
-        <div class="flex justify-content-between">
+    <div class="flex justify-content-between offer-data">
+      <div class="flex align-items-center">Status:</div>
+      <span [class]="'status-' + bankOffer.status.toLowerCase()">{{ bankOffer.status }}</span>
+    </div>
+    <div *ngIf="bankOffer.offer != null">
+        <div class="flex justify-content-between offer-data">
             <div>Loan value:</div>
-            <div>{{bankOffer.loanValue}}</div>
+            <div>{{bankOffer.offer.loanValue}}</div>
         </div>
-        <div class="flex justify-content-between">
+        <div class="flex justify-content-between offer-data">
             <div>Number Of Installments:</div>
-            <div>{{bankOffer.numberOfInstallments}}</div>
+            <div>{{bankOffer.offer.numberOfInstallments}}</div>
         </div>
-        <div class="flex justify-content-between">
+        <div class="flex justify-content-between offer-data">
             <div>Percentage:</div>
-            <div>{{bankOffer.percentage}}</div>
+            <div>{{bankOffer.offer.percentage}}</div>
         </div>
-        <div class="flex justify-content-between">
+        <div class="flex justify-content-between offer-data">
             <div>Monthly Installment:</div>
-            <div>{{bankOffer.monthlyInstallment}}</div>
+            <div>{{bankOffer.offer.monthlyInstallment}}</div>
         </div>
-        <p-button type="download" styleClass="p-button-style" label="Download contract" icon="pi pi-download" (onClick)="downloadContract()"></p-button>
-        <p-button *ngIf="!bankOffer.selected; else requestOffer" type="select" styleClass="p-button-style" label="Select Offer" (onClick)="selectOffer()"></p-button>
-        <ng-template #requestOffer>
+        <div *ngIf="bankOffer.status == 'OFFERRECEIVED'">
+          <p-button type="download" styleClass="p-button-style" label="Download contract" icon="pi pi-download" (onClick)="downloadContract()"></p-button>
+          <div *ngIf="bankOffer.contractDownloaded">
             <p-fileUpload
                 #fileUpload
                 name="signedContract[]"
@@ -52,14 +56,12 @@
                 <ng-template pTemplate="file" let-file>
                     <div class="flex justify-content-evenly flex align-items-center flex-wrap">
                         {{file.name}}
-                        <button pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="onRemoveFileHandler()"></button>
+                        <button pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="onRemoveFileHandler()" styleClass="p-button-remove"></button>
                     </div>
                 </ng-template>
             </p-fileUpload>
             <p-button type="request" styleClass="p-button-style" label="Request Offer" (onClick)="requestOfferOnClickHandeler()"></p-button>
-        </ng-template>
+          </div>
+        </div>
     </div>
-    <ng-template #bankOfferIsNull>
-        <div class="flex justify-content-center font-bold" style="margin-top: 20px">Offer Not Posted Yet</div>
-    </ng-template>
 </p-card>

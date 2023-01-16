@@ -253,6 +253,29 @@ namespace LoanComparer.Application.Migrations
                     b.ToTable("Offers");
                 });
 
+            modelBuilder.Entity("LoanComparer.Application.Model.OfferEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("LoanValueAsSmallestNominal")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("MonthlyInstallmentAsSmallestNominal")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("NumberOfInstallments")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Percentage")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Offers");
+                });
+
             modelBuilder.Entity("LoanComparer.Application.Model.Role", b =>
                 {
                     b.Property<string>("Id")
@@ -322,9 +345,7 @@ namespace LoanComparer.Application.Migrations
 
                     b.HasIndex("InquiryId");
 
-                    b.HasIndex("OfferId")
-                        .IsUnique()
-                        .HasFilter("[OfferId] IS NOT NULL");
+                    b.HasIndex("OfferId");
 
                     b.ToTable("InquiryStatuses");
                 });

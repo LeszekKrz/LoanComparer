@@ -244,7 +244,7 @@ public sealed class MiniBankInterface : BankInterfaceBase
             }.Serialize()
         };
     }
-
+    
     public override async Task<byte[]> GetDocumentContentAsync(Offer offer, SentInquiryStatus sentInquiryStatus)
     {
         if (!await EnsureClientIsValidAsync())

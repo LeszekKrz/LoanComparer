@@ -14,7 +14,7 @@ public sealed class Offer
     public double Percentage { get; init; }
     
     public decimal MonthlyInstallment { get; init; }
-
+    
     public string DocumentLink { get; init; } = null!;
     
     public OfferEntity ToEntity()
