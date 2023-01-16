@@ -244,7 +244,7 @@ public sealed class MiniBankInterface : BankInterfaceBase
         };
     }
     
-    public override async Task<Stream> GetDocumentContentAsync(Offer offer, SentInquiryStatus sentInquiryStatus)
+    public override async Task<Stream> GetDocumentContentAsync(SentInquiryStatus sentInquiryStatus)
     {
         if (!await EnsureClientIsValidAsync())
             throw new InvalidCredentialException("An error has occured while trying to get mini bank interface credentials");
@@ -252,15 +252,15 @@ public sealed class MiniBankInterface : BankInterfaceBase
         var additionalData = AdditionalStatusData.Deserialize(sentInquiryStatus.AdditionalData);
         if (additionalData.OfferId is null)
             throw new InvalidOperationException("Error trying to get the document from mini bank because offerid was null."
-                + $"Related offerid in our system: {offer.Id}");
+                + $"Related offerid in our system: {sentInquiryStatus.ReceivedOffer!.Id}");
 
         return await _clientWithToken!
             .Client
-            .Request("Offer", additionalData.OfferId, "document", offer.DocumentLink.Split('/')[^1])
+            .Request("Offer", additionalData.OfferId, "document", sentInquiryStatus.ReceivedOffer!.DocumentLink.Split('/')[^1])
             .GetStreamAsync();
     }
 
-    public override async Task ApplyForAnOfferAsync(Offer offer, SentInquiryStatus sentInquiryStatus, IFormFile file)
+    public override async Task ApplyForAnOfferAsync(SentInquiryStatus sentInquiryStatus, IFormFile file)
     {
         if (!await EnsureClientIsValidAsync())
             throw new InvalidCredentialException("An error has occured while trying to get mini bank interface credentials");
@@ -268,13 +268,12 @@ public sealed class MiniBankInterface : BankInterfaceBase
         var additionalData = AdditionalStatusData.Deserialize(sentInquiryStatus.AdditionalData);
         if (additionalData.OfferId is null)
             throw new InvalidOperationException("Error trying to get the document from mini bank because offerid was null."
-                + $" Related offerid in our system: {offer.Id}");
+                + $" Related offerid in our system: {sentInquiryStatus.ReceivedOffer!.Id}");
 
         await using var stream = file.OpenReadStream();
         await _clientWithToken!
             .Client
             .Request("Offer", additionalData.OfferId, "document", "upload")
-            .AllowAnyHttpStatus()
             .PostMultipartAsync(mp =>
             {
                 mp.AddFile("formFile", stream, file.FileName, file.ContentType);

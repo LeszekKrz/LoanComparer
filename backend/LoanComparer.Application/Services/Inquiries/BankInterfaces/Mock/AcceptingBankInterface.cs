@@ -47,12 +47,12 @@ public sealed class AcceptingBankInterface : BankInterfaceBase
         });
     }
 
-    public override Task<Stream> GetDocumentContentAsync(Offer offer, SentInquiryStatus sentInquiryStatus)
+    public override Task<Stream> GetDocumentContentAsync(SentInquiryStatus sentInquiryStatus)
     {
         return Task.FromResult(Stream.Null);
     }
 
-    public override Task ApplyForAnOfferAsync(Offer offer, SentInquiryStatus sentInquiryStatus, IFormFile file)
+    public override Task ApplyForAnOfferAsync(SentInquiryStatus sentInquiryStatus, IFormFile file)
     {
         return Task.CompletedTask;
     }

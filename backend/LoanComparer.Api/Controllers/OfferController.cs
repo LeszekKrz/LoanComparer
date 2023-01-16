@@ -34,9 +34,9 @@ namespace LoanComparer.Api.Controllers
             if (checkResult == OwnershipTestResult.Unauthorized)
                 return Unauthorized();
 
-            var (offer, sentInquiryStatus) = await _query.GetOfferWithStatusOrThrowAsync(offerId);
+            var sentInquiryStatus = await _query.GetStatusWithOfferOrThrowAsync(offerId);
             var bank = GetBankInterfaceOrThrow(sentInquiryStatus.BankName);
-            var fileContent = await bank.GetDocumentContentAsync(offer, sentInquiryStatus);
+            var fileContent = await bank.GetDocumentContentAsync(sentInquiryStatus);
             var fileName = "contract.txt";
             SetContentDispositionHeader(fileName);
             return File(fileContent, "text/plain", fileName);
@@ -60,12 +60,12 @@ namespace LoanComparer.Api.Controllers
                 return BadRequest();
             if (checkResult == OwnershipTestResult.Unauthorized)
                 return Unauthorized();
-            var (offer, sentInquiryStatus) = await _query.GetOfferWithStatusOrThrowAsync(offerId);
+            var sentInquiryStatus = await _query.GetStatusWithOfferOrThrowAsync(offerId);
             if (sentInquiryStatus.Status != InquiryStatus.OfferReceived)
                 return BadRequest($"Tried to apply for an offer which status was {sentInquiryStatus.Status}."
                     + $"You can only apply for offers with status {InquiryStatus.OfferReceived}.");
             var bank = GetBankInterfaceOrThrow(sentInquiryStatus.BankName);
-            await bank.ApplyForAnOfferAsync(offer, sentInquiryStatus, formFile);
+            await bank.ApplyForAnOfferAsync(sentInquiryStatus, formFile);
             await _command.UpdateStatusAndAddSignedContractAsync(offerId, sentInquiryStatus.Status, formFile);
             return ApplyForAnOfferResponse.FromInquiryStatus(sentInquiryStatus.Status);
         }
