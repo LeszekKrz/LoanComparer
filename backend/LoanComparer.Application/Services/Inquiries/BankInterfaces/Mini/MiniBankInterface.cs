@@ -260,15 +260,14 @@ public sealed class MiniBankInterface : BankInterfaceBase
             .GetStreamAsync();
     }
 
-    public override async Task ApplyForAnOfferAsync(SentInquiryStatus sentInquiryStatus, IFormFile file)
+    public override async Task<InquiryStatus> ApplyForAnOfferAsync(SentInquiryStatus sentInquiryStatus, IFormFile file)
     {
         if (!await EnsureClientIsValidAsync())
             throw new InvalidCredentialException("An error has occured while trying to get mini bank interface credentials");
 
         var additionalData = AdditionalStatusData.Deserialize(sentInquiryStatus.AdditionalData);
         if (additionalData.OfferId is null)
-            throw new InvalidOperationException("Error trying to get the document from mini bank because offerid was null."
-                + $" Related offerid in our system: {sentInquiryStatus.ReceivedOffer!.Id}");
+            return InquiryStatus.Error;
 
         await using var stream = file.OpenReadStream();
         await _clientWithToken!
@@ -279,7 +278,7 @@ public sealed class MiniBankInterface : BankInterfaceBase
                 mp.AddFile("formFile", stream, file.FileName, file.ContentType);
             });
 
-        sentInquiryStatus.Status = InquiryStatus.WaitingForAcceptance;
+        return InquiryStatus.WaitingForAcceptance;
     }
 
     private sealed record ClientWithToken(IFlurlClient Client, BearerToken Token); 

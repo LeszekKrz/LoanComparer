@@ -34,6 +34,13 @@ public sealed class OfferCommand : IOfferCommand
         return memoryStream.ToArray();
     }
 
+    public async Task UpdateStatusAsync(Guid offerId, InquiryStatus inquiryStatus)
+    {
+        OfferEntity offerEntity = await GetOfferEntityWithStatusOrThrow(offerId);
+        offerEntity.SentInquiryStatus.Status = inquiryStatus;
+        await _context.SaveChangesAsync();
+    }
+
     private async Task<OfferEntity> GetOfferEntityWithStatusOrThrow(Guid offerId)
     {
         OfferEntity? entity = await _context.Offers

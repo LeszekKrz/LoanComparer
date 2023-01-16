@@ -65,9 +65,12 @@ namespace LoanComparer.Api.Controllers
                 return BadRequest($"Tried to apply for an offer which status was {sentInquiryStatus.Status}."
                     + $"You can only apply for offers with status {InquiryStatus.OfferReceived}.");
             var bank = GetBankInterfaceOrThrow(sentInquiryStatus.BankName);
-            await bank.ApplyForAnOfferAsync(sentInquiryStatus, formFile);
-            await _command.UpdateStatusAndAddSignedContractAsync(offerId, sentInquiryStatus.Status, formFile);
-            return ApplyForAnOfferResponse.FromInquiryStatus(sentInquiryStatus.Status);
+            var newInquiryStatus = await bank.ApplyForAnOfferAsync(sentInquiryStatus, formFile);
+            if (newInquiryStatus == InquiryStatus.WaitingForAcceptance)
+                await _command.UpdateStatusAndAddSignedContractAsync(offerId, newInquiryStatus, formFile);
+            else
+                await _command.UpdateStatusAsync(offerId, newInquiryStatus);
+            return ApplyForAnOfferResponse.FromInquiryStatus(newInquiryStatus);
         }
 
         private string? GetUsername()

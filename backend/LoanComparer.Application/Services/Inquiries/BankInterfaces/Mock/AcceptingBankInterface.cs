@@ -52,8 +52,8 @@ public sealed class AcceptingBankInterface : BankInterfaceBase
         return Task.FromResult(Stream.Null);
     }
 
-    public override Task ApplyForAnOfferAsync(SentInquiryStatus sentInquiryStatus, IFormFile file)
+    public override Task<InquiryStatus> ApplyForAnOfferAsync(SentInquiryStatus sentInquiryStatus, IFormFile file)
     {
-        return Task.CompletedTask;
+        return Task.FromResult(InquiryStatus.WaitingForAcceptance);
     }
 }
