@@ -1,16 +1,10 @@
-﻿using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Mime;
-using System.Security.Authentication;
-using System.Text;
+﻿using System.Security.Authentication;
 using Flurl.Http;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SendGrid;
 
 namespace LoanComparer.Application.Services.Inquiries.BankInterfaces.Mini;
 
@@ -18,7 +12,6 @@ public sealed class MiniBankInterface : BankInterfaceBase
 {
     private readonly IOptionsSnapshot<MiniBankConfiguration> _config;
     private ClientWithToken? _clientWithToken;
-    private HttpClientWithToken? _httpClientWithToken;
     
     public override string BankName => "MiNI Bank";
 
@@ -196,25 +189,6 @@ public sealed class MiniBankInterface : BankInterfaceBase
         _clientWithToken = new(new FlurlClient(_config.Value.BaseUrl).WithOAuthBearerToken(token.Value), token);
         return true;
     }
-
-    private async Task<bool> EnsureHttpClientIsValidAsync()
-    {
-        if (_httpClientWithToken?.Token.IsValid ?? false) return true;
-
-        var token = await GetTokenAsync();
-        if (token is null)
-        {
-            _httpClientWithToken = null;
-            return false;
-        }
-
-        HttpClient httpClient = new();
-        httpClient.BaseAddress = new Uri(_config.Value.BaseUrl + '/');
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Value);
-        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        _httpClientWithToken = new(httpClient, token);
-        return true;    
-    }
     
     private async Task<BearerToken?> GetTokenAsync()
     {
@@ -289,25 +263,6 @@ public sealed class MiniBankInterface : BankInterfaceBase
 
     public override async Task<InquiryStatus> ApplyForAnOfferAsync(OfferEntity offerEntity, IFormFile file)
     {
-        //if (!await EnsureHttpClientIsValidAsync())
-        //    throw new InvalidCredentialException("An error has occured while trying to get mini bank interface credentials");
-
-        //var additionalData = AdditionalStatusData.Deserialize(offerEntity.SentInquiryStatus.AdditionalData);
-        //if (additionalData.OfferId is null)
-        //    throw new InvalidOperationException($@"Error trying to get the document from mini bank because offerid was null.
-        //                                        Related offerid in our system: {offerEntity.Id}");
-
-        //byte[] fileContent = await GetBytes(file);
-        //ByteArrayContent byteArrayContent = new(fileContent);
-        //using MultipartFormDataContent multipartFormDataContent = new();
-        //multipartFormDataContent.Add(byteArrayContent, "txtFile", file.FileName);
-        //var response = await _httpClientWithToken!.Client.PostAsync($"Offer/{additionalData.OfferId}/document/upload", multipartFormDataContent);
-
-        //if (response is null || response.StatusCode != HttpStatusCode.OK)
-        //    throw new Exception("ale lipa");
-
-        //return InquiryStatus.WaitingForAcceptance;
-
         if (!await EnsureClientIsValidAsync())
             throw new InvalidCredentialException("An error has occured while trying to get mini bank interface credentials");
 
@@ -316,38 +271,13 @@ public sealed class MiniBankInterface : BankInterfaceBase
             throw new InvalidOperationException($@"Error trying to get the document from mini bank because offerid was null.
                                                 Related offerid in our system: {offerEntity.Id}");
 
-        //var applyRequest = ConvertFormFileToApplyRequest(file);
-
-        byte[] fileContent = await GetBytes(file);
-        string test = Encoding.ASCII.GetString(fileContent);
-
-        ContentDisposition contentDisposition = new()
-        {
-            FileName = file.FileName,
-        };
-
-        //string s = $"form-data; name\"formFile\"; filename=\"{file.FileName}\"";
-
-        try
-        {
             using var stream = file.OpenReadStream();
-            //stream.
             var response = await _clientWithToken!
                     .Client
                     .Request("Offer", additionalData.OfferId, "document", "upload")
                     .AllowAnyHttpStatus()
-                    //.WithHeader("Content-Type", "multipart/form-data")
-                    //.WithHeader("Content-Disposition", $"form-data; name=\"formFile\"; filename=\"{file.FileName}\"")
-                    .WithHeader("Accept", "*/*")
-                    //.PostAsync(file);
-                    //.PostAsync(new ByteArrayContent(fileContent));
                     .PostMultipartAsync(mp =>
                     {
-                        //mp.Headers.Add("Content-Disposition", $"form-data; name=\"formFile\"; filename=\"{file.FileName}\"");
-                        //mp.Add(new StreamContent(stream));
-                        //mp.Add(new ByteArrayContent(fileContent));
-                        //mp.Add(new ByteArrayContent(fileContent), "file", file.FileName);
-                        
                         mp.AddFile("formFile", stream, file.FileName, file.ContentType);
                     });
 
@@ -357,29 +287,7 @@ public sealed class MiniBankInterface : BankInterfaceBase
                 return InquiryStatus.WaitingForAcceptance;
             else
                 throw new Exception($"Mini bank responded with a status code {response!.StatusCode}");
-        }
-        catch (Exception e)
-        {
-            throw;
-        }
     }
-
-    private async Task<byte[]> GetBytes(IFormFile file)
-    {
-        using MemoryStream memoryStream = new();
-        await file.CopyToAsync(memoryStream);
-        return memoryStream.ToArray();
-    }
-
-    private MiniBankApplyForAnOfferRequest ConvertFormFileToApplyRequest(IFormFile formFile)
-    {
-        return new()
-        {
-            FormFile = formFile,
-        };
-    }
-
-    private sealed record HttpClientWithToken(HttpClient Client, BearerToken Token);
 
     private sealed record ClientWithToken(IFlurlClient Client, BearerToken Token); 
     
@@ -511,11 +419,6 @@ public sealed class MiniBankInterface : BankInterfaceBase
         public string? ApprovedBy { get; init; }
         public string DocumentLink { get; init; } = null!;
         public DateTime? DocumentLinkValidDate { get; init; }
-    }
-
-    private sealed class MiniBankApplyForAnOfferRequest
-    {
-        public IFormFile FormFile { get; init; } = null!;
     }
     #endregion
 }
