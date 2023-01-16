@@ -47,12 +47,12 @@ public sealed class AcceptingBankInterface : BankInterfaceBase
         });
     }
 
-    public override Task<byte[]> GetDocumentContentAsync(OfferEntity offerEntity)
+    public override Task<byte[]> GetDocumentContentAsync(Offer offer, SentInquiryStatus sentInquiryStatus)
     {
         throw new NotImplementedException();
     }
 
-    public override Task<InquiryStatus> ApplyForAnOfferAsync(OfferEntity offerEntity, IFormFile file)
+    public override Task ApplyForAnOfferAsync(Offer offer, SentInquiryStatus sentInquiryStatus, IFormFile file)
     {
         throw new NotImplementedException();
     }

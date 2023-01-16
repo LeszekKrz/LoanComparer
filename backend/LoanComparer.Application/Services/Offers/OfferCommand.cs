@@ -1,4 +1,5 @@
 ﻿using LoanComparer.Application.Model;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace LoanComparer.Application.Services.Offers;
@@ -18,10 +19,11 @@ public sealed class OfferCommand : IOfferCommand
         await _context.SaveChangesAsync();
     }
 
-    public async Task SetStatusOfAnOfferAsync(Guid offerId, InquiryStatus inquiryStatus)
+    public async Task UpdateStatusAndAddSignedContractAsync(Guid offerId, InquiryStatus inquiryStatus, IFormFile formFile)
     {
         OfferEntity entity = await GetOfferEntityWithStatusOrThrow(offerId);
         entity.SentInquiryStatus.Status = inquiryStatus;
+        // Add file here
         await _context.SaveChangesAsync();
     }
 

@@ -11,7 +11,7 @@ public sealed class SentInquiryStatus
 
     public string BankName { get; init; } = null!;
 
-    public InquiryStatus Status { get; init; }
+    public InquiryStatus Status { get; set; }
 
     public Offer? ReceivedOffer { get; init; }
     

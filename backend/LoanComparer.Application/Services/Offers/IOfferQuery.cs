@@ -7,6 +7,6 @@ namespace LoanComparer.Application.Services.Offers
     {
         public Task<OwnershipTestResult> CheckOwnerAsync(Guid offerId, string? username);
 
-        public Task<OfferEntity> GetOfferEntityWithStatusOrThrow(Guid offerId);
+        public Task<(Offer, SentInquiryStatus)> GetOfferWithStatusOrThrow(Guid offerId);
     }
 }

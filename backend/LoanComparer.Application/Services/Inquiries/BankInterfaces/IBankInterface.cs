@@ -18,7 +18,7 @@ public interface IBankInterface
     
     Task<SentInquiryStatus> SendInquiryAsync(Inquiry inquiry);
 
-    Task<byte[]> GetDocumentContentAsync(OfferEntity offerEntity);
+    Task<byte[]> GetDocumentContentAsync(Offer offer, SentInquiryStatus sentInquiryStatus);
 
-    Task<InquiryStatus> ApplyForAnOfferAsync(OfferEntity offerEntity, IFormFile file);
+    Task ApplyForAnOfferAsync(Offer offerEntity, SentInquiryStatus sentInquiryStatus, IFormFile file);
 }

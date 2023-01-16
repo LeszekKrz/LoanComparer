@@ -245,48 +245,48 @@ public sealed class MiniBankInterface : BankInterfaceBase
         };
     }
 
-    public override async Task<byte[]> GetDocumentContentAsync(OfferEntity offerEntity)
+    public override async Task<byte[]> GetDocumentContentAsync(Offer offer, SentInquiryStatus sentInquiryStatus)
     {
         if (!await EnsureClientIsValidAsync())
             throw new InvalidCredentialException("An error has occured while trying to get mini bank interface credentials");
 
-        var additionalData = AdditionalStatusData.Deserialize(offerEntity.SentInquiryStatus.AdditionalData);
+        var additionalData = AdditionalStatusData.Deserialize(sentInquiryStatus.AdditionalData);
         if (additionalData.OfferId is null)
-            throw new InvalidOperationException($@"Error trying to get the document from mini bank because offerid was null.
-                                                Related offerid in our system: {offerEntity.Id}");
+            throw new InvalidOperationException("Error trying to get the document from mini bank because offerid was null."
+                + $"Related offerid in our system: {offer.Id}");
 
         return await _clientWithToken!
             .Client
-            .Request("Offer", additionalData.OfferId, "document", offerEntity.DocumentLink.Split('/')[^1])
+            .Request("Offer", additionalData.OfferId, "document", offer.DocumentLink.Split('/')[^1])
             .GetBytesAsync();
     }
 
-    public override async Task<InquiryStatus> ApplyForAnOfferAsync(OfferEntity offerEntity, IFormFile file)
+    public override async Task ApplyForAnOfferAsync(Offer offer, SentInquiryStatus sentInquiryStatus, IFormFile file)
     {
         if (!await EnsureClientIsValidAsync())
             throw new InvalidCredentialException("An error has occured while trying to get mini bank interface credentials");
 
-        var additionalData = AdditionalStatusData.Deserialize(offerEntity.SentInquiryStatus.AdditionalData);
+        var additionalData = AdditionalStatusData.Deserialize(sentInquiryStatus.AdditionalData);
         if (additionalData.OfferId is null)
-            throw new InvalidOperationException($@"Error trying to get the document from mini bank because offerid was null.
-                                                Related offerid in our system: {offerEntity.Id}");
+            throw new InvalidOperationException("Error trying to get the document from mini bank because offerid was null."
+                + $" Related offerid in our system: {offer.Id}");
 
-            using var stream = file.OpenReadStream();
-            var response = await _clientWithToken!
-                    .Client
-                    .Request("Offer", additionalData.OfferId, "document", "upload")
-                    .AllowAnyHttpStatus()
-                    .PostMultipartAsync(mp =>
-                    {
-                        mp.AddFile("formFile", stream, file.FileName, file.ContentType);
-                    });
+        using var stream = file.OpenReadStream();
+        var response = await _clientWithToken!
+            .Client
+            .Request("Offer", additionalData.OfferId, "document", "upload")
+            .AllowAnyHttpStatus()
+            .PostMultipartAsync(mp =>
+            {
+                mp.AddFile("formFile", stream, file.FileName, file.ContentType);
+            });
 
-            if (response == null)
-                throw new Exception("Mini bank didn't respond");
-            else if (response!.StatusCode == 200)
-                return InquiryStatus.WaitingForAcceptance;
-            else
-                throw new Exception($"Mini bank responded with a status code {response!.StatusCode}");
+        if (response == null)
+            throw new Exception("Mini bank didn't respond");
+        else if (response!.StatusCode == 200)
+            sentInquiryStatus.Status = InquiryStatus.WaitingForAcceptance;
+        else
+            throw new Exception($"Mini bank responded with a status code {response!.StatusCode}");
     }
 
     private sealed record ClientWithToken(IFlurlClient Client, BearerToken Token); 

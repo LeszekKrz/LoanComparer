@@ -7,5 +7,5 @@ public interface IOfferCommand
 {
     Task SaveOfferAsync(Offer offer);
 
-    Task SetStatusOfAnOfferAsync(Guid offerId, InquiryStatus inquiryStatus);
+    Task UpdateStatusAndAddSignedContractAsync(Guid offerId, InquiryStatus inquiryStatus, IFormFile formFile);
 }

@@ -27,14 +27,14 @@ namespace LoanComparer.Application.Services.Offers
                 : OwnershipTestResult.Unauthorized;
         }
 
-        public async Task<OfferEntity> GetOfferEntityWithStatusOrThrow(Guid offerId)
+        public async Task<(Offer, SentInquiryStatus)> GetOfferWithStatusOrThrow(Guid offerId)
         {
-            OfferEntity? entity = await _context.Offers
+            OfferEntity? offerEntity = await _context.Offers
                 .Include(offer => offer.SentInquiryStatus)
                 .SingleOrDefaultAsync(offer => offer.Id == offerId);
-            if (entity is null)
+            if (offerEntity is null)
                 throw new InvalidOperationException($"There is no offer with id {offerId}");
-            return entity;
+            return (Offer.FromEntity(offerEntity), SentInquiryStatus.FromEntity(offerEntity.SentInquiryStatus));
         }
     }
 }

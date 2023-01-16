@@ -36,9 +36,9 @@ namespace LoanComparer.Api.Controllers
             if (checkResult == OwnershipTestResult.Unauthorized)
                 return Unauthorized();
 
-            OfferEntity offerEntity = await _query.GetOfferEntityWithStatusOrThrow(offerId);
-            var bank = GetBankInterfaceOrThrow(offerEntity.SentInquiryStatus.BankName);
-            byte[] fileContent = await bank.GetDocumentContentAsync(offerEntity);
+            (var offer, var sentInquiryStatus) = await _query.GetOfferWithStatusOrThrow(offerId);
+            var bank = GetBankInterfaceOrThrow(sentInquiryStatus.BankName);
+            byte[] fileContent = await bank.GetDocumentContentAsync(offer, sentInquiryStatus);
             var fileName = "contract.txt";
             SetContentDispositionHeader(fileName);
             return File(fileContent, "text/plain", fileName);
@@ -62,11 +62,14 @@ namespace LoanComparer.Api.Controllers
                 return BadRequest();
             if (checkResult == OwnershipTestResult.Unauthorized)
                 return Unauthorized();
-            OfferEntity offerEntity = await _query.GetOfferEntityWithStatusOrThrow(offerId);
-            var bank = GetBankInterfaceOrThrow(offerEntity.SentInquiryStatus.BankName);
-            InquiryStatus updatedStatus = await bank.ApplyForAnOfferAsync(offerEntity, formFile);
-            await _command.SetStatusOfAnOfferAsync(offerId, updatedStatus);
-            return ApplyForAnOfferResponse.FromInquiryStatus(updatedStatus);
+            (var offer, var sentInquiryStatus) = await _query.GetOfferWithStatusOrThrow(offerId);
+            if (sentInquiryStatus.Status != InquiryStatus.OfferReceived)
+                return BadRequest($"Tried to apply for an offer which status was {sentInquiryStatus.Status}."
+                    + $"You can only apply for offers with status {InquiryStatus.OfferReceived}.");
+            var bank = GetBankInterfaceOrThrow(sentInquiryStatus.BankName);
+            await bank.ApplyForAnOfferAsync(offer, sentInquiryStatus, formFile);
+            await _command.UpdateStatusAndAddSignedContractAsync(offerId, sentInquiryStatus.Status, formFile);
+            return ApplyForAnOfferResponse.FromInquiryStatus(sentInquiryStatus.Status);
         }
 
         private string? GetUsername()
