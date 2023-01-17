@@ -14,9 +14,9 @@ defaults:
     working-directory: backend
 
 jobs:
+  
   build:
     runs-on: windows-latest
-
     steps:
       - uses: actions/checkout@v2
 
@@ -27,9 +27,13 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
+        env:
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
         run: dotnet build --configuration Release
 
       - name: dotnet publish
+        env:
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
