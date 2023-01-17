@@ -118,6 +118,16 @@ namespace LoanComparer.Api.Tests.IntegrationTests
                         Status = InquiryStatus.Pending
                     });
                 }
+
+                public Task<Stream> GetDocumentContentAsync(SentInquiryStatus sentInquiryStatus)
+                {
+                    return Task.FromResult(Stream.Null);
+                }
+
+                public Task<InquiryStatus> ApplyForAnOfferAsync(SentInquiryStatus sentInquiryStatus, IFormFile file)
+                {
+                    return Task.FromResult(InquiryStatus.WaitingForAcceptance);
+                }
             }
         }
     }

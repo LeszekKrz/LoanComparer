@@ -162,7 +162,8 @@ public sealed class InquiriesControllerTests
                 LoanValue = inquiry.AmountRequested,
                 NumberOfInstallments = inquiry.NumberOfInstallments,
                 MonthlyInstallment = inquiry.AmountRequested / 2,
-                Percentage = 50
+                Percentage = 50,
+                DocumentLink = "https://testoffer",
             }.ToEntity();
             context.Inquiries.Add(inquiryEntity);
             context.Offers.Add(offerEntity);

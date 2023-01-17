@@ -45,7 +45,7 @@ namespace LoanComparer.Api.Controllers
             catch (InquiryErrorException e)
             {
                 await _command.UpdateStatusAsync(offerId, InquiryStatus.Error);
-                return BadRequest(e.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
             var fileName = "contract.txt";
             SetContentDispositionHeader(fileName);
