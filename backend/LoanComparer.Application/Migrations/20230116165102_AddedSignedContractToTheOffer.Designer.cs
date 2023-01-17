@@ -4,6 +4,7 @@ using LoanComparer.Application;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoanComparer.Application.Migrations
 {
     [DbContext(typeof(LoanComparerContext))]
-    partial class LoanComparerContextModelSnapshot : ModelSnapshot
+    [Migration("20230116165102_AddedSignedContractToTheOffer")]
+    partial class AddedSignedContractToTheOffer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -248,6 +250,9 @@ namespace LoanComparer.Application.Migrations
                     b.Property<byte[]>("SignedContractContent")
                         .HasColumnType("varbinary(max)");
 
+                    b.Property<string>("SignedContractName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Offers");
@@ -282,15 +287,15 @@ namespace LoanComparer.Application.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "e871e297-8a60-460b-ba0e-8213e11066d1",
-                            ConcurrencyStamp = "32bb333b-a59f-4346-8233-2ea84dff7448",
+                            Id = "a61c6a0c-8b79-4794-b269-c32e363cf3b2",
+                            ConcurrencyStamp = "cdf334c2-9701-4241-80e4-ed05c3128873",
                             Name = "Client",
                             NormalizedName = "CLIENT"
                         },
                         new
                         {
-                            Id = "d7dacdc8-6ea9-4138-9ca6-0eb1163e26a2",
-                            ConcurrencyStamp = "d61af7af-4a86-4e31-be7e-c354de8136af",
+                            Id = "a6a1773f-fc37-4f96-8090-3bf82a113202",
+                            ConcurrencyStamp = "3746ab41-7daa-4134-abf3-399f5856cc9b",
                             Name = "BankEmployee",
                             NormalizedName = "BANKEMPLOYEE"
                         });

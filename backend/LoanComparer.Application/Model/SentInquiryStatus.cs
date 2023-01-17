@@ -39,8 +39,10 @@ public sealed class SentInquiryStatus
             Status = Status switch
             {
                 InquiryStatus.Pending => "PENDING",
-                InquiryStatus.Accepted => "OFFERRECEIVED",
+                InquiryStatus.OfferReceived => "OFFERRECEIVED",
                 InquiryStatus.Rejected => "REJECTED",
+                InquiryStatus.Accepted => "ACCEPTED",
+                InquiryStatus.WaitingForAcceptance => "WAITINGFORACCEPTANCE",
                 InquiryStatus.Timeout => "TIMEOUT",
                 InquiryStatus.Error => "ERROR",
                 _ => throw new ArgumentOutOfRangeException()
@@ -84,12 +86,14 @@ public sealed class SentInquiryStatusEntity
     
     public Guid? OfferId { get; set; }
     
-    public string? AdditionalData { get; init; }
+    public string? AdditionalData { get; set; }
 }
 
 public enum InquiryStatus
 {
     Pending,
+    OfferReceived,
+    WaitingForAcceptance,
     Accepted,
     Rejected,
     Timeout,

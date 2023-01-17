@@ -1,5 +1,6 @@
 ﻿using System.Security.Authentication;
 using Flurl.Http;
+using LoanComparer.Application.Exceptions;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
@@ -225,20 +226,62 @@ public sealed class MiniBankInterface : BankInterfaceBase
             LoanValue = (decimal)response.RequestedValue,
             MonthlyInstallment = (decimal)response.MonthlyInstallment,
             NumberOfInstallments = response.RequestedPeriodInMonth,
-            Percentage = response.Percentage
+            Percentage = response.Percentage,
+            DocumentLink = response.DocumentLink,
         };
 
-        // TODO: Save document link (and valid date) somewhere
         return new()
         {
             Id = status.Id,
             BankName = status.BankName,
             Inquiry = status.Inquiry,
             ReceivedOffer = offer,
-            Status = InquiryStatus.Accepted
+            Status = InquiryStatus.OfferReceived,
+            AdditionalData = new AdditionalStatusData
+            {
+                InquireId = response.InquireId,
+                OfferId = offerId,
+            }.Serialize()
         };
     }
     
+    public override async Task<Stream> GetDocumentContentAsync(SentInquiryStatus sentInquiryStatus)
+    {
+        if (!await EnsureClientIsValidAsync())
+            throw new InvalidCredentialException("An error has occured while trying to get mini bank interface credentials");
+
+        var additionalData = AdditionalStatusData.Deserialize(sentInquiryStatus.AdditionalData);
+        if (additionalData.OfferId is null)
+            throw new InquiryErrorException("Error trying to get the document from mini bank because offerid was null."
+                + $"Related offerid in our system: {sentInquiryStatus.ReceivedOffer!.Id}");
+
+        return await _clientWithToken!
+            .Client
+            .Request("Offer", additionalData.OfferId, "document", sentInquiryStatus.ReceivedOffer!.DocumentLink.Split('/')[^1])
+            .GetStreamAsync();
+    }
+
+    public override async Task<InquiryStatus> ApplyForAnOfferAsync(SentInquiryStatus sentInquiryStatus, IFormFile file)
+    {
+        if (!await EnsureClientIsValidAsync())
+            throw new InvalidCredentialException("An error has occured while trying to get mini bank interface credentials");
+
+        var additionalData = AdditionalStatusData.Deserialize(sentInquiryStatus.AdditionalData);
+        if (additionalData.OfferId is null)
+            return InquiryStatus.Error;
+
+        await using var stream = file.OpenReadStream();
+        await _clientWithToken!
+            .Client
+            .Request("Offer", additionalData.OfferId, "document", "upload")
+            .PostMultipartAsync(mp =>
+            {
+                mp.AddFile("formFile", stream, file.FileName, file.ContentType);
+            });
+
+        return InquiryStatus.WaitingForAcceptance;
+    }
+
     private sealed record ClientWithToken(IFlurlClient Client, BearerToken Token); 
     
     private sealed record BearerToken(string Value)
@@ -368,7 +411,7 @@ public sealed class MiniBankInterface : BankInterfaceBase
         public DateTime UpdateDate { get; init; }
         public string? ApprovedBy { get; init; }
         public string DocumentLink { get; init; } = null!;
-        public DateTime DocumentLinkValidDate { get; init; }
+        public DateTime? DocumentLinkValidDate { get; init; }
     }
     #endregion
 }

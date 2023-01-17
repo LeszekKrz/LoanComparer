@@ -1,5 +1,6 @@
 ﻿using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
+using Microsoft.AspNetCore.Http;
 
 namespace LoanComparer.Application.Services.Inquiries.BankInterfaces.Mock;
 
@@ -35,5 +36,15 @@ public sealed class RejectingBankInterface : BankInterfaceBase
             ReceivedOffer = null,
             Status = InquiryStatus.Pending
         });
+    }
+
+    public override Task<Stream> GetDocumentContentAsync(SentInquiryStatus sentInquiryStatus)
+    {
+        return Task.FromResult(Stream.Null);
+    }
+
+    public override Task<InquiryStatus> ApplyForAnOfferAsync(SentInquiryStatus sentInquiryStatus, IFormFile file)
+    {
+        return Task.FromResult(InquiryStatus.WaitingForAcceptance);
     }
 }
