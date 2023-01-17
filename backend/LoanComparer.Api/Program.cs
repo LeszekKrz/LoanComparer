@@ -145,22 +145,26 @@ void ConfigureJwt(IServiceCollection services, IConfiguration config)
     var jwtSettings = new JwtSettings(config.GetSection("JWTSettings"));
     services.AddSingleton(jwtSettings);
 
+    string googleAuthenticationClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID") ??
+        throw new InvalidCredentialException("Environment variable GOOGLE_CLIENT_ID is not defined");
+    services.AddSingleton(new GoogleAuthenticationSettings(googleAuthenticationClientId));
+
     services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings.ValidIssuer,
-                ValidAudience = jwtSettings.ValidAudience,
-                IssuerSigningKey = new SymmetricSecurityKey(jwtSettings.SecurityKey)
-            };
-        });
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings.ValidIssuer,
+            ValidAudience = jwtSettings.ValidAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(jwtSettings.SecurityKey)
+        };
+    });
 }

@@ -20,6 +20,7 @@
     "@angular/platform-browser-dynamic": "^14.2.0",
     "@angular/router": "^14.2.0",
     "@auth0/angular-jwt": "^5.1.0",
+    "@types/google-one-tap": "^1.2.2",
     "file-saver-es": "^2.0.5",
     "primeflex": "^3.2.1",
     "primeicons": "^6.0.1",

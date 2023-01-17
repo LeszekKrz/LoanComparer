@@ -9,8 +9,6 @@ namespace LoanComparer.Application.ModelEntityTypeConfiguration
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            // I guess we can ignore phone number related things...
-
             builder.HasKey(x => x.Id);
 
             builder.HasOne(x => x.JobType)

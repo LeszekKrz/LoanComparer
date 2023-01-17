@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Google.Apis.Auth;
 using LoanComparer.Application.Constants;
 using LoanComparer.Application.DTO;
 using LoanComparer.Application.DTO.UserDTO;
@@ -9,9 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Web;
 
 namespace LoanComparer.Application.Services
@@ -23,15 +21,22 @@ namespace LoanComparer.Application.Services
         private readonly LoanComparerContext _context;
         private readonly JwtHandler _jwtHandler;
         private readonly IEmailService _emailService;
+        private readonly GoogleAuthenticationSettings _googleAuthenticationSettings;
 
-        public UserService(UserManager<User> userManager, IServiceProvider serviceProvider, LoanComparerContext context, JwtHandler jwtHandler,
-            IEmailService emailService)
+        public UserService(
+            UserManager<User> userManager,
+            IServiceProvider serviceProvider,
+            LoanComparerContext context,
+            JwtHandler jwtHandler,
+            IEmailService emailService,
+            GoogleAuthenticationSettings googleAuthenticationSettings)
         {
             _userManager = userManager;
             _serviceProvider = serviceProvider;
             _context = context;
             _jwtHandler = jwtHandler;
             _emailService = emailService;
+            _googleAuthenticationSettings = googleAuthenticationSettings;
         }
 
         public async Task RegisterUserAsync(UserForRegistrationDTO userForRegistration, CancellationToken cancellationToken)
@@ -74,16 +79,56 @@ namespace LoanComparer.Application.Services
             User user = await GetUserByEmailAsync(userForAuthentication.Email);
 
             if (!await _userManager.IsEmailConfirmedAsync(user))
-                throw new BadRequestException(new ErrorResponseDTO[1] { new ErrorResponseDTO("Email is not confirmed") }); // maybe send email to confirm here
+                throw new BadRequestException(new ErrorResponseDTO[1] { new ErrorResponseDTO("Email is not confirmed") });
 
             if (!await _userManager.CheckPasswordAsync(user, userForAuthentication.Password))
                 throw new BadRequestException(new ErrorResponseDTO[1] { new ErrorResponseDTO("Provided password is invalid") });
 
-            SigningCredentials signingCredentials = _jwtHandler.GetSigningCredentials();
-            ICollection<Claim> claims = await _jwtHandler.GetClaimsAsync(user);
-            JwtSecurityToken jwtSecurityToken = _jwtHandler.GenerateJwtSecurityToken(signingCredentials, claims);
-            string token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-            return new AuthenticationResponseDTO(token);
+            return new AuthenticationResponseDTO(await _jwtHandler.GenerateToken(user));
+        }
+
+        public async Task<AuthenticationResponseDTO> LoginUserWithGoogleAsync(UserForGoogleAuthenticationDTO userForGoogleAuthentication)
+        {
+            GoogleJsonWebSignature.Payload payload = await ValidateGoogleCredentialAsync(userForGoogleAuthentication);
+            UserLoginInfo userLoginInfo = new("GOOGLE", payload.Subject, "GOOGLE");
+            User user = await _userManager.FindByLoginAsync(userLoginInfo.LoginProvider, userLoginInfo.ProviderKey);
+
+            if (user != null)
+                return new AuthenticationResponseDTO(await _jwtHandler.GenerateToken(user));
+
+            user = await _userManager.FindByEmailAsync(payload.Email);
+            if (user != null)
+            {
+                await _userManager.AddLoginAsync(user, userLoginInfo);
+                return new AuthenticationResponseDTO(await _jwtHandler.GenerateToken(user));
+            }
+
+            user = await CreateNewGoogleUser(payload, userLoginInfo);
+            return new AuthenticationResponseDTO(await _jwtHandler.GenerateToken(user));
+        }
+
+        private async Task<GoogleJsonWebSignature.Payload> ValidateGoogleCredentialAsync(UserForGoogleAuthenticationDTO userForGoogleAuthentication)
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new List<string> { _googleAuthenticationSettings.ClientId, }
+            };
+
+            return await GoogleJsonWebSignature.ValidateAsync(userForGoogleAuthentication.credential, settings);
+        }
+
+        private async Task<User> CreateNewGoogleUser(GoogleJsonWebSignature.Payload payload, UserLoginInfo userLoginInfo)
+        {
+            User user = new()
+            {
+                Email = payload.Email,
+                UserName = payload.Email
+            };
+            await _userManager.CreateAsync(user);
+            await _userManager.AddToRoleAsync(user, LoanComparerConstants.ClientRoleName);
+            await _userManager.AddLoginAsync(user, userLoginInfo);
+
+            return user;
         }
 
         public async Task ForgotPasswordAsync(ForgotPasswordDTO forgotPassword, CancellationToken cancellationToken)

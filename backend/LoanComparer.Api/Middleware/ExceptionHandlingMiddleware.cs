@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Google.Apis.Auth;
 using LoanComparer.Application.DTO;
 using LoanComparer.Application.Exceptions;
 
@@ -31,6 +32,10 @@ namespace LoanComparer.Api.Middleware
             {
                 await HandleBadRequestException(httpContext, badRequestException);
             }
+            catch (InvalidJwtException invalidJwtException)
+            {
+                await HandleInvalidJwtException(httpContext, invalidJwtException);
+            }
             catch (Exception exception)
             {
                 HandleException(httpContext, exception);
@@ -49,6 +54,12 @@ namespace LoanComparer.Api.Middleware
             httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             var mappedErrors = badRequestException.Errors;
             await httpContext.Response.WriteAsJsonAsync(mappedErrors);
+        }
+
+        private async Task HandleInvalidJwtException(HttpContext httpContext, InvalidJwtException invalidJwtException)
+        {
+            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await httpContext.Response.WriteAsJsonAsync(new List<ErrorResponseDTO> { new(invalidJwtException.Message) });
         }
 
         private void HandleException(HttpContext httpContext, Exception exception)

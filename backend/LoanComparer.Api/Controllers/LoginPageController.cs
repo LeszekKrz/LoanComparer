@@ -21,5 +21,12 @@ namespace LoanComparer.Api.Controllers
             AuthenticationResponseDTO authenticationResponse = await _userService.LoginUserAsync(userForAuthentication, cancellationToken);
             return Ok(authenticationResponse);
         }
+
+        [HttpPost("login-with-google")]
+        public async Task<ActionResult<AuthenticationResponseDTO>> LoginUserWithGoogleAsync([FromBody] UserForGoogleAuthenticationDTO userForGoogleAuthentication)
+        {
+            AuthenticationResponseDTO authenticationResponse = await _userService.LoginUserWithGoogleAsync(userForGoogleAuthentication);
+            return Ok(authenticationResponse);
+        }
     }
 }

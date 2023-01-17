@@ -1,6 +1,5 @@
 ﻿using LoanComparer.Application.Model;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -19,13 +18,21 @@ namespace LoanComparer.Application.Services.JwtFeatures
             _userManager = userManager;
         }
 
-        public SigningCredentials GetSigningCredentials()
+        public async Task<string> GenerateToken(User user)
+        {
+            var signingCredentials = GetSigningCredentials();
+            var claims = await GetClaimsAsync(user);
+            var tokenOptions = GenerateJwtSecurityToken(signingCredentials, claims);
+            return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+        }
+
+        private SigningCredentials GetSigningCredentials()
         {
             var symmetricSecurityKey = new SymmetricSecurityKey(_jwtSettings.SecurityKey);
             return new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
         }
 
-        public async Task<ICollection<Claim>> GetClaimsAsync(User user)
+        private async Task<ICollection<Claim>> GetClaimsAsync(User user)
         {
             var claims = new List<Claim>
             {
@@ -37,7 +44,7 @@ namespace LoanComparer.Application.Services.JwtFeatures
             return claims;
         }
 
-        public JwtSecurityToken GenerateJwtSecurityToken(SigningCredentials signingCredentials, ICollection<Claim> claims)
+        private JwtSecurityToken GenerateJwtSecurityToken(SigningCredentials signingCredentials, ICollection<Claim> claims)
         {
             return new JwtSecurityToken(
                 issuer: _jwtSettings.ValidIssuer,
