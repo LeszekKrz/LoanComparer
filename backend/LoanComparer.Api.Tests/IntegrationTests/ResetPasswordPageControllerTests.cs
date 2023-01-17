@@ -53,7 +53,7 @@ namespace LoanComparer.Api.Tests.IntegrationTests
                         "loan.comparer@gmail.com",
                         await context.JobTypes.SingleAsync(jobType => jobType.Name == "Other"),
                         1,
-                        new GovernmentId(
+                        new GovernmentIdEntity(
                             "PESEL",
                             "05240816772"));
                     await userManager.CreateAsync(user, "oldPassword123!");

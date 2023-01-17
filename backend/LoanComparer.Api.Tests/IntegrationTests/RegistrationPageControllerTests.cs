@@ -74,7 +74,7 @@ namespace LoanComparer.Api.Tests.IntegrationTests
                     User? userResult = await userManager
                         .Users
                         .Include(x => x.JobType)
-                        .Include(x => x.GovernmentId)
+                        .Include(x => x.GovernmentIdEntity)
                         .Include(x => x.UserRoles)
                             .ThenInclude(x => x.Role)
                         .SingleOrDefaultAsync();
@@ -88,8 +88,8 @@ namespace LoanComparer.Api.Tests.IntegrationTests
                     userResult.NormalizedUserName.Should().Be(userForRegistrationDTO.Email.ToUpper());
                     userResult.JobType.Name.Should().Be(userForRegistrationDTO.JobType.Name);
                     userResult.IncomeLevel.Should().Be(userForRegistrationDTO.IncomeLevel);
-                    userResult.GovernmentId.Type.Should().Be(userForRegistrationDTO.GovernmentId.Type);
-                    userResult.GovernmentId.Value.Should().Be(userForRegistrationDTO.GovernmentId.Value);
+                    userResult.GovernmentIdEntity.Type.Should().Be(userForRegistrationDTO.GovernmentId.Type);
+                    userResult.GovernmentIdEntity.Value.Should().Be(userForRegistrationDTO.GovernmentId.Value);
                     userManager.PasswordHasher.VerifyHashedPassword(userResult, userResult.PasswordHash, userForRegistrationDTO.Password);
                     userResult
                         .UserRoles

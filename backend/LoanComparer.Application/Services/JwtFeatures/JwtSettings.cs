@@ -10,7 +10,7 @@ namespace LoanComparer.Application.Services.JwtFeatures
         public string ValidAudience { get; }
         internal double ExpiresInDays { get; }
 
-        public JwtSettings(IConfigurationSection configurationSection)
+        public JwtSettings(IConfiguration configurationSection)
         {
             SecurityKey = Encoding.UTF8.GetBytes(configurationSection["securityKey"]);
             ValidIssuer = configurationSection["validIssuer"];

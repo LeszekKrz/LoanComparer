@@ -16,7 +16,7 @@ using System.Web;
 
 namespace LoanComparer.Application.Services
 {
-    public class UserService
+    public sealed class UserService
     {
         private readonly UserManager<User> _userManager;
         private readonly IServiceProvider _serviceProvider;
@@ -36,37 +36,32 @@ namespace LoanComparer.Application.Services
 
         public async Task RegisterUserAsync(UserForRegistrationDTO userForRegistration, CancellationToken cancellationToken)
         {
-            await _serviceProvider.GetService<IValidator<UserForRegistrationDTO>>().ValidateAndThrowAsync(userForRegistration, cancellationToken);
+            await _serviceProvider.GetService<IValidator<UserForRegistrationDTO>>()
+                .ValidateAndThrowAsync(userForRegistration, cancellationToken);
 
             var newUser = new User(
                 userForRegistration.FirstName,
                 userForRegistration.LastName,
                 userForRegistration.Email,
-                await _context.JobTypes.SingleAsync(jobType => jobType.Name == userForRegistration.JobType.Name, cancellationToken),
+                await _context.JobTypes.SingleAsync(jobType => jobType.Name == userForRegistration.JobType.Name,
+                    cancellationToken),
                 userForRegistration.IncomeLevel,
-                new GovernmentId(userForRegistration.GovernmentId));
+                new GovernmentIdEntity(userForRegistration.GovernmentId));
 
-            IdentityResult result = await _userManager.CreateAsync(newUser, userForRegistration.Password);
+            var result = await _userManager.CreateAsync(newUser, userForRegistration.Password);
 
             if (!result.Succeeded)
                 throw new BadRequestException(result.Errors.Select(error => new ErrorResponseDTO(error.Description)));
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
-
-            var queryParameters = new Dictionary<string, string?>()
+            var queryParameters = new Dictionary<string, string?>
             {
                 { "token", HttpUtility.UrlEncode(token) },
                 { "email", newUser.Email }
             };
+            var confirmationLink = QueryHelpers.AddQueryString(userForRegistration.ClientURI, queryParameters);
 
-            var callback = QueryHelpers.AddQueryString(userForRegistration.ClientURI, queryParameters);
-
-            var email = new Email(
-                new string[] { newUser.Email },
-                LoanComparerConstants.EmailConfirmEmailSubject,
-                string.Empty,
-                string.Format(LoanComparerConstants.EmailConfirmHtmlContent, newUser.FirstName, callback));
-
+            var email = new ConfirmEmailAddressEmail(newUser.Email, newUser.FirstName, confirmationLink);
             await _emailService.SendEmailAsync(email, cancellationToken);
 
             await _userManager.AddToRoleAsync(newUser, LoanComparerConstants.ClientRoleName);
@@ -93,26 +88,20 @@ namespace LoanComparer.Application.Services
 
         public async Task ForgotPasswordAsync(ForgotPasswordDTO forgotPassword, CancellationToken cancellationToken)
         {
-            await _serviceProvider.GetService<IValidator<ForgotPasswordDTO>>().ValidateAndThrowAsync(forgotPassword, cancellationToken);
+            await _serviceProvider.GetService<IValidator<ForgotPasswordDTO>>()
+                .ValidateAndThrowAsync(forgotPassword, cancellationToken);
 
-            User user = await GetUserByEmailAsync(forgotPassword.Email);
+            var user = await GetUserByEmailAsync(forgotPassword.Email);
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-            var queryParameters = new Dictionary<string, string?>()
+            var queryParameters = new Dictionary<string, string?>
             {
                 { "token", HttpUtility.UrlEncode(token) },
                 { "email", forgotPassword.Email }
             };
-
             var callback = QueryHelpers.AddQueryString(forgotPassword.ClientURI, queryParameters);
 
-            var email = new Email(
-                new string[] { user.Email },
-                LoanComparerConstants.PasswordResetEmailSubject,
-                string.Empty,
-                string.Format(LoanComparerConstants.PasswordResetHtmlContent, user.FirstName, callback));
-
+            var email = new ResetPasswordEmail(user.Email, user.FirstName, callback);
             await _emailService.SendEmailAsync(email, cancellationToken);
         }
 
@@ -120,9 +109,9 @@ namespace LoanComparer.Application.Services
         {
             await _serviceProvider.GetService<IValidator<ResetPasswordDTO>>().ValidateAndThrowAsync(resetPassword, cancellationToken);
 
-            User user = await GetUserByEmailAsync(resetPassword.Email);
+            var user = await GetUserByEmailAsync(resetPassword.Email);
             
-            IdentityResult resetPasswordResult = await _userManager.ResetPasswordAsync(user, HttpUtility.UrlDecode(resetPassword.Token), resetPassword.Password);
+            var resetPasswordResult = await _userManager.ResetPasswordAsync(user, HttpUtility.UrlDecode(resetPassword.Token), resetPassword.Password);
 
             if (!resetPasswordResult.Succeeded)
                 throw new BadRequestException(resetPasswordResult.Errors.Select(error => new ErrorResponseDTO(error.Description)));
@@ -140,9 +129,9 @@ namespace LoanComparer.Application.Services
 
         private async Task<User> GetUserByEmailAsync(string email)
         {
-            User user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
-                throw new BadRequestException(new ErrorResponseDTO[1] { new ErrorResponseDTO("There is no registered user with email provided") });
+                throw new BadRequestException(new ErrorResponseDTO[] { new("There is no registered user with email provided") });
             return user;
         }
     }
