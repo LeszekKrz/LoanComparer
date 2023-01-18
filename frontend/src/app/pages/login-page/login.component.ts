@@ -33,6 +33,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     private ngZone: NgZone) { }
 
   ngOnInit(): void {
+    console.log(environment.googleClientId);
     // @ts-ignore
     window.onGoogleLibraryLoad = () => {
       // @ts-ignore

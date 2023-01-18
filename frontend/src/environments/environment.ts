@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   webApiUrl: 'https://localhost:7282/api',
   webUrl: 'https://localhost:4200',
-  googleClientId: '452183077573-tnp81622msv1acc48ial948l5d0huvk2.apps.googleusercontent.com'
+  googleClientId: process.env['GOOGLE_CLIENT_ID'] as string
 };
 
 /*
