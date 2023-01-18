@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
@@ -26,7 +26,11 @@ export class LoginComponent implements OnInit, OnDestroy {
   passwordEyeIcon = 'pi-eye';
   private googleClientId = environment.googleClientId;
 
-  constructor(private authenticationService: AuthenticationService, private messageService: MessageService, private router: Router) { }
+  constructor(
+    private authenticationService: AuthenticationService,
+    private messageService: MessageService,
+    private router: Router,
+    private ngZone: NgZone) { }
 
   ngOnInit(): void {
     // @ts-ignore
@@ -36,16 +40,14 @@ export class LoginComponent implements OnInit, OnDestroy {
         client_id: this.googleClientId,
         callback: this.handleCredentialResponse.bind(this),
         auto_select: false,
-        cancel_on_tap_outside: true
+        cancel_on_tap_outside: true,
       });
       // @ts-ignore
       google.accounts.id.renderButton(
-      // @ts-ignore
-      document.getElementById('googleButton'),
-        { theme: 'outline', size: 'large', width: '100%' },
+        // @ts-ignore
+        document.getElementById('googleButton'),
+        { type: 'icon' },
       );
-      // @ts-ignore
-      google.accounts.id.prompt((_: PromptMomentNotification) => {});
     };
   }
 
@@ -70,7 +72,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       },
       complete: () => {
         this.authenticationService.sendAuthenticationStateChangedNotification(true);
-        this.router.navigate(['home']);
+        this.ngZone.run(() => this.router.navigate(['home']));
       }
     }));
   }
