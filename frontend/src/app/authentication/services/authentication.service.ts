@@ -8,6 +8,7 @@ import { AuthenticationResponseDTO } from "../models/authentication-response-dto
 import { ForgotPasswordDTO } from "../models/forgot-password-dto";
 import { ResetPasswordDTO } from "../models/reset-password-dto";
 import { UserForAuthenticationDTO } from "../models/user-for-authentication-dto";
+import { UserForGoogleAuthenticationDTO } from "../models/user-for-google-authentication-dto";
 import { UserForRegistrationDTO } from "../models/user-for-registration-dto";
 
 @Injectable({
@@ -37,6 +38,10 @@ export class AuthenticationService {
 
   loginUser(userForAuthentication: UserForAuthenticationDTO): Observable<AuthenticationResponseDTO> {
     return this.httpClient.post<AuthenticationResponseDTO>(`${this.loginPageWebAPIUrl}/login`, userForAuthentication);
+  }
+
+  loginWithGoogle(userForGoogleAuthentication: UserForGoogleAuthenticationDTO): Observable<AuthenticationResponseDTO> {
+    return this.httpClient.post<AuthenticationResponseDTO>(`${this.loginPageWebAPIUrl}/login-with-google`, userForGoogleAuthentication);
   }
 
   logout(): void {
