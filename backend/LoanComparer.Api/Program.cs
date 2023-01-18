@@ -114,6 +114,10 @@ void ConfigureUserIdentity(IServiceCollection services)
 
 void ConfigureServices(IServiceCollection services)
 {
+    string googleAuthenticationClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID")
+        ?? throw new InvalidCredentialException("Environment variable GOOGLE_CLIENT_ID is not defined");
+    services.AddSingleton(new GoogleAuthenticationSettings(googleAuthenticationClientId));
+
     services.AddDbContext<LoanComparerContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
     
@@ -144,10 +148,6 @@ void ConfigureJwt(IServiceCollection services, IConfiguration config)
 
     var jwtSettings = new JwtSettings(config.GetSection("JWTSettings"));
     services.AddSingleton(jwtSettings);
-
-    string googleAuthenticationClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID")
-        ?? throw new InvalidCredentialException("Environment variable GOOGLE_CLIENT_ID is not defined");
-    services.AddSingleton(new GoogleAuthenticationSettings(googleAuthenticationClientId));
 
     services.AddAuthentication(options =>
     {

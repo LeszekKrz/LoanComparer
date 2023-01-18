@@ -58,7 +58,7 @@ namespace LoanComparer.Api.Middleware
 
         private async Task HandleInvalidJwtException(HttpContext httpContext, InvalidJwtException invalidJwtException)
         {
-            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await httpContext.Response.WriteAsJsonAsync(new List<ErrorResponseDTO> { new(invalidJwtException.Message) });
         }
 

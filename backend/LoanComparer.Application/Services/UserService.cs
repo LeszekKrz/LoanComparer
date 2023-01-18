@@ -84,7 +84,7 @@ namespace LoanComparer.Application.Services
             if (!await _userManager.CheckPasswordAsync(user, userForAuthentication.Password))
                 throw new BadRequestException(new ErrorResponseDTO[1] { new ErrorResponseDTO("Provided password is invalid") });
 
-            return new AuthenticationResponseDTO(await _jwtHandler.GenerateToken(user));
+            return new AuthenticationResponseDTO(await _jwtHandler.GenerateTokenAsync(user));
         }
 
         public async Task<AuthenticationResponseDTO> LoginUserWithGoogleAsync(UserForGoogleAuthenticationDTO userForGoogleAuthentication)
@@ -94,17 +94,17 @@ namespace LoanComparer.Application.Services
             User user = await _userManager.FindByLoginAsync(userLoginInfo.LoginProvider, userLoginInfo.ProviderKey);
 
             if (user != null)
-                return new AuthenticationResponseDTO(await _jwtHandler.GenerateToken(user));
+                return new AuthenticationResponseDTO(await _jwtHandler.GenerateTokenAsync(user));
 
             user = await _userManager.FindByEmailAsync(payload.Email);
             if (user != null)
             {
                 await _userManager.AddLoginAsync(user, userLoginInfo);
-                return new AuthenticationResponseDTO(await _jwtHandler.GenerateToken(user));
+                return new AuthenticationResponseDTO(await _jwtHandler.GenerateTokenAsync(user));
             }
 
             user = await CreateNewGoogleUser(payload, userLoginInfo);
-            return new AuthenticationResponseDTO(await _jwtHandler.GenerateToken(user));
+            return new AuthenticationResponseDTO(await _jwtHandler.GenerateTokenAsync(user));
         }
 
         private async Task<GoogleJsonWebSignature.Payload> ValidateGoogleCredentialAsync(UserForGoogleAuthenticationDTO userForGoogleAuthentication)

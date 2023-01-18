@@ -18,7 +18,7 @@ namespace LoanComparer.Application.Services.JwtFeatures
             _userManager = userManager;
         }
 
-        public async Task<string> GenerateToken(User user)
+        public async Task<string> GenerateTokenAsync(User user)
         {
             var signingCredentials = GetSigningCredentials();
             var claims = await GetClaimsAsync(user);
