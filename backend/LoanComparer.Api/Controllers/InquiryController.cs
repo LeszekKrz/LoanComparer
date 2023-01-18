@@ -72,6 +72,6 @@ public sealed class InquiryController : ControllerBase
 
     private string? GetUsername()
     {
-        return User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;   
+        return User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value; 
     }
 }
