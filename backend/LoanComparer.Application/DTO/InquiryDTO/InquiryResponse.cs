@@ -14,5 +14,5 @@ public sealed class InquiryResponse
 
     public JobDetailsDTO JobDetails { get; init; } = null!;
 
-    public GovernmentIdDTO GovtId { get; init; } = null!;
+    public GovernmentIdDTO GovId { get; init; } = null!;
 }

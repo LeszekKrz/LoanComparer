@@ -48,7 +48,7 @@ public sealed class Inquiry
             NumberOfInstallments = NumberOfInstallments,
             PersonalData = PersonalData.ToDto(),
             JobDetails = JobDetails.ToDto(),
-            GovtId = GovernmentId.ToDto()
+            GovId = GovernmentId.ToDto()
         };
     }
 

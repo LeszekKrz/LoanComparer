@@ -1,9 +1,12 @@
 ﻿using System.Security.Authentication;
 using Flurl.Http;
+using LoanComparer.Application.Constants;
+using LoanComparer.Application.DTO.OfferApplicationDTO;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LoanComparer.Application.Services.Inquiries.BankInterfaces.This;
 
@@ -18,7 +21,7 @@ public sealed class ThisBankInterface : BankInterfaceBase
         _config = config;
     }
 
-    public override string BankName => "This Bank";
+    public override string BankName => LoanComparerConstants.OurBankName;
     
     public override async Task<SentInquiryStatus> SendInquiryAsync(Inquiry inquiry)
     {
@@ -221,6 +224,37 @@ public sealed class ThisBankInterface : BankInterfaceBase
             });
 
         return InquiryStatus.WaitingForAcceptance;
+    }
+
+    public async Task<InquiryStatus> ReviewApplicationAsync(SentInquiryStatus sentInquiryStatus, ReviewApplicationRequestDTO reviewApplicationRequest)
+    {
+        if (sentInquiryStatus.ReceivedOffer is null)
+            throw new InvalidOperationException(
+                "Cannot review for an offer related to this inquiry because no offer was received");
+
+        if (!await EnsureClientIsValidAsync())
+            return InquiryStatus.Error;
+
+        try
+        {
+            var response = await (
+                await _clientWithToken!
+                    .Client
+                    .Request("application", sentInquiryStatus.ReceivedOffer.Id, "review")
+                    .PostJsonAsync(reviewApplicationRequest)
+            ).GetJsonAsync<OfferResponse>();
+
+            return reviewApplicationRequest.Accept ? InquiryStatus.Accepted : InquiryStatus.Rejected;
+        }
+        catch (Exception e) when (e is FlurlHttpException or FormatException)
+        {
+            if (e is FlurlHttpException { StatusCode: StatusCodes.Status422UnprocessableEntity })
+            {
+                return InquiryStatus.Rejected;
+            }
+
+            return InquiryStatus.Error;
+        }
     }
 
     private static string GetEnv(string name)
