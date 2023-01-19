@@ -8,6 +8,7 @@ using LoanComparer.Application.Services;
 using LoanComparer.Application.Services.Inquiries;
 using LoanComparer.Application.Services.Inquiries.BankInterfaces;
 using LoanComparer.Application.Services.Inquiries.BankInterfaces.Mini;
+using LoanComparer.Application.Services.Inquiries.BankInterfaces.This;
 using LoanComparer.Application.Services.JwtFeatures;
 using LoanComparer.Application.Services.Offers;
 using LoanComparer.Application.Validators;
@@ -88,6 +89,9 @@ void ConfigureOptions(IServiceCollection services, IConfiguration config)
         .ValidateDataAnnotations();
     services.AddOptions<MiniBankConfiguration>()
         .Bind(config.GetSection(MiniBankConfiguration.SectionName))
+        .ValidateDataAnnotations();
+    services.AddOptions<ThisBankConfiguration>()
+        .Bind(config.GetSection(ThisBankConfiguration.SectionName))
         .ValidateDataAnnotations();
 }
 
