@@ -13,6 +13,7 @@ public sealed class ThisBankInterface : BankInterfaceBase
 {
     private readonly IOptionsSnapshot<ThisBankConfiguration> _config;
     private ClientWithToken? _clientWithToken;
+    private ClientWithToken? _adminClientWithToken;
 
     public ThisBankInterface(IInquiryCommand inquiryCommand, IOfferCommand offerCommand,
         IOptionsSnapshot<ThisBankConfiguration> config) : base(inquiryCommand, offerCommand)
@@ -154,7 +155,7 @@ public sealed class ThisBankInterface : BankInterfaceBase
         _clientWithToken = new(new FlurlClient(_config.Value.BaseUrl).WithOAuthBearerToken(token.Value), token);
         return true;
     }
-    
+
     private async Task<BearerToken?> GetTokenAsync()
     {
         if (!await EnsureUserIsCreatedAsync()) return null;
@@ -183,7 +184,57 @@ public sealed class ThisBankInterface : BankInterfaceBase
         var registrationResponse = await authClient.Request("users", "register").PostJsonAsync(new
         {
             Username = _config.Value.AuthUsername,
-            Password = GetEnv("THIS_BANK__API_PASSWORD"),
+            Password = GetEnv("THIS_BANK_API_PASSWORD"),
+            Key = GetEnv("REGISTRATION_KEY")
+        });
+
+        return registrationResponse.StatusCode == StatusCodes.Status201Created;
+    }
+
+    private async Task<bool> EnsureAdminClientIsValidAsync()
+    {
+        if (_adminClientWithToken?.Token.IsValid ?? false) return true;
+
+        var token = await GetAdminTokenAsync();
+        if (token is null)
+        {
+            _adminClientWithToken = null;
+            return false;
+        }
+
+        _clientWithToken = new(new FlurlClient(_config.Value.BaseUrl).WithOAuthBearerToken(token.Value), token);
+        return true;
+    }
+
+    private async Task<BearerToken?> GetAdminTokenAsync()
+    {
+        if (!await EnsureAdminUserIsCreatedAsync()) return null;
+
+        var password = GetEnv("THIS_BANK_API_PASSWORD");
+        var authClient = new FlurlClient(_config.Value.BaseUrl).AllowAnyHttpStatus();
+        var response = await authClient.Request("admin", "auth").PostJsonAsync(new
+        {
+            Username = "admin",
+            Password = password
+        });
+
+        if (response.StatusCode != StatusCodes.Status200OK) return null;
+        var authResponse = await response.GetJsonAsync<AuthenticationResponse>();
+        return BearerToken.FromResponse(authResponse);
+    }
+
+    private async Task<bool> EnsureAdminUserIsCreatedAsync()
+    {
+        var authClient = new FlurlClient(_config.Value.BaseUrl).AllowAnyHttpStatus();
+        var userExistsResponse = await authClient.Request("users", "exists").
+            SetQueryParam("username", "admin").
+            GetAsync();
+        if (userExistsResponse.StatusCode == StatusCodes.Status204NoContent) return true;
+
+        var registrationResponse = await authClient.Request("users", "register").PostJsonAsync(new
+        {
+            Username = "admin",
+            Password = GetEnv("THIS_BANK_API_PASSWORD"),
             Key = GetEnv("REGISTRATION_KEY")
         });
         
@@ -201,7 +252,7 @@ public sealed class ThisBankInterface : BankInterfaceBase
 
         return await _clientWithToken!
             .Client
-            .Request("offer", sentInquiryStatus.ReceivedOffer.DocumentLink, "document")
+            .Request("offers", sentInquiryStatus.ReceivedOffer.DocumentLink, "document")
             .GetStreamAsync();
     }
 
@@ -219,7 +270,7 @@ public sealed class ThisBankInterface : BankInterfaceBase
             Request("apply", sentInquiryStatus.ReceivedOffer.Id).
             PostMultipartAsync(mp =>
             {
-                mp.AddFile("formFile", stream, file.FileName, file.ContentType);
+                mp.AddFile("file", stream, file.FileName, file.ContentType);
             });
 
         return InquiryStatus.WaitingForAcceptance;
@@ -231,16 +282,21 @@ public sealed class ThisBankInterface : BankInterfaceBase
             throw new InvalidOperationException(
                 "Cannot review for an offer related to this inquiry because no offer was received");
 
-        if (!await EnsureClientIsValidAsync())
+        if (!await EnsureAdminClientIsValidAsync())
             return InquiryStatus.Error;
+
+        ReviewRequest reviewRequest = new()
+        {
+            Accept = reviewApplicationRequest.Accept
+        };
 
         try
         {
             var response = await (
-                await _clientWithToken!
+                await _adminClientWithToken!
                     .Client
-                    .Request("application", sentInquiryStatus.ReceivedOffer.Id, "review")
-                    .PostJsonAsync(reviewApplicationRequest)
+                    .Request("applications", sentInquiryStatus.ReceivedOffer.Id, "review")
+                    .PostJsonAsync(reviewRequest)
             ).GetJsonAsync<OfferResponse>();
 
             return reviewApplicationRequest.Accept ? InquiryStatus.Accepted : InquiryStatus.Rejected;
@@ -345,6 +401,11 @@ public sealed class ThisBankInterface : BankInterfaceBase
             public string Name { get; init; } = null!;
             public string Value { get; init; } = null!;
         }
+    }
+
+    private sealed class ReviewRequest
+    {
+        public bool Accept { get; init; }
     }
     #endregion
 }

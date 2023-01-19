@@ -55,7 +55,7 @@ public sealed class SentInquiryStatus
         return new()
         {
             Id = entity.Id,
-            Inquiry = Inquiry.FromEntity(entity.Inquiry),
+            Inquiry = entity.Inquiry is not null ? Inquiry.FromEntity(entity.Inquiry) : null,
             BankName = entity.BankName,
             Status = entity.Status,
             ReceivedOffer = entity.Offer is not null ? Offer.FromEntity(entity.Offer) : null,
