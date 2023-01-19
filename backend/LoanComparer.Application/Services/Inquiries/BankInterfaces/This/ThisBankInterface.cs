@@ -6,7 +6,6 @@ using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace LoanComparer.Application.Services.Inquiries.BankInterfaces.This;
 
@@ -122,19 +121,19 @@ public sealed class ThisBankInterface : BankInterfaceBase
 
         return new()
         {
-            Amout = (double)inquiry.AmountRequested,
+            Amount = (double)inquiry.AmountRequested,
             Installments = inquiry.NumberOfInstallments,
             FirstName = inquiry.PersonalData.FirstName,
             LastName = inquiry.PersonalData.LastName,
             Income = (int)inquiry.JobDetails.IncomeLevel,
             JobType = new()
             {
-                TypeId = matchedJobType?.Id ?? unknownJobId,
+                Id = matchedJobType?.Id ?? unknownJobId,
                 Name = matchedJobType?.Name ?? inquiry.JobDetails.JobName
             },
-            GovernmentDocument = new()
+            GovernmentId = new()
             {
-                TypeId = matchedGovernmentDocumentType?.Id ?? unknownGovIdType,
+                Id = matchedGovernmentDocumentType?.Id ?? unknownGovIdType,
                 Name = matchedGovernmentDocumentType?.Name ?? inquiry.GovernmentId.Type,
                 Value = inquiry.GovernmentId.Value
             }
@@ -175,7 +174,7 @@ public sealed class ThisBankInterface : BankInterfaceBase
 
     private async Task<bool> EnsureUserIsCreatedAsync()
     {
-        var authClient = new FlurlClient(_config.Value.BaseUrl).AllowHttpStatus();
+        var authClient = new FlurlClient(_config.Value.BaseUrl).AllowAnyHttpStatus();
         var userExistsResponse = await authClient.Request("users", "exists").
             SetQueryParam("username", _config.Value.AuthUsername).
             GetAsync();
@@ -184,7 +183,7 @@ public sealed class ThisBankInterface : BankInterfaceBase
         var registrationResponse = await authClient.Request("users", "register").PostJsonAsync(new
         {
             Username = _config.Value.AuthUsername,
-            Password = GetEnv("THIS_BANK_PASSWORD"),
+            Password = GetEnv("THIS_BANK__API_PASSWORD"),
             Key = GetEnv("REGISTRATION_KEY")
         });
         
@@ -278,8 +277,8 @@ public sealed class ThisBankInterface : BankInterfaceBase
 
         public static BearerToken? FromResponse(AuthenticationResponse response)
         {
-            if (response.AccessToken is null || response.ExpirationTime is null) return null;
-            return new(response.AccessToken, response.ExpirationTime.Value);
+            if (response.Token is null || response.ExpirationTime is null) return null;
+            return new(response.Token, response.ExpirationTime.Value);
         }
     }
 
@@ -298,31 +297,31 @@ public sealed class ThisBankInterface : BankInterfaceBase
     
     private sealed class AuthenticationResponse
     {
-        public string? AccessToken { get; init; }
+        public string? Token { get; init; }
 
         public DateTime? ExpirationTime { get; init; }
     }
 
     private sealed class ThisBankInquiryRequest
     {
-        public double Amout { get; init; }
+        public double Amount { get; init; }
         public int Installments { get; init; }
         public string? FirstName { get; init; }
         public string? LastName { get; init; }
         public int Income { get; init; }
-        public GovernmentDocumentRequest GovernmentDocument { get; init; } = null!;
+        public GovernmentDocumentRequest GovernmentId { get; init; } = null!;
         public JobTypeRequest JobType { get; init; } = null!;
 
         public sealed class GovernmentDocumentRequest
         {
-            public int TypeId { get; init; }
+            public int Id { get; init; }
             public string Name { get; init; }
             public string Value { get; init; }
         }
 
         public sealed class JobTypeRequest
         {
-            public int TypeId { get; init; }
+            public int Id { get; init; }
             public string Name { get; init; }
         }
     }
