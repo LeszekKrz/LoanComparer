@@ -30,6 +30,8 @@ jobs:
           npm install
           
       - name: npm build
+        env: 
+          GOOGLE_CLIENT_ID: client_id
         run: |
           npm run build-prod
           
