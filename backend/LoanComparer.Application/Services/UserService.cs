@@ -180,9 +180,9 @@ namespace LoanComparer.Application.Services
             return user;
         }
 
-        public async Task<UsersCountDTO> GetUserCountAsync()
+        public async Task<int> GetUserCountAsync()
         {
-            return new(await _userManager.Users.CountAsync());
+            return await _userManager.Users.CountAsync();
         }
 
         public async Task<UserInfoDTO> GetUserInfoAsync(string username)

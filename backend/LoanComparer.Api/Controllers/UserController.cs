@@ -17,10 +17,10 @@ namespace LoanComparer.Api.Controllers
         }
 
         [HttpGet("users-count")]
-        public async Task<ActionResult<UsersCountDTO>> GetUserCountAsync()
+        public async Task<UsersCountDTO> GetUserCountAsync()
         {
-            UsersCountDTO usersCount = await _userService.GetUserCountAsync();
-            return Ok(usersCount);
+            UsersCountDTO usersCount = new(await _userService.GetUserCountAsync());
+            return usersCount;
         }
 
         [HttpGet("user/info")]
