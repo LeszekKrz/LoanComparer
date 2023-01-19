@@ -192,7 +192,7 @@ namespace LoanComparer.Application.Services
                 .Include(user => user.GovernmentIdEntity)
                 .SingleOrDefaultAsync(user => user.UserName == username);
             if (user == null)
-                throw new BadRequestException(new ErrorResponseDTO[] { new("There is no registered user with email provided") });
+                throw new Exception("There is no registered user with username provided");
 
             return new(
                 user.FirstName,
