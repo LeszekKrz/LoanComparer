@@ -1,6 +1,13 @@
+import { GovernmentIdDTO } from "./government-id-dto";
+import { JobDetailsDTO } from "./job-details-dto";
+import { PersonalDataDTO } from "./personal-data-dto";
+
 export interface InquiryDTO {
   id: string;
-  loanValue: number;
+  amountRequested: number;
   numberOfInstallments: number;
-  dateOfInquirySubmition: Date;
+  creationTime: Date;
+  personalData: PersonalDataDTO;
+  jobDetails: JobDetailsDTO;
+  governmentId: GovernmentIdDTO;
 }
