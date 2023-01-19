@@ -34,8 +34,16 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     if (this.authenticationHttpService.isUserAuthenticated()) {
       const getInquiries$ = this.homeHttpService.getInquiries().pipe(
-        tap((inquiries: InquiryDTO[]) => this.inquiries = inquiries)
-      );
+        tap((inquiries: InquiryDTO[]) => this.inquiries = inquiries.sort((inquiry1, inquiry2) => {
+          if (inquiry1.creationTime < inquiry2.creationTime) {
+            return 1;
+          }
+          if (inquiry1.creationTime > inquiry2.creationTime) {
+            return -1;
+          }
+          return 0;
+        })
+      ));
       this.subscriptions.push(this.doWithLoading(getInquiries$).subscribe());
     }
 
