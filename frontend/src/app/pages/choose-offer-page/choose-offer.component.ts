@@ -28,7 +28,6 @@ export class ChooseOfferComponent implements OnInit, OnDestroy {
 
     const getOffers$ = this.offerHttpService.getOffers(this.route.snapshot.params['inquiryId']).pipe(
       tap((bankOffersDTO: BankOfferDTO[]) => {
-        console.log(bankOffersDTO);
         bankOffersDTO.forEach(bankOfferDTO => {
           const bankOffer: BankOffer = this.getBankOfferFromDTO(bankOfferDTO);
           if (bankOfferDTO.bankName == 'This Bank') {

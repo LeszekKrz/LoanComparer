@@ -61,7 +61,6 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
         })),
       this.adminPanelHttpService.getOfferRequests().pipe(
         tap((offerRequests: ApplicationDTO[]) => {
-          console.log(offerRequests);
           this.applications = offerRequests;
         })
       )

@@ -26,8 +26,6 @@ export class OfferCardComponent implements OnDestroy {
     private fileService: FileService) {}
 
   onSelectFileHandler(event: any): void {
-    console.log(event.type)
-    console.log(event.files[0]);
     const signedContract = event.files[0];
     if (signedContract.type == 'text/plain') {
       this.bankOffer!.signedContract = new FormData();
