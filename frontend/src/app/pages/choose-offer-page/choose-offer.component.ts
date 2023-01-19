@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { FileUpload } from 'primeng/fileupload';
 import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { BankOffer } from './models/bank-offer';
 import { BankOfferDTO } from './models/bank-offer-dto';
@@ -35,13 +34,13 @@ export class ChooseOfferComponent implements OnInit, OnDestroy {
       tap((bankOffersDTO: BankOfferDTO[]) => {
         bankOffersDTO.forEach(bankOfferDTO => {
           const bankOffer: BankOffer = this.getBankOfferFromDTO(bankOfferDTO);
-          if (bankOfferDTO.bank == 'our') {
+          if (bankOfferDTO.bankName == 'our') {
             this.ourBankOffer = bankOffer;
           }
-          else if (bankOfferDTO.bank == 'lecturer') {
+          else if (bankOfferDTO.bankName == 'MiNI Bank') {
             this.lecturersBankOffer = bankOffer;
           }
-          else if (bankOfferDTO.bank == 'other team') {
+          else if (bankOfferDTO.bankName == 'other team') {
             this.otherTeamsBankOffer = bankOffer;
           }
         });
@@ -60,7 +59,7 @@ export class ChooseOfferComponent implements OnInit, OnDestroy {
           loanValue: bankOfferDTO.offer.loanValue,
           numberOfInstallments: bankOfferDTO.offer.numberOfInstallments,
           percentage: bankOfferDTO.offer.percentage,
-          monthlyInstallment: bankOfferDTO.offer.monthlyInstallments,
+          monthlyInstallment: bankOfferDTO.offer.monthlyInstallment,
         },
       contractDownloaded: false,
       signedContract: null,
