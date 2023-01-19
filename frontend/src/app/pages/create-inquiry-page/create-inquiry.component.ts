@@ -65,7 +65,9 @@ export class CreateInquiryComponent implements OnInit, OnDestroy {
             firstName: userInfoDTO.firstName,
             lastName: userInfoDTO.lastName,
             email: userInfoDTO.email,
-            jobType: {name: userInfoDTO.jobType},
+            jobType: userInfoDTO.jobType != null
+              ? {name: userInfoDTO.jobType}
+              : null,
             incomeLevel: userInfoDTO.incomeLevel,
             governmentIdType: userInfoDTO.governmentIdType,
             governmentIdValue: userInfoDTO.governmentIdValue,

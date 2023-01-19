@@ -4,6 +4,7 @@ import { MessageService } from 'primeng/api';
 import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { BankOffer } from './models/bank-offer';
 import { BankOfferDTO } from './models/bank-offer-dto';
+import { RequestOfferResponse } from './models/request-offer-response';
 import { OfferHttpService } from './services/offer.http.service';
 
 @Component({
@@ -80,7 +81,28 @@ export class ChooseOfferComponent implements OnInit, OnDestroy {
   }
 
   handleOnOfferRequest(bankOffer: BankOffer): void {
-    console.log(bankOffer);
-    // send info to backend and go to home page
+    const requestOffer$ = this.offerHttpService.requestOffer(bankOffer.offer!.id, bankOffer.signedContract!).pipe(
+      tap((requestOfferResponse: RequestOfferResponse) => {
+        bankOffer.status = requestOfferResponse.status;
+        bankOffer.contractDownloaded = false;
+        bankOffer.signedContract = null;
+
+        if (requestOfferResponse.status == 'ERROR') {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error while trying to apply for a loan'
+          });
+        }
+        else {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Successful application for a loan'
+          });
+        }
+      }));
+
+    this.subscriptions.push(this.doWithLoading(requestOffer$).subscribe());
   }
 }

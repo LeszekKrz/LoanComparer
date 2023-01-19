@@ -60,7 +60,7 @@
     cursor: pointer;
 }
 
-.status-submitted {
+.status-pending {
   color: #348ce0;
   background-color: #c7ecfc;
   padding: 2px 10px;
@@ -72,19 +72,19 @@
   padding: 2px 10px;
 }
 
-.status-applied {
+.status-waitingforacceptance {
   color: #a06750;
   background-color: #fbedba;
   padding: 2px 10px;
 }
 
-.status-applicationaccepted {
+.status-accepted {
   color: #357b3a;
   background-color: #d5efd6;
   padding: 2px 10px;
 }
 
-.status-applicationrejected, .status-error, .status-rejected, .status-timeout {
+.status-error, .status-rejected, .status-timeout {
   color: #b94444;
   background-color: #ffdbdf;
   padding: 2px 10px;

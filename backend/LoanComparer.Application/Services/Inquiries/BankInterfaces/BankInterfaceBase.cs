@@ -27,17 +27,24 @@ public abstract class BankInterfaceBase : IBankInterface
         switch (newStatus.Status)
         {
             case InquiryStatus.Pending:
+                if (status.Status == InquiryStatus.Pending)
+                    return status;
                 throw new InvalidOperationException(
                     $"Inquiry status changed to {InquiryStatus.Pending} from {status.Status}");
             case InquiryStatus.OfferReceived:
                 if (newStatus.ReceivedOffer is null)
                     throw new InvalidOperationException(
                         "Inquiry status is marked as offer received, but offer is set to null");
+                if (status.Status == InquiryStatus.OfferReceived)
+                    return status;
                 await _offerCommand.SaveOfferAsync(newStatus.ReceivedOffer);
                 await _inquiryCommand.LinkSavedOfferToStatusAsync(newStatus, newStatus.ReceivedOffer.Id);
                 break;
             case InquiryStatus.Rejected:
                 await _inquiryCommand.MarkAsRejectedAsync(newStatus);
+                break;
+            case InquiryStatus.Accepted:
+                await _inquiryCommand.MarkAsAcceptedAsync(newStatus);
                 break;
             case InquiryStatus.Timeout:
                 throw new InvalidOperationException();

@@ -31,7 +31,7 @@ export class OfferCardComponent implements OnDestroy {
     const signedContract = event.files[0];
     if (signedContract.type == 'text/plain') {
       this.bankOffer!.signedContract = new FormData();
-      this.bankOffer!.signedContract.append('signedContract', new Blob([signedContract], {type: 'txt'}), signedContract.name);
+      this.bankOffer!.signedContract.append('formFile', new Blob([signedContract], {type: 'txt'}), signedContract.name);
     }
   }
 

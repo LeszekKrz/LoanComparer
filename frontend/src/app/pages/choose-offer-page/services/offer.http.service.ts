@@ -5,7 +5,6 @@ import { AuthenticationService } from 'src/app/authentication/services/authentic
 import { getHttpOptionsWithAuthenticationHeader } from 'src/app/core/functions/get-http-options-with-authorization-header';
 import { environment } from 'src/environments/environment';
 import { BankOfferDTO } from '../models/bank-offer-dto';
-import { RequestOfferDTO } from '../models/request-offer-dto';
 import { RequestOfferResponse } from '../models/request-offer-response';
 
 @Injectable({
@@ -42,10 +41,10 @@ export class OfferHttpService {
       });
   }
 
-  requestOffer(offerId: string, requestOfferDTO: RequestOfferDTO): Observable<RequestOfferResponse> {
+  requestOffer(offerId: string, formFile: FormData): Observable<RequestOfferResponse> {
     return this.httpClient.post<RequestOfferResponse>(
       `${this.chooseOfferPageWebAPIUrl}/offers/${offerId}/apply`,
-      requestOfferDTO,
+      formFile,
       this.authenticationService.isUserAuthenticated()
       ? getHttpOptionsWithAuthenticationHeader()
       : {});
