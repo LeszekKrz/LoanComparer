@@ -271,26 +271,12 @@ public sealed class ThisBankInterface : BankInterfaceBase
             Accept = reviewApplicationRequest.Accept
         };
 
-        try
-        {
-            var response = await (
-                await _adminClientWithToken!
+        var response = await _adminClientWithToken!
                     .Client
                     .Request("applications", sentInquiryStatus.ReceivedOffer.Id, "review")
-                    .PostJsonAsync(reviewRequest)
-            ).GetJsonAsync<OfferResponse>();
+                    .PostJsonAsync(reviewRequest);
 
-            return reviewApplicationRequest.Accept ? InquiryStatus.Accepted : InquiryStatus.Rejected;
-        }
-        catch (Exception e) when (e is FlurlHttpException or FormatException)
-        {
-            if (e is FlurlHttpException { StatusCode: StatusCodes.Status422UnprocessableEntity })
-            {
-                return InquiryStatus.Rejected;
-            }
-
-            return InquiryStatus.Error;
-        }
+        return reviewApplicationRequest.Accept ? InquiryStatus.Accepted : InquiryStatus.Rejected;
     }
 
     private static string GetEnv(string name)

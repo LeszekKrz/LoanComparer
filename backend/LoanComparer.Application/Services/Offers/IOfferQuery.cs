@@ -10,6 +10,8 @@ namespace LoanComparer.Application.Services.Offers
 
         public Task<SentInquiryStatus> GetStatusWithOfferOrThrowAsync(Guid offerId);
 
+        public Task<SentInquiryStatus> GetStatusWithOfferAndInquiryOrThrowAsync(Guid offerId);
+
         public Task<IReadOnlyCollection<OfferApplicationDTO>> GetAllApplicationsForThisBank();
 
         public Task<byte[]> GetSignedDocument(Guid offerId);

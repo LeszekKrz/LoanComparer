@@ -80,5 +80,16 @@ namespace LoanComparer.Application.Services.Offers
                 throw new InvalidOperationException($"There is no offer with id {offerId}");
             return SentInquiryStatus.FromEntity(sentInquiryStatusEntity);
         }
+
+        public async Task<SentInquiryStatus> GetStatusWithOfferAndInquiryOrThrowAsync(Guid offerId)
+        {
+            SentInquiryStatusEntity? sentInquiryStatusEntity = await _context.InquiryStatuses
+                .Include(inquiryStatus => inquiryStatus.Offer)
+                .Include(inquiryStatus => inquiryStatus.Inquiry)
+                .SingleOrDefaultAsync(inquiryStatus => inquiryStatus.OfferId == offerId);
+            if (sentInquiryStatusEntity is null || sentInquiryStatusEntity.Offer is null)
+                throw new InvalidOperationException($"There is no offer with id {offerId}");
+            return SentInquiryStatus.FromEntity(sentInquiryStatusEntity);
+        }
     }
 }
