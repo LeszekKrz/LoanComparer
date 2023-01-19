@@ -1,16 +1,15 @@
-﻿using LoanComparer.Application.DTO;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace LoanComparer.Application.Model
 {
     public class User : IdentityUser
     {
-        public string? FirstName { get; private set; }
-        public string? LastName { get; private set; }
-        public JobType? JobType { get; private set; }
-        public int? IncomeLevel { get; private set; }
-        public GovernmentIdEntity GovernmentIdEntity { get; private set; }
-        public virtual ICollection<UserRole> UserRoles { get; private set; }
+        public string? FirstName { get; init; }
+        public string? LastName { get; init; }
+        public JobType? JobType { get; init; }
+        public int? IncomeLevel { get; init; }
+        public GovernmentIdEntity? GovernmentIdEntity { get; init; }
+        public virtual ICollection<UserRole> UserRoles { get; init; }
 
         public User(string firstName, string lastName, string email, JobType jobType, int incomeLevel, GovernmentIdEntity governmentIdEntity)
         {
@@ -20,9 +19,9 @@ namespace LoanComparer.Application.Model
             JobType = jobType;
             IncomeLevel = incomeLevel;
             GovernmentIdEntity = governmentIdEntity;
-            UserName = email; // hack
+            UserName = email;
         }
 
-        private User() { }
+        public User() { }
     }
 }

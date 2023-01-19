@@ -114,6 +114,10 @@ void ConfigureUserIdentity(IServiceCollection services)
 
 void ConfigureServices(IServiceCollection services)
 {
+    string googleAuthenticationClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID")
+        ?? throw new InvalidCredentialException("Environment variable GOOGLE_CLIENT_ID is not defined");
+    services.AddSingleton(new GoogleAuthenticationSettings(googleAuthenticationClientId));
+
     services.AddDbContext<LoanComparerContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
     
@@ -146,21 +150,21 @@ void ConfigureJwt(IServiceCollection services, IConfiguration config)
     services.AddSingleton(jwtSettings);
 
     services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings.ValidIssuer,
-                ValidAudience = jwtSettings.ValidAudience,
-                IssuerSigningKey = new SymmetricSecurityKey(jwtSettings.SecurityKey)
-            };
-        });
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings.ValidIssuer,
+            ValidAudience = jwtSettings.ValidAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(jwtSettings.SecurityKey)
+        };
+    });
 }
