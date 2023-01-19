@@ -172,7 +172,7 @@ public sealed class ThisBankInterface : BankInterfaceBase
 
     private async Task<bool> EnsureUserIsCreatedAsync()
     {
-        var authClient = new FlurlClient(_config.Value.BaseUrl).AllowHttpStatus();
+        var authClient = new FlurlClient(_config.Value.BaseUrl).AllowAnyHttpStatus();
         var userExistsResponse = await authClient.Request("users", "exists").
             SetQueryParam("username", _config.Value.AuthUsername).
             GetAsync();
