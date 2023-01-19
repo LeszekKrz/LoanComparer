@@ -37,7 +37,7 @@ namespace LoanComparer.Application.Services.Offers
                 InquiryStatus.Rejected
             };
 
-            return await _context.InquiryStatuses
+            return (await _context.InquiryStatuses
                 .Include(inquiryStatus => inquiryStatus.Offer)
                 .Include(inquiryStatus => inquiryStatus.Inquiry)
                 .Where(inquiryStatus => applicationStatuses.Contains(inquiryStatus.Status)
@@ -55,7 +55,9 @@ namespace LoanComparer.Application.Services.Offers
                     inquiryStatus.Inquiry.GovernmentIdType,
                     inquiryStatus.Inquiry.GovernmentIdValue
                 ))
-                .ToListAsync();
+                .ToListAsync())
+                .OrderByDescending(inquiryStatus => inquiryStatus.DateOfApplication)
+                .ToList();
         }
 
         public async Task<byte[]> GetSignedDocument(Guid offerId)

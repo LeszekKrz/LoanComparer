@@ -202,43 +202,24 @@ public sealed class ThisBankInterface : BankInterfaceBase
             return false;
         }
 
-        _clientWithToken = new(new FlurlClient(_config.Value.BaseUrl).WithOAuthBearerToken(token.Value), token);
+        _adminClientWithToken = new(new FlurlClient(_config.Value.BaseUrl).WithOAuthBearerToken(token.Value), token);
         return true;
     }
 
     private async Task<BearerToken?> GetAdminTokenAsync()
     {
-        if (!await EnsureAdminUserIsCreatedAsync()) return null;
+        var adminUsernameAndPassword = GetEnv("SEED_ADMIN_CREDENTIALS").Split(':');
 
-        var password = GetEnv("THIS_BANK_API_PASSWORD");
         var authClient = new FlurlClient(_config.Value.BaseUrl).AllowAnyHttpStatus();
-        var response = await authClient.Request("admin", "auth").PostJsonAsync(new
+        var response = await authClient.Request("users", "auth").PostJsonAsync(new
         {
-            Username = "admin",
-            Password = password
+            Username = adminUsernameAndPassword[0],
+            Password = adminUsernameAndPassword[1]
         });
 
         if (response.StatusCode != StatusCodes.Status200OK) return null;
         var authResponse = await response.GetJsonAsync<AuthenticationResponse>();
         return BearerToken.FromResponse(authResponse);
-    }
-
-    private async Task<bool> EnsureAdminUserIsCreatedAsync()
-    {
-        var authClient = new FlurlClient(_config.Value.BaseUrl).AllowAnyHttpStatus();
-        var userExistsResponse = await authClient.Request("users", "exists").
-            SetQueryParam("username", "admin").
-            GetAsync();
-        if (userExistsResponse.StatusCode == StatusCodes.Status204NoContent) return true;
-
-        var registrationResponse = await authClient.Request("users", "register").PostJsonAsync(new
-        {
-            Username = "admin",
-            Password = GetEnv("THIS_BANK_API_PASSWORD"),
-            Key = GetEnv("REGISTRATION_KEY")
-        });
-        
-        return registrationResponse.StatusCode == StatusCodes.Status201Created;
     }
 
     public override async Task<Stream> GetDocumentContentAsync(SentInquiryStatus sentInquiryStatus)
