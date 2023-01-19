@@ -3,5 +3,5 @@ export interface OfferDTO {
   loanValue: number;
   numberOfInstallments: number;
   percentage: number;
-  monthlyInstallments: number;
+  monthlyInstallment: number;
 }

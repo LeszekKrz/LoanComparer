@@ -1,10 +1,10 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { FileUpload } from 'primeng/fileupload';
 import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { BankOffer } from './models/bank-offer';
 import { BankOfferDTO } from './models/bank-offer-dto';
+import { RequestOfferResponse } from './models/request-offer-response';
 import { OfferHttpService } from './services/offer.http.service';
 
 @Component({
@@ -35,13 +35,13 @@ export class ChooseOfferComponent implements OnInit, OnDestroy {
       tap((bankOffersDTO: BankOfferDTO[]) => {
         bankOffersDTO.forEach(bankOfferDTO => {
           const bankOffer: BankOffer = this.getBankOfferFromDTO(bankOfferDTO);
-          if (bankOfferDTO.bank == 'our') {
+          if (bankOfferDTO.bankName == 'our') {
             this.ourBankOffer = bankOffer;
           }
-          else if (bankOfferDTO.bank == 'lecturer') {
+          else if (bankOfferDTO.bankName == 'MiNI Bank') {
             this.lecturersBankOffer = bankOffer;
           }
-          else if (bankOfferDTO.bank == 'other team') {
+          else if (bankOfferDTO.bankName == 'other team') {
             this.otherTeamsBankOffer = bankOffer;
           }
         });
@@ -60,7 +60,7 @@ export class ChooseOfferComponent implements OnInit, OnDestroy {
           loanValue: bankOfferDTO.offer.loanValue,
           numberOfInstallments: bankOfferDTO.offer.numberOfInstallments,
           percentage: bankOfferDTO.offer.percentage,
-          monthlyInstallment: bankOfferDTO.offer.monthlyInstallments,
+          monthlyInstallment: bankOfferDTO.offer.monthlyInstallment,
         },
       contractDownloaded: false,
       signedContract: null,
@@ -81,7 +81,28 @@ export class ChooseOfferComponent implements OnInit, OnDestroy {
   }
 
   handleOnOfferRequest(bankOffer: BankOffer): void {
-    console.log(bankOffer);
-    // send info to backend and go to home page
+    const requestOffer$ = this.offerHttpService.requestOffer(bankOffer.offer!.id, bankOffer.signedContract!).pipe(
+      tap((requestOfferResponse: RequestOfferResponse) => {
+        bankOffer.status = requestOfferResponse.status;
+        bankOffer.contractDownloaded = false;
+        bankOffer.signedContract = null;
+
+        if (requestOfferResponse.status == 'ERROR') {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error while trying to apply for a loan'
+          });
+        }
+        else {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Successful application for a loan'
+          });
+        }
+      }));
+
+    this.subscriptions.push(this.doWithLoading(requestOffer$).subscribe());
   }
 }

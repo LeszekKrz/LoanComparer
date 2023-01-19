@@ -1,7 +1,7 @@
 import { OfferDTO } from "./offer-dto";
 
 export interface BankOfferDTO {
-  bank: string;
+  bankName: string;
   status: string;
   offer: OfferDTO | null;
 }

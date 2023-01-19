@@ -30,3 +30,14 @@ public sealed record StatusChangedEmail : Email
     {
     }
 }
+
+public sealed record NewInquiryEmail : Email
+{
+    public NewInquiryEmail(string recipientEmail, string recipientName, string checkInquiryLink) : base(
+        new[] { recipientEmail },
+        "[Loan Comparer] New inquiry has been submitted",
+        string.Empty,
+        $@"Dear {recipientName},<br>Click the link to check status of your inquiry: <a href=""{checkInquiryLink}"">Check</a>")
+    {
+    }
+}

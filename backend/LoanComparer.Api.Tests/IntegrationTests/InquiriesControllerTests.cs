@@ -58,7 +58,7 @@ public sealed class InquiriesControllerTests
                     EndDate = null,
                     IncomeLevel = 5000m
                 },
-                GovtId = new("PESEL", "12345678910")
+                GovernmentId = new("PESEL", "12345678910")
             });
 
             response.StatusCode.Should().Be(StatusCodes.Status200OK);
@@ -116,7 +116,7 @@ public sealed class InquiriesControllerTests
                     EndDate = null,
                     IncomeLevel = 5000m
                 },
-                GovtId = new("PESEL", "123456789")
+                GovernmentId = new("PESEL", "123456789")
             });
 
             response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);

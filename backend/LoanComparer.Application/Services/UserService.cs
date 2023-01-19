@@ -179,5 +179,29 @@ namespace LoanComparer.Application.Services
                 throw new BadRequestException(new ErrorResponseDTO[] { new("There is no registered user with email provided") });
             return user;
         }
+
+        public async Task<int> GetUserCountAsync()
+        {
+            return await _userManager.Users.CountAsync();
+        }
+
+        public async Task<UserInfoDTO> GetUserInfoAsync(string username)
+        {
+            var user = await _context.Users
+                .Include(user => user.JobType)
+                .Include(user => user.GovernmentIdEntity)
+                .SingleOrDefaultAsync(user => user.UserName == username);
+            if (user == null)
+                throw new Exception("There is no registered user with username provided");
+
+            return new(
+                user.FirstName,
+                user.LastName,
+                user.Email,
+                user.JobType?.Name ?? null,
+                user.IncomeLevel,
+                user.GovernmentIdEntity?.Type ?? null,
+                user.GovernmentIdEntity?.Value ?? null);
+        }
     }
 }

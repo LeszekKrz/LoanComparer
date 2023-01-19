@@ -22,11 +22,11 @@ public sealed class InquiryQuery : IInquiryQuery
             ToListAsync();
     }
 
-    public async Task<IReadOnlyList<SentInquiryStatus>> GetAllPendingStatusesAsync()
+    public async Task<IReadOnlyList<SentInquiryStatus>> GetAllStatusesThatShouldBeRefreshedAsync()
     {
         return await _context.InquiryStatuses.Include(s => s.Inquiry).
             Include(s => s.Offer).
-            Where(s => s.Status == InquiryStatus.Pending).
+            Where(s => s.Status == InquiryStatus.Pending || s.Status == InquiryStatus.WaitingForAcceptance).
             Select(s => SentInquiryStatus.FromEntity(s)).
             ToListAsync();
     }

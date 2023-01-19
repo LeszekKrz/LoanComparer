@@ -6,7 +6,7 @@ public interface IInquiryQuery
 {
     Task<IReadOnlyList<SentInquiryStatus>> GetPendingStatusesForUserAsync(string username);
 
-    Task<IReadOnlyList<SentInquiryStatus>> GetAllPendingStatusesAsync();
+    Task<IReadOnlyList<SentInquiryStatus>> GetAllStatusesThatShouldBeRefreshedAsync();
 
     Task<IReadOnlyList<SentInquiryStatus>> GetPendingStatusesOlderThanAsync(TimeSpan limit);
 

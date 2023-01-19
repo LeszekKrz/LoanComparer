@@ -230,13 +230,23 @@ public sealed class MiniBankInterface : BankInterfaceBase
             DocumentLink = response.DocumentLink,
         };
 
+        var newInquiryStatus = response.StatusId switch
+        {
+            1 => InquiryStatus.OfferReceived,
+            2 => InquiryStatus.Rejected,
+            3 => InquiryStatus.OfferReceived,
+            4 => InquiryStatus.WaitingForAcceptance,
+            5 => InquiryStatus.Accepted,
+            _ => InquiryStatus.Error,
+        };
+
         return new()
         {
             Id = status.Id,
             BankName = status.BankName,
             Inquiry = status.Inquiry,
             ReceivedOffer = offer,
-            Status = InquiryStatus.OfferReceived,
+            Status = newInquiryStatus,
             AdditionalData = new AdditionalStatusData
             {
                 InquireId = response.InquireId,
