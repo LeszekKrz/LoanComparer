@@ -15,7 +15,6 @@ import { OfferHttpService } from './services/offer.http.service';
 export class ChooseOfferComponent implements OnInit, OnDestroy {
   inquiryId!: string;
   ourBankOffer!: BankOffer;
-  otherTeamsBankOffer!: BankOffer;
   lecturersBankOffer!: BankOffer;
   subscriptions: Subscription[] = [];
   isProgressSpinnerVisible = false;
@@ -27,22 +26,16 @@ export class ChooseOfferComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.inquiryId = this.route.snapshot.params['inquiryId'];
 
-    this.ourBankOffer = {status: 'ERROR', offer: { id: '1', loanValue: 100, numberOfInstallments: 20, percentage: 1.45, monthlyInstallment: 5.2}, contractDownloaded: false, signedContract: null};
-    this.otherTeamsBankOffer = {status: 'OFFERRECEIVED', offer: { id: '1', loanValue: 100, numberOfInstallments: 20, percentage: 1.45, monthlyInstallment: 5.2}, contractDownloaded: false, signedContract: null};
-    this.lecturersBankOffer = {status: 'SUBMITTED', offer: { id: '1', loanValue: 100, numberOfInstallments: 20, percentage: 1.45, monthlyInstallment: 5.2}, contractDownloaded: false, signedContract: null};
-
     const getOffers$ = this.offerHttpService.getOffers(this.route.snapshot.params['inquiryId']).pipe(
       tap((bankOffersDTO: BankOfferDTO[]) => {
+        console.log(bankOffersDTO);
         bankOffersDTO.forEach(bankOfferDTO => {
           const bankOffer: BankOffer = this.getBankOfferFromDTO(bankOfferDTO);
-          if (bankOfferDTO.bankName == 'our') {
+          if (bankOfferDTO.bankName == 'This Bank') {
             this.ourBankOffer = bankOffer;
           }
           else if (bankOfferDTO.bankName == 'MiNI Bank') {
             this.lecturersBankOffer = bankOffer;
-          }
-          else if (bankOfferDTO.bankName == 'other team') {
-            this.otherTeamsBankOffer = bankOffer;
           }
         });
       }),

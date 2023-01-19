@@ -91,22 +91,22 @@
     <ng-template pTemplate="body" let-inquiry>
       <tr>
         <td>
-          <div class="center-text">{{ inquiry.loanValue }}</div>
+          <div class="center-text">{{ inquiry.amountRequested }}</div>
         </td>
         <td>
           <div class="center-text">{{ inquiry.numberOfInstallments }}</div>
         </td>
         <td>
-          <div class="center-text">{{ inquiry.dateOfInquirySubmition | date: 'dd.MM.yyyy, HH:mm' }}</div>
+          <div class="center-text">{{ inquiry.creationTime | date: 'dd.MM.yyyy, HH:mm' }}</div>
         </td>
         <td>
-          <div class="center-text">{{ inquiry.personalData.email }}</div>
+          <div class="center-text">{{ inquiry.personalData.notificationEmail }}</div>
         </td>
         <td>
-          <div class="center-text">{{ inquiry.governmentId.type }}</div>
+          <div class="center-text">{{ inquiry.govId.type }}</div>
         </td>
         <td>
-          <div class="center-text">{{ inquiry.governmentId.value }}</div>
+          <div class="center-text">{{ inquiry.govId.value }}</div>
         </td>
       </tr>
     </ng-template>
@@ -298,7 +298,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="7">
+        <td colspan="8">
           <p class="table-empty-message" *ngIf="applications.length == 0; else noMatchingapplications">Offer requests list is empty</p>
           <ng-template #noMatchingapplications>
             <p class="table-empty-message" *ngIf="applications.length != 0">No matching offer requests found</p>

@@ -33,8 +33,7 @@ namespace LoanComparer.Application.Services.Offers
             var applicationStatuses = new InquiryStatus[]
             {
                 InquiryStatus.WaitingForAcceptance,
-                InquiryStatus.Accepted,
-                InquiryStatus.Rejected
+                InquiryStatus.Accepted
             };
 
             return (await _context.InquiryStatuses
@@ -56,7 +55,7 @@ namespace LoanComparer.Application.Services.Offers
                     inquiryStatus.Inquiry.GovernmentIdValue
                 ))
                 .ToListAsync())
-                .OrderByDescending(inquiryStatus => inquiryStatus.DateOfApplication)
+                //.OrderByDescending(inquiryStatus => inquiryStatus.DateOfApplication)
                 .ToList();
         }
 

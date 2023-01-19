@@ -17,7 +17,7 @@ namespace LoanComparer.Application.DTO.OfferApplicationDTO
     {
         public OfferApplicationDTO(
             Guid offerId,
-            decimal loanValue,
+            decimal loanValueAsSmallestNominal,
             int numberOfInstallments,
             double percentage,
             decimal monthlyInstallments,
@@ -28,7 +28,7 @@ namespace LoanComparer.Application.DTO.OfferApplicationDTO
             string governmentIdType,
             string governmentIdValue) : this(
                 offerId,
-                loanValue,
+                loanValueAsSmallestNominal / 100m,
                 numberOfInstallments,
                 percentage,
                 monthlyInstallments,

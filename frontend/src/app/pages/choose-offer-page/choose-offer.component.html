@@ -1,11 +1,12 @@
+<div class="progress-spinner" *ngIf="isProgressSpinnerVisible">
+  <p-progressSpinner></p-progressSpinner>
+</div>
+
 <div class="flex justify-content-evenly flex-wrap">
-    <div class="flex justify-content-center">
+    <div class="flex justify-content-center" *ngIf="ourBankOffer != null">
         <app-offer-card [offerName]="'Our\'s Bank Offer'" [bankOffer]="ourBankOffer" (onOfferRequest)="handleOnOfferRequest($event)"></app-offer-card>
     </div>
-    <div class="flex justify-content-center">
-        <app-offer-card [offerName]="'Other\'s Team Bank Offer'" [bankOffer]="otherTeamsBankOffer" (onOfferRequest)="handleOnOfferRequest($event)"></app-offer-card>
-    </div>
-    <div class="flex justify-content-center">
+    <div class="flex justify-content-center" *ngIf="lecturersBankOffer != null">
         <app-offer-card [offerName]="'Lecturer\'s Bank Offer'" [bankOffer]="lecturersBankOffer" (onOfferRequest)="handleOnOfferRequest($event)"></app-offer-card>
     </div>
 </div>
