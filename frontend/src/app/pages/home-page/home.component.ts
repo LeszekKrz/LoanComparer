@@ -4,6 +4,7 @@ import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { AuthenticationService } from 'src/app/authentication/services/authentication.service';
 import { applicationDescription } from './home-page-constants';
 import { InquiryDTO } from './models/inquiry-dto';
+import { UserCountDTO } from './models/user-count-dto';
 import { HomeHttpServiceService } from './services/home.http.service';
 
 @Component({
@@ -12,8 +13,8 @@ import { HomeHttpServiceService } from './services/home.http.service';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  registeredUsersCount: number = 100; // we should fetch it from backend
-  inquiries: InquiryDTO[] = []; // we should fetch it
+  registeredUsersCount!: number;
+  inquiries: InquiryDTO[] = [];
   isProgressSpinnerVisible: boolean = false;
   subscriptions: Subscription[] = [];
   isUserAuthenticated!: boolean;
@@ -31,20 +32,17 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.isUserAuthenticated = isAuthenticated;
     }));
 
-    this.inquiries = [{id: '1', loanValue: 100, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-07')},
-    {id: '2', loanValue: 1000, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-11-02')},
-    {id: '3', loanValue: 109.99, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-01')},
-    {id: '4', loanValue: 1000, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-11-02')},
-    {id: '5', loanValue: 109.99, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-01')}]; // we should fetch it here
-
     if (this.authenticationHttpService.isUserAuthenticated()) {
       const getInquiries$ = this.homeHttpService.getInquiries().pipe(
-        tap((inquiries: InquiryDTO[]) => {
-          this.inquiries = inquiries;
-        })
+        tap((inquiries: InquiryDTO[]) => this.inquiries = inquiries)
       );
       this.subscriptions.push(this.doWithLoading(getInquiries$).subscribe());
     }
+
+    const getUsersCount$ = this.homeHttpService.getUsersCount().pipe(
+      tap((userCount: UserCountDTO) => this.registeredUsersCount = userCount.count)
+    );
+    this.subscriptions.push(this.doWithLoading(getUsersCount$).subscribe());
   }
 
   ngOnDestroy(): void {

@@ -10,7 +10,7 @@ public sealed class InquiryRequest
 
     public JobDetailsDTO JobDetails { get; init; } = null!;
 
-    public GovernmentIdDTO GovtId { get; init; } = null!;
+    public GovernmentIdDTO GovernmentId { get; init; } = null!;
 }
 
 public sealed class PersonalDataDTO

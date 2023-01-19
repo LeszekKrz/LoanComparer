@@ -3,11 +3,13 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors,
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
+import { AuthenticationService } from 'src/app/authentication/services/authentication.service';
 import { JobType } from 'src/app/core/models/job-type';
 import { JobTypeDTO } from 'src/app/core/models/job-type-dto';
 import { JobTypesHttpService } from 'src/app/core/services/job.type.http.service';
 import { CreateInquiryResponse } from './models/create-inquiry-response';
 import { InquiryDTO } from './models/inquiry-dto';
+import { UserInfoDTO } from './models/user-info-dto';
 import { InquiryHttpServiceService } from './services/inquiry.http.service.service';
 
 @Component({
@@ -21,15 +23,17 @@ export class CreateInquiryComponent implements OnInit, OnDestroy {
   subscriptions: Subscription[] = [];
   governmentIdTypes = ['PESEL', 'ID Number', 'Passport Number'];
   jobTypes: JobType[] = [];
+  isUserAuthenticated!: boolean;
 
   constructor(private formBuilder: FormBuilder,
     private jobTypesHttpService: JobTypesHttpService,
     private inquiryHttpService: InquiryHttpServiceService,
     private messageService: MessageService,
-    private router: Router) { }
+    private router: Router,
+    private authenticationService: AuthenticationService) { }
 
   ngOnInit(): void {
-    // jesli zalogowany to pobierz dane
+    this.isUserAuthenticated = this.authenticationService.isUserAuthenticated();
 
     this.createInquiryForm = this.formBuilder.group({
       firstName: new FormControl('', Validators.required),
@@ -53,6 +57,25 @@ export class CreateInquiryComponent implements OnInit, OnDestroy {
       })
     );
     this.subscriptions.push(this.doWithLoading(getJobTypes$).subscribe());
+
+    if (this.isUserAuthenticated) {
+      const getUserInfo$ = this.inquiryHttpService.getUserInfo().pipe(
+        tap((userInfoDTO: UserInfoDTO) => {
+          this.createInquiryForm.setValue({
+            firstName: userInfoDTO.firstName,
+            lastName: userInfoDTO.lastName,
+            email: userInfoDTO.email,
+            jobType: {name: userInfoDTO.jobType},
+            incomeLevel: userInfoDTO.incomeLevel,
+            governmentIdType: userInfoDTO.governmentIdType,
+            governmentIdValue: userInfoDTO.governmentIdValue,
+            loanValue: null,
+            numberOfInstallments: null,
+          });
+        })
+      );
+      this.subscriptions.push(this.doWithLoading(getUserInfo$).subscribe());
+    }
   }
 
   private governmentIdValueIsValid: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
@@ -95,20 +118,20 @@ export class CreateInquiryComponent implements OnInit, OnDestroy {
     }
 
     const createInquiryDTO: InquiryDTO = {
-      loanValue: this.createInquiryForm.get('loanValue')!.value,
+      amountRequested: this.createInquiryForm.get('loanValue')!.value,
       numberOfInstallments: this.createInquiryForm.get('numberOfInstallments')!.value,
-      personalDataDTO: {
-        email: this.createInquiryForm.get('email')!.value,
+      personalData: {
+        notificationEmail: this.createInquiryForm.get('email')!.value,
         firstName: this.createInquiryForm.get('firstName')!.value,
         lastName: this.createInquiryForm.get('lastName')!.value,
         birthDate: null,
       },
-      governmentIdDTO: {
+      governmentId: {
         type: this.createInquiryForm.get('governmentIdType')!.value,
         value: this.createInquiryForm.get('governmentIdValue')!.value,
       },
-      jobDetailsDTO: {
-        name: this.createInquiryForm.get('jobType')!.value,
+      jobDetails: {
+        jobName: this.createInquiryForm.get('jobType')!.value.name,
         incomeLevel: this.createInquiryForm.get('incomeLevel')!.value,
         description: null,
         startDate: null,

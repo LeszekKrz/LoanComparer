@@ -1,15 +1,12 @@
 ﻿using LoanComparer.Application.DTO.UserDTO;
-using LoanComparer.Application.Model;
 using LoanComparer.Application.Services;
-using LoanComparer.Application.Services.Inquiries;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace LoanComparer.Api.Controllers
 {
     [ApiController]
-    [Route("api/user")]
+    [Route("api")]
     public class UserController : ControllerBase
     {
         private readonly UserService _userService;
@@ -26,7 +23,7 @@ namespace LoanComparer.Api.Controllers
             return Ok(usersCount);
         }
 
-        [HttpGet("info")]
+        [HttpGet("user/info")]
         public async Task<ActionResult<UserInfoDTO>> GetUserInfoAsync()
         {
             var username = GetUsername();

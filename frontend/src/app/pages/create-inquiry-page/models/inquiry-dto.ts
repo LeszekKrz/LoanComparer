@@ -3,9 +3,9 @@ import { JobDetailsDTO } from "./job-details-dto";
 import { PersonalDataDTO } from "./personal-data-dto";
 
 export interface InquiryDTO {
-  loanValue: number;
+  amountRequested: number;
   numberOfInstallments: number;
-  personalDataDTO: PersonalDataDTO;
-  governmentIdDTO: GovernmentIdDTO;
-  jobDetailsDTO: JobDetailsDTO;
+  personalData: PersonalDataDTO;
+  governmentId: GovernmentIdDTO;
+  jobDetails: JobDetailsDTO;
 }

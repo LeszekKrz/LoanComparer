@@ -73,7 +73,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
           this.applications = offerRequests;
         })
       )
-    ])
+    ]);
 
     this.subscriptions.push(this.doWithLoading(getInquiriesAndApplications$).subscribe());
   }
