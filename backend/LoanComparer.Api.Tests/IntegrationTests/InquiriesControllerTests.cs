@@ -83,7 +83,7 @@ public sealed class InquiriesControllerTests
                         EndDate = null,
                         IncomeLevel = 5000m
                     },
-                    GovtId = new("PESEL", "12345678910")
+                    GovId = new("PESEL", "12345678910")
                 },
                 options => options.Excluding(i => i.Id).Excluding(i => i.CreationTime));
             inquiry.CreationTime.Should().BeBefore(DateTimeOffset.Now).And
