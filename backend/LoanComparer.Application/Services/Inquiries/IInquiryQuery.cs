@@ -1,4 +1,5 @@
-﻿using LoanComparer.Application.Model;
+﻿using LoanComparer.Application.DTO.InquiryDTO;
+using LoanComparer.Application.Model;
 
 namespace LoanComparer.Application.Services.Inquiries;
 
@@ -15,6 +16,8 @@ public interface IInquiryQuery
     Task<IReadOnlyList<SentInquiryStatus>> GetStatusesForInquiryAsync(Guid inquiryId);
 
     Task<OwnershipTestResult> CheckOwnerAsync(Guid inquiryId, string? username);
+
+    Task<IReadOnlyCollection<InquiryResponse>> GetAllInquiries();
 }
 
 public enum OwnershipTestResult

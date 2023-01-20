@@ -19,11 +19,12 @@ public sealed class OfferCommand : IOfferCommand
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateStatusAndAddSignedContractAsync(Guid offerId, InquiryStatus inquiryStatus, IFormFile formFile)
+    public async Task UpdateStatusAndApplicationRelatedFieldsAsync(Guid offerId, InquiryStatus inquiryStatus, IFormFile formFile)
     {
         OfferEntity offerEntity = await GetOfferEntityWithStatusOrThrow(offerId);
         offerEntity.SentInquiryStatus.Status = inquiryStatus;
         offerEntity.SignedContractContent = await GetIFormFileContentInBytes(formFile);
+        offerEntity.DateOfApplication = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         await _context.SaveChangesAsync();
     }
 

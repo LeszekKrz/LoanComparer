@@ -41,3 +41,14 @@ public sealed record NewInquiryEmail : Email
     {
     }
 }
+
+public sealed record ApplicationReviewedEmail : Email
+{
+    public ApplicationReviewedEmail(string recipientEmail, string recipientName, bool accepted, string checkInquiryLink) : base(
+        new[] { recipientEmail },
+        "[Loan Comparer] Application has been resolved",
+        string.Empty,
+        $@"Dear {recipientName},<br>Your application was {(accepted ? "accepted" : "rejected")}. Click the link to check status of your inquiry: <a href=""{checkInquiryLink}"">Check</a>")
+    {
+    }
+}

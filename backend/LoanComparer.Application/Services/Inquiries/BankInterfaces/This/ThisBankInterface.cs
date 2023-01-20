@@ -1,5 +1,7 @@
 ﻿using System.Security.Authentication;
 using Flurl.Http;
+using LoanComparer.Application.Constants;
+using LoanComparer.Application.DTO.OfferApplicationDTO;
 using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Offers;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +13,7 @@ public sealed class ThisBankInterface : BankInterfaceBase
 {
     private readonly IOptionsSnapshot<ThisBankConfiguration> _config;
     private ClientWithToken? _clientWithToken;
+    private ClientWithToken? _adminClientWithToken;
 
     public ThisBankInterface(IInquiryCommand inquiryCommand, IOfferCommand offerCommand,
         IOptionsSnapshot<ThisBankConfiguration> config) : base(inquiryCommand, offerCommand)
@@ -18,7 +21,7 @@ public sealed class ThisBankInterface : BankInterfaceBase
         _config = config;
     }
 
-    public override string BankName => "This Bank";
+    public override string BankName => LoanComparerConstants.OurBankName;
     
     public override async Task<SentInquiryStatus> SendInquiryAsync(Inquiry inquiry)
     {
@@ -119,19 +122,19 @@ public sealed class ThisBankInterface : BankInterfaceBase
 
         return new()
         {
-            Amout = (double)inquiry.AmountRequested,
+            Amount = (double)inquiry.AmountRequested,
             Installments = inquiry.NumberOfInstallments,
             FirstName = inquiry.PersonalData.FirstName,
             LastName = inquiry.PersonalData.LastName,
             Income = (int)inquiry.JobDetails.IncomeLevel,
             JobType = new()
             {
-                TypeId = matchedJobType?.Id ?? unknownJobId,
+                Id = matchedJobType?.Id ?? unknownJobId,
                 Name = matchedJobType?.Name ?? inquiry.JobDetails.JobName
             },
-            GovernmentDocument = new()
+            GovernmentId = new()
             {
-                TypeId = matchedGovernmentDocumentType?.Id ?? unknownGovIdType,
+                Id = matchedGovernmentDocumentType?.Id ?? unknownGovIdType,
                 Name = matchedGovernmentDocumentType?.Name ?? inquiry.GovernmentId.Type,
                 Value = inquiry.GovernmentId.Value
             }
@@ -152,7 +155,7 @@ public sealed class ThisBankInterface : BankInterfaceBase
         _clientWithToken = new(new FlurlClient(_config.Value.BaseUrl).WithOAuthBearerToken(token.Value), token);
         return true;
     }
-    
+
     private async Task<BearerToken?> GetTokenAsync()
     {
         if (!await EnsureUserIsCreatedAsync()) return null;
@@ -181,11 +184,42 @@ public sealed class ThisBankInterface : BankInterfaceBase
         var registrationResponse = await authClient.Request("users", "register").PostJsonAsync(new
         {
             Username = _config.Value.AuthUsername,
-            Password = GetEnv("THIS_BANK_PASSWORD"),
+            Password = GetEnv("THIS_BANK_API_PASSWORD"),
             Key = GetEnv("REGISTRATION_KEY")
         });
-        
+
         return registrationResponse.StatusCode == StatusCodes.Status201Created;
+    }
+
+    private async Task<bool> EnsureAdminClientIsValidAsync()
+    {
+        if (_adminClientWithToken?.Token.IsValid ?? false) return true;
+
+        var token = await GetAdminTokenAsync();
+        if (token is null)
+        {
+            _adminClientWithToken = null;
+            return false;
+        }
+
+        _adminClientWithToken = new(new FlurlClient(_config.Value.BaseUrl).WithOAuthBearerToken(token.Value), token);
+        return true;
+    }
+
+    private async Task<BearerToken?> GetAdminTokenAsync()
+    {
+        var adminUsernameAndPassword = GetEnv("SEED_ADMIN_CREDENTIALS").Split(':');
+
+        var authClient = new FlurlClient(_config.Value.BaseUrl).AllowAnyHttpStatus();
+        var response = await authClient.Request("users", "auth").PostJsonAsync(new
+        {
+            Username = adminUsernameAndPassword[0],
+            Password = adminUsernameAndPassword[1]
+        });
+
+        if (response.StatusCode != StatusCodes.Status200OK) return null;
+        var authResponse = await response.GetJsonAsync<AuthenticationResponse>();
+        return BearerToken.FromResponse(authResponse);
     }
 
     public override async Task<Stream> GetDocumentContentAsync(SentInquiryStatus sentInquiryStatus)
@@ -199,7 +233,7 @@ public sealed class ThisBankInterface : BankInterfaceBase
 
         return await _clientWithToken!
             .Client
-            .Request("offer", sentInquiryStatus.ReceivedOffer.DocumentLink, "document")
+            .Request("offers", sentInquiryStatus.ReceivedOffer.DocumentLink, "document")
             .GetStreamAsync();
     }
 
@@ -217,10 +251,32 @@ public sealed class ThisBankInterface : BankInterfaceBase
             Request("apply", sentInquiryStatus.ReceivedOffer.Id).
             PostMultipartAsync(mp =>
             {
-                mp.AddFile("formFile", stream, file.FileName, file.ContentType);
+                mp.AddFile("file", stream, file.FileName, file.ContentType);
             });
 
         return InquiryStatus.WaitingForAcceptance;
+    }
+
+    public async Task<InquiryStatus> ReviewApplicationAsync(SentInquiryStatus sentInquiryStatus, ReviewApplicationRequestDTO reviewApplicationRequest)
+    {
+        if (sentInquiryStatus.ReceivedOffer is null)
+            throw new InvalidOperationException(
+                "Cannot review for an offer related to this inquiry because no offer was received");
+
+        if (!await EnsureAdminClientIsValidAsync())
+            return InquiryStatus.Error;
+
+        ReviewRequest reviewRequest = new()
+        {
+            Accept = reviewApplicationRequest.Accept
+        };
+
+        var response = await _adminClientWithToken!
+                    .Client
+                    .Request("applications", sentInquiryStatus.ReceivedOffer.Id, "review")
+                    .PostJsonAsync(reviewRequest);
+
+        return reviewApplicationRequest.Accept ? InquiryStatus.Accepted : InquiryStatus.Rejected;
     }
 
     private static string GetEnv(string name)
@@ -244,8 +300,8 @@ public sealed class ThisBankInterface : BankInterfaceBase
 
         public static BearerToken? FromResponse(AuthenticationResponse response)
         {
-            if (response.AccessToken is null || response.ExpirationTime is null) return null;
-            return new(response.AccessToken, response.ExpirationTime.Value);
+            if (response.Token is null || response.ExpirationTime is null) return null;
+            return new(response.Token, response.ExpirationTime.Value);
         }
     }
 
@@ -264,31 +320,31 @@ public sealed class ThisBankInterface : BankInterfaceBase
     
     private sealed class AuthenticationResponse
     {
-        public string? AccessToken { get; init; }
+        public string? Token { get; init; }
 
         public DateTime? ExpirationTime { get; init; }
     }
 
     private sealed class ThisBankInquiryRequest
     {
-        public double Amout { get; init; }
+        public double Amount { get; init; }
         public int Installments { get; init; }
         public string? FirstName { get; init; }
         public string? LastName { get; init; }
         public int Income { get; init; }
-        public GovernmentDocumentRequest GovernmentDocument { get; init; } = null!;
+        public GovernmentDocumentRequest GovernmentId { get; init; } = null!;
         public JobTypeRequest JobType { get; init; } = null!;
 
         public sealed class GovernmentDocumentRequest
         {
-            public int TypeId { get; init; }
+            public int Id { get; init; }
             public string Name { get; init; }
             public string Value { get; init; }
         }
 
         public sealed class JobTypeRequest
         {
-            public int TypeId { get; init; }
+            public int Id { get; init; }
             public string Name { get; init; }
         }
     }
@@ -312,6 +368,11 @@ public sealed class ThisBankInterface : BankInterfaceBase
             public string Name { get; init; } = null!;
             public string Value { get; init; } = null!;
         }
+    }
+
+    private sealed class ReviewRequest
+    {
+        public bool Accept { get; init; }
     }
     #endregion
 }

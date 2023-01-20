@@ -1,5 +1,7 @@
-﻿using LoanComparer.Application.Model;
+﻿using LoanComparer.Application.DTO.InquiryDTO;
+using LoanComparer.Application.Model;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Immutable;
 
 namespace LoanComparer.Application.Services.Inquiries;
 
@@ -66,5 +68,13 @@ public sealed class InquiryQuery : IInquiryQuery
         return entity.OwnerUsername is null || entity.OwnerUsername == username
             ? OwnershipTestResult.Allowed
             : OwnershipTestResult.Unauthorized;
+    }
+
+    public async Task<IReadOnlyCollection<InquiryResponse>> GetAllInquiries()
+    {
+        return (await _context.Inquiries
+            .Select(inquiryEntity => Inquiry.FromEntity(inquiryEntity).ToResponse())
+            .ToListAsync())
+            .OrderByDescending(inquiryResponse => inquiryResponse.CreationTime).ToList();
     }
 }

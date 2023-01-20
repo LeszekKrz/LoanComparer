@@ -77,7 +77,7 @@ namespace LoanComparer.Api.Controllers
             var bank = GetBankInterfaceOrThrow(sentInquiryStatus.BankName);
             var newInquiryStatus = await bank.ApplyForAnOfferAsync(sentInquiryStatus, formFile);
             if (newInquiryStatus == InquiryStatus.WaitingForAcceptance)
-                await _command.UpdateStatusAndAddSignedContractAsync(offerId, newInquiryStatus, formFile);
+                await _command.UpdateStatusAndApplicationRelatedFieldsAsync(offerId, newInquiryStatus, formFile);
             else
                 await _command.UpdateStatusAsync(offerId, newInquiryStatus);
             return ApplyForAnOfferResponse.FromInquiryStatus(newInquiryStatus);
