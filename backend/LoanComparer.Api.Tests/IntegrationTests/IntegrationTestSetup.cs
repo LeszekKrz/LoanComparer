@@ -40,6 +40,7 @@ namespace LoanComparer.Api.Tests.IntegrationTests
             {
                 builder.UseEnvironment("Test");
                 Environment.SetEnvironmentVariable("SENDGRID_API_KEY", "TestSendGridAPIKey");
+                Environment.SetEnvironmentVariable("GOOGLE_CLIENT_ID", "TestGoogleClientID");
                 builder.ConfigureAppConfiguration((_, conf) =>
                 {
                     conf.AddJsonFile(configPath, false);
