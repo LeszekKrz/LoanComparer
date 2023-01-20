@@ -1,6 +1,7 @@
-﻿using LoanComparer.Application.Model;
+﻿using LoanComparer.Application.Constants;
+using LoanComparer.Application.DTO.OfferApplicationDTO;
+using LoanComparer.Application.Model;
 using LoanComparer.Application.Services.Inquiries;
-using LoanComparer.Application.Services.Inquiries.BankInterfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace LoanComparer.Application.Services.Offers
@@ -27,10 +28,63 @@ namespace LoanComparer.Application.Services.Offers
                 : OwnershipTestResult.Unauthorized;
         }
 
+        public async Task<IReadOnlyCollection<OfferApplicationDTO>> GetAllApplicationsForThisBank()
+        {
+            var applicationStatuses = new InquiryStatus[]
+            {
+                InquiryStatus.WaitingForAcceptance,
+                InquiryStatus.Accepted
+            };
+
+            return (await _context.InquiryStatuses
+                .Include(inquiryStatus => inquiryStatus.Offer)
+                .Include(inquiryStatus => inquiryStatus.Inquiry)
+                .Where(inquiryStatus => applicationStatuses.Contains(inquiryStatus.Status)
+                    && inquiryStatus.BankName == LoanComparerConstants.OurBankName)
+                .Select(inquiryStatus => new OfferApplicationDTO(
+                    (Guid)inquiryStatus.OfferId!,
+                    inquiryStatus.Offer!.LoanValueAsSmallestNominal,
+                    inquiryStatus.Offer.NumberOfInstallments,
+                    inquiryStatus.Offer.Percentage,
+                    inquiryStatus.Offer.MonthlyInstallmentAsSmallestNominal,
+                    inquiryStatus.Status,
+                    inquiryStatus.Inquiry.CreationTimestamp,
+                    (long)inquiryStatus.Offer.DateOfApplication!,
+                    inquiryStatus.Inquiry.NotificationEmail,
+                    inquiryStatus.Inquiry.GovernmentIdType,
+                    inquiryStatus.Inquiry.GovernmentIdValue
+                ))
+                .ToListAsync())
+                //.OrderByDescending(inquiryStatus => inquiryStatus.DateOfApplication)
+                .ToList();
+        }
+
+        public async Task<byte[]> GetSignedDocument(Guid offerId)
+        {
+            OfferEntity? offer = await _context.Offers.SingleOrDefaultAsync(offer => offer.Id == offerId);
+            if (offer == null)
+                throw new InvalidOperationException($"There is no offer with id {offerId}");
+            if (offer.SignedContractContent == null)
+                throw new InvalidOperationException($"Signed contract for offer with id {offerId} is null");
+
+            return offer.SignedContractContent;
+        }
+
         public async Task<SentInquiryStatus> GetStatusWithOfferOrThrowAsync(Guid offerId)
         {
             SentInquiryStatusEntity? sentInquiryStatusEntity = await _context.InquiryStatuses
                 .Include(inquiryStatus => inquiryStatus.Offer)
+                .SingleOrDefaultAsync(inquiryStatus => inquiryStatus.OfferId == offerId);
+            if (sentInquiryStatusEntity is null || sentInquiryStatusEntity.Offer is null)
+                throw new InvalidOperationException($"There is no offer with id {offerId}");
+            return SentInquiryStatus.FromEntity(sentInquiryStatusEntity);
+        }
+
+        public async Task<SentInquiryStatus> GetStatusWithOfferAndInquiryOrThrowAsync(Guid offerId)
+        {
+            SentInquiryStatusEntity? sentInquiryStatusEntity = await _context.InquiryStatuses
+                .Include(inquiryStatus => inquiryStatus.Offer)
+                .Include(inquiryStatus => inquiryStatus.Inquiry)
                 .SingleOrDefaultAsync(inquiryStatus => inquiryStatus.OfferId == offerId);
             if (sentInquiryStatusEntity is null || sentInquiryStatusEntity.Offer is null)
                 throw new InvalidOperationException($"There is no offer with id {offerId}");

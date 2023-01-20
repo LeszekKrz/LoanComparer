@@ -2,9 +2,9 @@ import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from 'src/app/authentication/services/authentication.service';
+import { getHttpOptionsWithAuthenticationHeader } from 'src/app/core/functions/get-http-options-with-authorization-header';
 import { environment } from 'src/environments/environment';
 import { BankOfferDTO } from '../models/bank-offer-dto';
-import { RequestOfferDTO } from '../models/request-offer-dto';
 import { RequestOfferResponse } from '../models/request-offer-response';
 
 @Injectable({
@@ -18,11 +18,7 @@ export class OfferHttpService {
   getOffers(inquiryId: string): Observable<BankOfferDTO[]> {
     const getOffersWebAPIUrl: string = `${this.chooseOfferPageWebAPIUrl}/inquiries/${inquiryId}/offers`;
     if (this.authenticationService.isUserAuthenticated()) {
-      const httpOptions = {
-        headers: new HttpHeaders({
-          Authorization: localStorage.getItem('token')!
-        }),
-      };
+      const httpOptions = getHttpOptionsWithAuthenticationHeader();
       return this.httpClient.get<BankOfferDTO[]>(getOffersWebAPIUrl, httpOptions);
     }
     return this.httpClient.get<BankOfferDTO[]>(getOffersWebAPIUrl);
@@ -45,16 +41,12 @@ export class OfferHttpService {
       });
   }
 
-  requestOffer(offerId: string, requestOfferDTO: RequestOfferDTO): Observable<RequestOfferResponse> {
+  requestOffer(offerId: string, formFile: FormData): Observable<RequestOfferResponse> {
     return this.httpClient.post<RequestOfferResponse>(
       `${this.chooseOfferPageWebAPIUrl}/offers/${offerId}/apply`,
-      requestOfferDTO,
+      formFile,
       this.authenticationService.isUserAuthenticated()
-      ? {
-        headers: new HttpHeaders({
-          Authorization: localStorage.getItem('token')!
-        }),
-      }
+      ? getHttpOptionsWithAuthenticationHeader()
       : {});
   }
 }

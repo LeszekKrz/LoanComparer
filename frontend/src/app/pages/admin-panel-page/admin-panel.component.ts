@@ -54,15 +54,6 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
     ]
     }
 
-    this.inquiries = [{id: '1', loanValue: 100, numberOfInstallments: 5, dateOfInquirySubmition: new Date('2022-12-07'), personalData: {email: 'bilbo@gmail.com', firstName: 'Bilbo', lastName: 'Baggins', birthDate: null}, governmentId: {type: 'PESEL', value: '11122233312'}, jobDetails: {name: 'Nikt', incomeLevel: 1000, description: null, startDate: null, endDate: null}}];
-    this.inquiriesCloned = this.inquiries.slice(0);
-
-    this.applications = [{id: '1', loanValue: 100, numberOfInstallments: 3, percentage: 10, monthlyInstallment: 43, status: 'WAITINGFORACCEPTANCE', email: 'marcin.latoszek06@gmail.com', dateOfInquiry: new Date("2022-11-04"), dateOfApplication: new Date("2022-11-10"), governmentId: { type: "PESEL", value: "99992123843" }},
-    {id: '2', loanValue: 110, numberOfInstallments: 30, percentage: 1, monthlyInstallment: 10, status: 'ACCEPTED', email: 'bilbo@gmail.com', dateOfInquiry: new Date("2022-12-04"), dateOfApplication: new Date("2022-12-10"), governmentId: { type: "PESEL", value: "89328392792"}},
-    {id: '3', loanValue: 100, numberOfInstallments: 30, percentage: 1, monthlyInstallment: 10, status: 'ACCEPTED', email: 'bilbo@gmail.com', dateOfInquiry: new Date("2022-12-04"), dateOfApplication: new Date("2022-12-10"), governmentId: { type: "PESEL", value: "89328392792"}},
-    {id: '4', loanValue: 300, numberOfInstallments: 34, percentage: 5.5, monthlyInstallment: 43, status: 'REJECTED', email: 'marcin.latoszek06@gmail.com', dateOfInquiry: new Date("2022-11-04"), dateOfApplication: new Date("2022-11-10"), governmentId: { type: "ID NUMBER", value: "33332213940" }}];
-    this.applicationsCloned = this.applications.slice(0);
-
     const getInquiriesAndApplications$ = forkJoin([
       this.adminPanelHttpService.getInquiries().pipe(
         tap((inquiries: InquiryDTO[]) => {
@@ -73,9 +64,12 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
           this.applications = offerRequests;
         })
       )
-    ])
+    ]);
 
     this.subscriptions.push(this.doWithLoading(getInquiriesAndApplications$).subscribe());
+
+    this.inquiriesCloned = this.inquiries.slice(0);
+    this.applicationsCloned = this.applications.slice(0);
   }
 
   ngOnDestroy(): void {
@@ -115,7 +109,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
         : 'Are you sure you want to reject this application?',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.subscriptions.push(this.adminPanelHttpService.reviewApplication(application.id, {accept: accept}).subscribe((response: ReviewApplicationResponse) => {
+        this.subscriptions.push(this.doWithLoading(this.adminPanelHttpService.reviewApplication(application.offerId, {accept: accept})).subscribe((response: ReviewApplicationResponse) => {
           application.status = response.status;
         }));
         this.applicationsTable._filter();

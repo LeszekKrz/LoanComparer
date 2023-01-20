@@ -1,5 +1,5 @@
 export interface JobDetailsDTO {
-  name: string;
+  jobName: string;
   incomeLevel: number;
   description: string | null;
   startDate: Date | null;

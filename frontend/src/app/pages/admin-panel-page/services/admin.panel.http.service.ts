@@ -6,6 +6,7 @@ import { InquiryDTO } from '../models/inquiry-dto';
 import { ApplicationDTO } from '../models/application-dto';
 import { ReviewApplicationDTO } from '../models/review-application-dto';
 import { ReviewApplicationResponse } from '../models/review-application-response.dto';
+import { getHttpOptionsWithAuthenticationHeader } from 'src/app/core/functions/get-http-options-with-authorization-header';
 
 @Injectable({
   providedIn: 'root'
@@ -16,20 +17,12 @@ export class AdminPanelHttpService {
   constructor(private httpClient: HttpClient) { }
 
   getInquiries(): Observable<InquiryDTO[]> {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        Authorization: localStorage.getItem('token')!
-      }),
-    };
+    const httpOptions = getHttpOptionsWithAuthenticationHeader();
     return this.httpClient.get<InquiryDTO[]>(`${this.adminPanelPageWebAPIUrl}/inquiries`, httpOptions);
   }
 
   getOfferRequests(): Observable<ApplicationDTO[]> {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        Authorization: localStorage.getItem('token')!
-      }),
-    };
+    const httpOptions = getHttpOptionsWithAuthenticationHeader();
     return this.httpClient.get<ApplicationDTO[]>(`${this.adminPanelPageWebAPIUrl}/applications`, httpOptions);
   }
 
@@ -46,14 +39,11 @@ export class AdminPanelHttpService {
   }
 
   reviewApplication(offerId: string, reviewApplicationDTO: ReviewApplicationDTO): Observable<ReviewApplicationResponse> {
+    const httpOptions = getHttpOptionsWithAuthenticationHeader();
     return this.httpClient.put<ReviewApplicationResponse>(
       `${this.adminPanelPageWebAPIUrl}/applications/${offerId}/review`,
       reviewApplicationDTO,
-      {
-        headers: new HttpHeaders({
-          Authorization: localStorage.getItem('token')!
-        }),
-      }
+      httpOptions
     );
   }
 }

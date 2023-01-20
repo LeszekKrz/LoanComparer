@@ -5,7 +5,11 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "SENDGRID_API_KEY": "secret_key",
+        "MINI_BANK_API_PASSWORD": "secret_password",
+        "THIS_BANK_API_PASSWORD": "secret_password",
+        "REGISTRATION_KEY": "secret_key"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7282;http://localhost:5282"

@@ -13,6 +13,7 @@
         internal const int IdNumberLength = 9;
         internal const int PassportNumberLength = 9;
         public const string ClientRoleName = "Client";
-        internal const string BankEmployeeRoleName = "BankEmployee";
+        public const string BankEmployeeRoleName = "BankEmployee";
+        public const string OurBankName = "This Bank";
     }
 }

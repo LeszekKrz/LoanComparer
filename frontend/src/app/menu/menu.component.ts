@@ -40,6 +40,7 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   logoutButtonOnClick(): void {
     this.authenticationHttpService.logout();
+    this.router.navigate(['home']);
   }
 
   adminPanelButtonOnClick(): void {

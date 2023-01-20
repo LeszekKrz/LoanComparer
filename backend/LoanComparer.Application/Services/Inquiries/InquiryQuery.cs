@@ -1,5 +1,7 @@
-﻿using LoanComparer.Application.Model;
+﻿using LoanComparer.Application.DTO.InquiryDTO;
+using LoanComparer.Application.Model;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Immutable;
 
 namespace LoanComparer.Application.Services.Inquiries;
 
@@ -22,11 +24,11 @@ public sealed class InquiryQuery : IInquiryQuery
             ToListAsync();
     }
 
-    public async Task<IReadOnlyList<SentInquiryStatus>> GetAllPendingStatusesAsync()
+    public async Task<IReadOnlyList<SentInquiryStatus>> GetAllStatusesThatShouldBeRefreshedAsync()
     {
         return await _context.InquiryStatuses.Include(s => s.Inquiry).
             Include(s => s.Offer).
-            Where(s => s.Status == InquiryStatus.Pending).
+            Where(s => s.Status == InquiryStatus.Pending || s.Status == InquiryStatus.WaitingForAcceptance).
             Select(s => SentInquiryStatus.FromEntity(s)).
             ToListAsync();
     }
@@ -66,5 +68,13 @@ public sealed class InquiryQuery : IInquiryQuery
         return entity.OwnerUsername is null || entity.OwnerUsername == username
             ? OwnershipTestResult.Allowed
             : OwnershipTestResult.Unauthorized;
+    }
+
+    public async Task<IReadOnlyCollection<InquiryResponse>> GetAllInquiries()
+    {
+        return (await _context.Inquiries
+            .Select(inquiryEntity => Inquiry.FromEntity(inquiryEntity).ToResponse())
+            .ToListAsync())
+            .OrderByDescending(inquiryResponse => inquiryResponse.CreationTime).ToList();
     }
 }

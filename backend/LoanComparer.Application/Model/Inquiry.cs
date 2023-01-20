@@ -34,7 +34,7 @@ public sealed class Inquiry
             CreationTime = DateTimeOffset.Now,
             PersonalData = PersonalData.FromDto(request.PersonalData),
             JobDetails = JobDetails.FromDto(request.JobDetails),
-            GovernmentId = GovernmentId.FromDto(request.GovtId)
+            GovernmentId = GovernmentId.FromDto(request.GovernmentId)
         };
     }
 
@@ -48,7 +48,7 @@ public sealed class Inquiry
             NumberOfInstallments = NumberOfInstallments,
             PersonalData = PersonalData.ToDto(),
             JobDetails = JobDetails.ToDto(),
-            GovtId = GovernmentId.ToDto()
+            GovId = GovernmentId.ToDto()
         };
     }
 

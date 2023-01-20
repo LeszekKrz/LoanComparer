@@ -43,6 +43,14 @@ public sealed class InquiryCommand : IInquiryCommand
         return SentInquiryStatus.FromEntity(entity);
     }
 
+    public async Task<SentInquiryStatus> MarkAsAcceptedAsync(SentInquiryStatus status)
+    {
+        var entity = await GetEntityAndThrowIfNotPresent(status);
+        entity.Status = InquiryStatus.Accepted;
+        await _context.SaveChangesAsync();
+        return SentInquiryStatus.FromEntity(entity);
+    }
+
     public async Task<SentInquiryStatus> MarkAsBankServerErrorAsync(SentInquiryStatus status)
     {
         var entity = await GetEntityAndThrowIfNotPresent(status);

@@ -1,5 +1,5 @@
 export interface PersonalDataDTO {
-  email: string;
+  notificationEmail: string;
   firstName: string;
   lastName: string;
   birthDate: Date | null;

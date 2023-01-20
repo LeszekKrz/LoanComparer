@@ -7,6 +7,7 @@ import { TableModule } from 'primeng/table';
 import { FileUploadModule } from 'primeng/fileupload';
 import { RippleModule } from 'primeng/ripple';
 import { OfferCardComponent } from './components/offer-card.component';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 
 
@@ -24,7 +25,8 @@ import { OfferCardComponent } from './components/offer-card.component';
     ButtonModule,
     TableModule,
     FileUploadModule,
-    RippleModule
+    RippleModule,
+    ProgressSpinnerModule
   ]
 })
 export class ChooseOfferPageModule { }

@@ -12,6 +12,8 @@ public interface IInquiryCommand
 
     Task<SentInquiryStatus> MarkAsRejectedAsync(SentInquiryStatus status);
 
+    Task<SentInquiryStatus> MarkAsAcceptedAsync(SentInquiryStatus status);
+
     Task<SentInquiryStatus> MarkAsBankServerErrorAsync(SentInquiryStatus status);
 
     Task<SentInquiryStatus> MarkAsTimeoutAsync(SentInquiryStatus status);

@@ -81,4 +81,6 @@ public sealed class OfferEntity
     public SentInquiryStatusEntity SentInquiryStatus { get; init; } = null!;
 
     public byte[]? SignedContractContent { get; set; }
+
+    public long? DateOfApplication { get; set; }
 }

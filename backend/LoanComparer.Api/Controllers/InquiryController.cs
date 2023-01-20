@@ -1,10 +1,13 @@
 ﻿using System.Security.Claims;
 using FluentValidation;
+using LoanComparer.Application.Configuration;
 using LoanComparer.Application.DTO.InquiryDTO;
 using LoanComparer.Application.Model;
+using LoanComparer.Application.Services;
 using LoanComparer.Application.Services.Inquiries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace LoanComparer.Api.Controllers;
 
@@ -17,15 +20,25 @@ public sealed class InquiryController : ControllerBase
     private readonly IInquirySender _sender;
     private readonly IInquiryRefresher _refresher;
     private readonly IValidator<InquiryRequest> _validator;
+    private readonly IEmailService _emailService;
+    private readonly IOptionsMonitor<InquiryConfiguration> _config;
 
-    public InquiryController(IInquiryQuery query, IInquiryCommand command, IInquirySender sender,
-        IInquiryRefresher refresher, IValidator<InquiryRequest> validator)
+    public InquiryController(
+        IInquiryQuery query,
+        IInquiryCommand command,
+        IInquirySender sender,
+        IInquiryRefresher refresher,
+        IValidator<InquiryRequest> validator,
+        IEmailService emailService,
+        IOptionsMonitor<InquiryConfiguration> config)
     {
         _query = query;
         _command = command;
         _sender = sender;
         _refresher = refresher;
         _validator = validator;
+        _emailService = emailService;
+        _config = config;
     }
 
     [HttpPost]
@@ -33,11 +46,21 @@ public sealed class InquiryController : ControllerBase
     public async Task<ActionResult<InquiryResponse>> CreateAsync(InquiryRequest request)
     {
         await _validator.ValidateAndThrowAsync(request);
-        var inquiry = Inquiry.FromRequest(request, GetUsername());
+        string? username = GetUsername();
+        var inquiry = Inquiry.FromRequest(request, username);
         var statuses = _sender.SendInquiryToAllBanks(inquiry);
         await foreach (var status in statuses)
         {
             await _command.SaveInquiryStatusAsync(status);
+        }
+
+        if (username == null)
+        {
+            NewInquiryEmail email = new(
+                inquiry.PersonalData.NotificationEmail,
+                inquiry.PersonalData.FirstName,
+                string.Format(_config.CurrentValue.CheckInquiryStatusUrl, inquiry.Id));
+            await _emailService.SendEmailAsync(email, CancellationToken.None);
         }
 
         return inquiry.ToResponse();
@@ -72,6 +95,6 @@ public sealed class InquiryController : ControllerBase
 
     private string? GetUsername()
     {
-        return User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;   
+        return User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value; 
     }
 }

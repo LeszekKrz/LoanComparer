@@ -229,6 +229,9 @@ namespace LoanComparer.Application.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<long?>("DateOfApplication")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("DocumentLink")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -282,15 +285,15 @@ namespace LoanComparer.Application.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "29aae5dc-bb88-4907-a34b-ad872be101ff",
-                            ConcurrencyStamp = "e61ddd9d-d508-4fb6-83d2-ffe3fb69fbde",
+                            Id = "1980b4f8-ede2-48a4-8b92-f601b5ee6d57",
+                            ConcurrencyStamp = "477b008f-6299-4fdf-b5d6-af6f68964ed6",
                             Name = "Client",
                             NormalizedName = "CLIENT"
                         },
                         new
                         {
-                            Id = "51a1a7a1-a83a-48ca-b748-25c72aacb0f9",
-                            ConcurrencyStamp = "7fe14097-9e7c-49ed-8f56-17ed648f6066",
+                            Id = "9930a8fb-76d2-4211-982e-909752c3c701",
+                            ConcurrencyStamp = "e4c346d1-ca07-4a1a-9cb0-ed7543f7f187",
                             Name = "BankEmployee",
                             NormalizedName = "BANKEMPLOYEE"
                         });

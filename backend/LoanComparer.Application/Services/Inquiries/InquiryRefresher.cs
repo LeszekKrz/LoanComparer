@@ -44,7 +44,7 @@ public sealed class InquiryRefresher : IInquiryRefresher
 
     public async Task RefreshAllStatusesAndSendNotificationsAsync()
     {
-        var statusesToRefresh = await _query.GetAllPendingStatusesAsync();
+        var statusesToRefresh = await _query.GetAllStatusesThatShouldBeRefreshedAsync();
         foreach (var inquiryStatus in statusesToRefresh)
         {
             var bankInterface = GetBankInterfaceForStatus(inquiryStatus);

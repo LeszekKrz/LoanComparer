@@ -21,6 +21,6 @@ export class FileService {
     }
 
     const file = new Blob([blob], { type: blob.type });
-    saveAs(file, decodeURI(fileName || 'export'));
+    saveAs(file, decodeURI(fileName || 'contract'));
   }
 }
