@@ -37,7 +37,7 @@ jobs:
           
       - name: check files
         run: |
-          ls dist\loan-comparer
+          ls ${{ steps.deploy-to-webapp.outputs.webapp-url }}
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
