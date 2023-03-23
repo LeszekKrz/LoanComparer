@@ -34,10 +34,6 @@ jobs:
           GOOGLE_CLIENT_ID: client_id
         run: |
           npm run build-prod
-          
-      - name: check files
-        run: |
-          echo ${{ steps.deploy-to-webapp.outputs.webapp-url }}
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
@@ -61,6 +57,9 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: deploy_dist
+      - name: check files
+        run: |
+          echo "${{ steps.deploy-to-webapp.outputs.webapp-url }}"
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
