@@ -37,7 +37,7 @@ jobs:
           
       - name: check files
         run: |
-          ls ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+          echo ${{ steps.deploy-to-webapp.outputs.webapp-url }}
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
